@@ -20,7 +20,7 @@ public class Product implements Serializable {
     private Timestamp createdAt;
 
 
-    private int quantity;
+    private Integer quantity;
     private String type;
     private String thumbnail;
     private List<String> imageList;
@@ -28,7 +28,7 @@ public class Product implements Serializable {
 
     public Product() {}
 
-    public Product(int id, int categoryId, String productName, String descriptionThumbnail, String productDescription, String productDetail, String brand, BigDecimal price, BigDecimal originPrice, BigDecimal discount, int stockQuantity, Timestamp createdAt, int quantity, String type, String thumbnail, List<String> imageList, BigDecimal avgRating) {
+    public Product(int id, int categoryId, String productName, String descriptionThumbnail, String productDescription, String productDetail, String brand, BigDecimal price, BigDecimal originPrice, BigDecimal discount, int stockQuantity, Timestamp createdAt, Integer quantity, String type, String thumbnail, List<String> imageList, BigDecimal avgRating) {
         this.id = id;
         this.categoryId = categoryId;
         this.productName = productName;
@@ -104,7 +104,7 @@ public class Product implements Serializable {
         this.brand = brand;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -112,7 +112,7 @@ public class Product implements Serializable {
         this.price = price;
     }
 
-    public BigDecimal getOriginPrice() {
+    public double getOriginPrice() {
         return originPrice;
     }
 
@@ -120,7 +120,7 @@ public class Product implements Serializable {
         this.originPrice = originPrice;
     }
 
-    public BigDecimal getDiscount() {
+    public double getDiscount() {
         return discount;
     }
 
@@ -144,11 +144,11 @@ public class Product implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
@@ -182,5 +182,10 @@ public class Product implements Serializable {
 
     public void setAvgRating(BigDecimal avgRating) {
         this.avgRating = avgRating;
+    }
+
+    public void quantityUp(int qty){
+        this.quantity += qty;
+
     }
 }
