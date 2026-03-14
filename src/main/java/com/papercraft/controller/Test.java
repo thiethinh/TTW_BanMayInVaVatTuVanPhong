@@ -1,6 +1,6 @@
     package com.papercraft.controller;
 
-    import com.papercraft.db.DBConnect;
+    import com.papercraft.utils.DBConnect;
     import jakarta.servlet.ServletException;
     import jakarta.servlet.annotation.WebServlet;
     import jakarta.servlet.http.*;

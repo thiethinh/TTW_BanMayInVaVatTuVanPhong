@@ -1,4 +1,4 @@
-package com.papercraft.db;
+package com.papercraft.utils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -19,8 +19,4 @@ public class DBConnect {
     public static Connection getConnection() throws Exception {
         return dataSource.getConnection();
     }
-
-
-
 }
-
