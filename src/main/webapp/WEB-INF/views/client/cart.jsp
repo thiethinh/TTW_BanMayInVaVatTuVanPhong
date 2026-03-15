@@ -55,37 +55,37 @@
 
                     <c:forEach items="${items}" var="item">
                         <div class="product-detail">
-                            <a href="${pageContext.request.contextPath}/product-detail?productId=${item.product.id}">
-                                <img src="${item.product.thumbnail}"/>
+                            <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
+                                <img src="${item.thumbnail}"/>
                             </a>
 
                             <div id="info">
-                                <h2>${item.product.productName}</h2>
+                                <h2>${item.productName}</h2>
 
                                 <div class="quantity-box-wrapper">
                                     <span class="label">Số lượng:</span>
 
                                     <div class="quantity-control">
                                         <button type="button" class="btn-qty"
-                                                onclick="updateQuantity(${item.product.id}, -1)">
+                                                onclick="updateQuantity(${item.id}, -1)">
                                             <i class="fa-solid fa-minus"></i>
                                         </button>
 
                                         <input type="number"
-                                               id="qty-${item.product.id}"
+                                               id="qty-${item.id}"
                                                value="${item.quantity}"
                                                min="1"
                                                class="input-qty"
-                                               onchange="updateQuantity(${item.product.id}, 0)">
+                                               onchange="updateQuantity(${item.id}, 0)">
 
                                         <button type="button" class="btn-qty"
-                                                onclick="updateQuantity(${item.product.id}, 1)">
+                                                onclick="updateQuantity(${item.id}, 1)">
                                             <i class="fa-solid fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <a href="${pageContext.request.contextPath}/cart?action=remove&id=${item.product.id}">
+                                <a href="${pageContext.request.contextPath}/cart?action=remove&id=${item.id}">
 
                                     <button id="bt-remove">
                                         <i class="fa fa-trash-can"></i> Xoá
@@ -96,7 +96,7 @@
                             <div class="item-cost">
                                 <span class="label">Giá:</span>
                                 <span class="price">
-                                    <fmt:formatNumber value="${item.total}" pattern="#,###"/> ₫
+                                    <fmt:formatNumber value="${item.getSalePrice() * item.quantity}" pattern="#,###"/> ₫
                                 </span>
                             </div>
                         </div>
