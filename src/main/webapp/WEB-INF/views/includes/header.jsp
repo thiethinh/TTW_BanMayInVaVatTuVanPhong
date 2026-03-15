@@ -76,12 +76,6 @@
                     </c:if>
 
                 </div>
-
-                <!-- MOBILE MENU -->
-                <div class="menu-toggle">
-                    <i class="fa-solid fa-bars" id="menu-open-icon"></i>
-                    <i class="fa-solid fa-times" id="menu-close-icon"></i>
-                </div>
             </div>
 
         </div>

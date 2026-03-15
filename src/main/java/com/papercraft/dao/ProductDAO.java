@@ -2,18 +2,17 @@ package com.papercraft.dao;
 
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAO {
 
-    //getAllProduct
-    public List<Product> getAllProduct(String type){
+    // getAllProduct
+    public List<Product> getAllProduct(String type) {
         List<Product> list = new ArrayList<>();
 
-        String sql= """
+        String sql = """
                 SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name
                                     FROM product p
                                     JOIN category c ON p.category_id = c.id
@@ -21,11 +20,11 @@ public class ProductDAO {
                                     WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product';
                 """;
         try (Connection conn = DBConnect.getConnection();
-        PreparedStatement ps= conn.prepareStatement(sql)){
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1,type);
-            try (ResultSet rs = ps.executeQuery()){
-                while (rs.next()){
+            ps.setString(1, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     Product p = new Product();
 
                     p.setId(rs.getInt("id"));
@@ -33,18 +32,18 @@ public class ProductDAO {
                     p.setProductName(rs.getString("product_name"));
                     p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setBrand(rs.getString("brand"));
-                    p.setPrice(rs.getBigDecimal("price"));
+                    p.setPrice(rs.getDouble("price"));
 
-                    String imgName= rs.getString("img_name");
-                    if(imgName != null && !imgName.trim().isEmpty()){
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
                         p.setThumbnail("images/upload/" + rs.getString("img_name"));
-                    }else{
+                    } else {
                         p.setThumbnail("images/logo.webp");
                     }
                     list.add(p);
                 }
             } catch (SQLException e) {
-                System.err.println("Lỗi tại getAllProduct với type = " +type);
+                System.err.println("Lỗi tại getAllProduct với type = " + type);
                 e.printStackTrace();
             }
             return list;
@@ -54,6 +53,7 @@ public class ProductDAO {
             throw new RuntimeException(e);
         }
     }
+
     // getAllImageOfProduct
     public List<String> getAllImageOfProduct(int id) {
         List<String> images = new ArrayList<>();
@@ -81,7 +81,7 @@ public class ProductDAO {
         return images;
     }
 
-    //Thêm một sản phẩm mới vào cơ sở dữ liệu.
+    // Thêm một sản phẩm mới vào cơ sở dữ liệu.
     public boolean insertProduct(Product product) throws Exception {
 
         String sql = "INSERT INTO product (category_id, product_name, description_thumbnail, product_description, product_detail, " +
@@ -124,6 +124,57 @@ public class ProductDAO {
             throw new RuntimeException("Database error occurred while adding a new product.", e);
         }
     }
-    
 
+    // getFeaturedProductsByCategory
+    public List<Product> getFeaturedProductsByType(String type) {
+        List<Product> list = new ArrayList<>();
+        String sql = """
+                SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name, p.discount, p.origin_price
+                FROM product p
+                JOIN category c ON p.category_id = c.id
+                LEFT JOIN image i ON i.entity_id = p.id
+                AND i.is_thumbnail = 1
+                AND i.entity_type = 'Product'
+                WHERE c.type = ? 
+                ORDER BY p.discount DESC
+                LIMIT 10;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, type);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setId(rs.getInt("id"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    p.setBrand(rs.getString("brand"));
+                    p.setDiscount(rs.getDouble("discount"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setPrice(rs.getDouble("price"));
+
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.isEmpty()) {
+
+                        p.setThumbnail("images/upload/" + imgName);
+                    } else {
+
+                        p.setThumbnail("images/logo.webp");
+                    }
+
+                    list.add(p);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi tại getFeaturedProductsByType: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

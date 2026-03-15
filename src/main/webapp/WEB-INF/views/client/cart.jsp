@@ -22,7 +22,7 @@
 </head>
 
 <body data-context="${pageContext.request.contextPath}">
-<jsp:include page="includes/header.jsp"/>
+<jsp:include page="../includes/header.jsp"/>
 
 <!-- =================MAIN===================== -->
 
@@ -147,7 +147,7 @@
 
 <!-- ================= END MAIN===================== -->
 
-<jsp:include page="includes/footer.jsp"/>
+<jsp:include page="../includes/footer.jsp"/>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
