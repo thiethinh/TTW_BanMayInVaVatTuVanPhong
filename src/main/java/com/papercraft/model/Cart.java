@@ -32,12 +32,12 @@ public class Cart implements Serializable {
     }
 
     //======== TOTAL =====
-    public BigDecimal total(){
-        BigDecimal sum = BigDecimal.valueOf(0);
+    public double total(){
+        double sum = 0;
         for(Product p: data.values()){
-            BigDecimal quantity= BigDecimal.valueOf(p.getQuantity());
-            BigDecimal totalPrice= p.getPrice().multiply(quantity);
-            sum = sum.add(totalPrice);
+            double quantity= p.getQuantity();
+            double totalPrice= p.getPrice() * quantity;
+            sum += totalPrice;
         }
         return sum;
     }

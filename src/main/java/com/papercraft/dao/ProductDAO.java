@@ -15,10 +15,10 @@ public class ProductDAO {
     private static final String ROOT_PATH = "images/upload/";
 
     //getAllProduct
-    public List<Product> getAllProduct(String type){
+    public List<Product> getAllProduct(String type) {
         List<Product> list = new ArrayList<>();
 
-        String sql= """
+        String sql = """
                 SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name
                                     FROM product p
                                     JOIN category c ON p.category_id = c.id
@@ -26,11 +26,11 @@ public class ProductDAO {
                                     WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product';
                 """;
         try (Connection conn = DBConnect.getConnection();
-        PreparedStatement ps= conn.prepareStatement(sql)){
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1,type);
-            try (ResultSet rs = ps.executeQuery()){
-                while (rs.next()){
+            ps.setString(1, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     Product p = new Product();
 
                     p.setId(rs.getInt("id"));
@@ -38,18 +38,18 @@ public class ProductDAO {
                     p.setProductName(rs.getString("product_name"));
                     p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setBrand(rs.getString("brand"));
-                    p.setPrice(rs.getBigDecimal("price"));
+                    p.setPrice(rs.getDouble("price"));
 
-                    String imgName= rs.getString("img_name");
-                    if(imgName != null && !imgName.trim().isEmpty()){
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
                         p.setThumbnail("images/upload/" + rs.getString("img_name"));
-                    }else{
+                    } else {
                         p.setThumbnail("images/logo.webp");
                     }
                     list.add(p);
                 }
             } catch (SQLException e) {
-                System.err.println("Lỗi tại getAllProduct với type = " +type);
+                System.err.println("Lỗi tại getAllProduct với type = " + type);
                 e.printStackTrace();
             }
             return list;
@@ -105,9 +105,9 @@ public class ProductDAO {
             ps.setString(4, product.getProductDescription());
             ps.setString(5, product.getProductDetail());
             ps.setString(6, product.getBrand());
-            ps.setBigDecimal(7, product.getPrice());
-            ps.setBigDecimal(8, product.getOriginPrice());
-            ps.setBigDecimal(9, product.getDiscount());
+            ps.setDouble(7, product.getPrice());
+            ps.setDouble(8, product.getOriginPrice());
+            ps.setDouble(9, product.getDiscount());
             ps.setInt(10, product.getStockQuantity());
 
             int rowsAffected = ps.executeUpdate();
@@ -130,47 +130,47 @@ public class ProductDAO {
             throw new RuntimeException("Database error occurred while adding a new product.", e);
         }
     }// ========= getFeaturedProductsByType ========
-    public List<Product> getFeaturedProductsByType(String type){
+
+    public List<Product> getFeaturedProductsByType(String type) {
         List<Product> list = new ArrayList<>();
 
-        String sql= """
+        String sql = """
                 SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name, p.discount, p.origin_price
                                 FROM product p
                                 JOIN category c ON p.category_id = c.id
                                 LEFT JOIN image i ON i.entity_id = p.id
                                 AND i.is_thumbnail = 1
                                 AND i.entity_type = 'Product'
-                                WHERE c.type = ?\s
+                                WHERE c.type = ?
                                 ORDER BY p.discount DESC
                                 LIMIT 10;
-                                """;
+                """;
 
-        try(Connection conn= DBConnect.getConnection();
-        PreparedStatement ps= conn.prepareStatement("sql")){
-            ps.setString(1,type);
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, type);
 
-            try(ResultSet rs = ps.executeQuery()){
-                while (rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     Product p = new Product();
                     p.setId(rs.getInt("id"));
                     p.setCategoryId(rs.getInt("category_id"));
                     p.setProductName(rs.getString("product_name"));
-                    p.setDescriptionThumbnail(rs.getString("description_thumnail"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setBrand(rs.getString("brand"));
-                    p.setDiscount(rs.getBigDecimal("discount"));
-                    p.setOriginPrice(rs.getBigDecimal("origin_price"));
-                    p.setPrice(rs.getBigDecimal("price"));
+                    p.setDiscount(rs.getDouble("discount"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setPrice(rs.getDouble("price"));
 
                     String imgName = rs.getString("img_name");
-                    if(imgName != null && !imgName.trim().isEmpty()){
+                    if (imgName != null && !imgName.trim().isEmpty()) {
                         p.setThumbnail("images/upload/" + imgName);
-                    }else{
+                    } else {
                         p.setThumbnail("images/logo.webp");
                     }
                     list.add(p);
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 System.err.println("Lỗi tại getFeaturedProductsByType: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -183,7 +183,7 @@ public class ProductDAO {
     }
 
     //====== getProductById ========
-    public static Product getProductById(int id){
+    public static Product getProductById(int id) {
         Product p = null;
         String sql = """
                 SELECT p.*, i.img_name, c.type
@@ -194,23 +194,23 @@ public class ProductDAO {
                 AND i.entity_type = 'Product'
                 WHERE p.id = ?
                 """;
-        try(Connection conn = DBConnect.getConnection();
-            PreparedStatement ps = conn.prepareStatement("sql")){
-            ps.setInt(1,id);
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
 
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
-                    p= new Product();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    p = new Product();
                     p.setId(rs.getInt("id"));
                     p.setCategoryId(rs.getInt("category_id"));
                     p.setProductName(rs.getString("product_name"));
-                    p.setDescriptionThumbnail(rs.getString("description_thumnail"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setProductDescription(rs.getString("product_description"));
                     p.setProductDetail(rs.getString("product_detail"));
                     p.setBrand(rs.getString("brand"));
-                    p.setPrice(BigDecimal.valueOf(rs.getDouble("price")));
-                    p.setOriginPrice(BigDecimal.valueOf(rs.getDouble("origin_price")));
-                    p.setDiscount(BigDecimal.valueOf(rs.getDouble("discount")));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setDiscount(rs.getDouble("discount"));
                     p.setStockQuantity(rs.getInt("stock_quantity"));
                     p.setCreatedAt(rs.getTimestamp("created_at"));
 
@@ -224,25 +224,26 @@ public class ProductDAO {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    return p;
+        return p;
     }
+
     // =========UpdateProduct =========
-    public boolean UpdateProduct (Product p){
+    public boolean UpdateProduct(Product p) {
         String sql = """
                 UPDATE product
                         SET category_id = ?, product_name = ?, product_description = ?, product_detail = ?,
                             origin_price = ?, price = ?, stock_quantity = ?
                         WHERE id = ?
                 """;
-        try(Connection conn = DBConnect.getConnection();
-        PreparedStatement ps = conn.prepareStatement("sql")){
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1,p.getCategoryId());
+            ps.setInt(1, p.getCategoryId());
             ps.setString(2, p.getProductName());
             ps.setString(3, p.getProductDescription());
             ps.setString(4, p.getProductDetail());
-            ps.setBigDecimal(5, p.getOriginPrice());
-            ps.setBigDecimal(6, p.getPrice());
+            ps.setDouble(5, p.getOriginPrice());
+            ps.setDouble(6, p.getPrice());
             ps.setInt(7, p.getStockQuantity());
             ps.setInt(8, p.getId());
 
@@ -253,18 +254,19 @@ public class ProductDAO {
             throw new RuntimeException(e);
         }
     }
-    //======= countProducts =====
-    public int countProducts(String keyword){
-        String sql = """
-                    SELECT COUNT(*) FROM product WHERE product_name LIKE ?
-                    """;
-        try(Connection conn = DBConnect.getConnection();
-        PreparedStatement ps= conn.prepareStatement("sql")){
-            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim() + "%";
-            ps.setString(1,search);
 
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
+    //======= countProducts =====
+    public int countProducts(String keyword) {
+        String sql = """
+                SELECT COUNT(*) FROM product WHERE product_name LIKE ?
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim() + "%";
+            ps.setString(1, search);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     return rs.getInt(1);
                 }
             } catch (SQLException e) {
@@ -278,9 +280,9 @@ public class ProductDAO {
         return 0;
     }
 
-// ===== getProductsPagination =========
+    // ===== getProductsPagination =========
 // ======= getAllBrandByType =========
-    public Set<String> getAllBrandByType(String type){
+    public Set<String> getAllBrandByType(String type) {
         //TODO
         return Set.of();
     }

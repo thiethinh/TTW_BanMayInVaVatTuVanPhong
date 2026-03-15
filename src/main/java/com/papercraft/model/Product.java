@@ -2,7 +2,7 @@ package com.papercraft.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class Product implements Serializable {
@@ -13,9 +13,9 @@ public class Product implements Serializable {
     private String productDescription;
     private String productDetail;
     private String brand;
-    private BigDecimal price;
-    private BigDecimal originPrice;
-    private BigDecimal discount;
+    private double price;
+    private double originPrice;
+    private double discount;
     private int stockQuantity;
     private Timestamp createdAt;
 
@@ -26,9 +26,10 @@ public class Product implements Serializable {
     private List<String> imageList;
     private BigDecimal avgRating;
 
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(int id, int categoryId, String productName, String descriptionThumbnail, String productDescription, String productDetail, String brand, BigDecimal price, BigDecimal originPrice, BigDecimal discount, int stockQuantity, Timestamp createdAt, Integer quantity, String type, String thumbnail, List<String> imageList, BigDecimal avgRating) {
+    public Product(int id, int categoryId, String productName, String descriptionThumbnail, String productDescription, String productDetail, String brand, double price, double originPrice, double discount, int stockQuantity, Timestamp createdAt, Integer quantity, String type, String thumbnail, List<String> imageList, BigDecimal avgRating) {
         this.id = id;
         this.categoryId = categoryId;
         this.productName = productName;
@@ -104,27 +105,27 @@ public class Product implements Serializable {
         this.brand = brand;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public BigDecimal getOriginPrice() {
+    public double getOriginPrice() {
         return originPrice;
     }
 
-    public void setOriginPrice(BigDecimal originPrice) {
+    public void setOriginPrice(double originPrice) {
         this.originPrice = originPrice;
     }
 
-    public BigDecimal getDiscount() {
+    public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(BigDecimal discount) {
+    public void setDiscount(double discount) {
         this.discount = discount;
     }
 
@@ -187,8 +188,5 @@ public class Product implements Serializable {
     public void quantityUp(int qty) {
         this.quantity += qty;
 
-    }
-
-    public void setCreatedAt(java.sql.Timestamp createdAt) {
     }
 }
