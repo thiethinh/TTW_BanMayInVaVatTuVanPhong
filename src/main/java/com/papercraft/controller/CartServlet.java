@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "CartServlet", value = "/Cart")
+@WebServlet("/cart")
 public class CartServlet extends HttpServlet {
 
     @Override
@@ -26,10 +26,18 @@ public class CartServlet extends HttpServlet {
             cart= new Cart();
             session.setAttribute("cart",cart);
         }
+
+        if ("count".equals(action)) {
+            response.setContentType("text/plain");
+            response.getWriter().print(cart.getTotalQuantity());
+            return;
+        }
+
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
-                Product p= ProductDAO.getProductById(id);
+                ProductDAO dao = new ProductDAO();
+                Product p = dao.getProductById(id);
                 if (p != null){
                     p.setQuantity(1);
                     cart.put(p);
@@ -58,7 +66,7 @@ public class CartServlet extends HttpServlet {
         request.setAttribute("vat",vat);
         request.setAttribute("grandTotal", grandTotal);
 
-        request.getRequestDispatcher("cart.jsp").forward(request,response);
+        request.getRequestDispatcher("/WEB-INF/views/client/cart.jsp").forward(request,response);
     }
 
     @Override

@@ -11,6 +11,13 @@ public class Cart implements Serializable {
     public Cart() {
         this.data = new HashMap<>();
     }
+    public int getTotalQuantity() {
+        int total = 0;
+        for (Product product : data.values()) {
+            total += product.getQuantity();
+        }
+        return total;
+    }
 
     public Product get(int id){
         return data.get(id);
@@ -28,7 +35,7 @@ public class Cart implements Serializable {
     }
     //==== REMOVE ========
     public boolean remove(int id){
-        return data.remove(id) ==null;
+        return data.remove(id) !=null;
     }
 
     //======== TOTAL =====
@@ -36,10 +43,13 @@ public class Cart implements Serializable {
         double sum = 0;
         for(Product p: data.values()){
             double quantity= p.getQuantity();
-            double totalPrice= p.getPrice() * quantity;
+            double totalPrice= p.getSalePrice() * quantity;
             sum += totalPrice;
         }
         return sum;
+    }
+    public Collection<Product> getValues() {
+        return data.values();
     }
 //=== LIST ====
     public Collection<Product> list(){

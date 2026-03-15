@@ -1,0 +1,71 @@
+.page-section {
+    padding: 10px 20px;
+    margin-top: 100px;
+    margin-bottom: 20px;
+}
+
+.page-section .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    padding: 40px;
+    border-radius: 16px;
+    /* Bo góc giống các thẻ ở trang chủ */
+    box-shadow: 0 4px 20px rgba(16, 24, 40, 0.05);
+}
+
+.page-section h1 {
+    color: var(--fourth-color);
+    /* Màu chữ tiêu đề đậm */
+    text-align: center;
+    font-size: 2.25rem;
+    margin-bottom: 12px;
+}
+
+.page-section .last-updated {
+    text-align: center;
+    font-style: italic;
+    color: #667085;
+    /* Màu xám nhạt cho thông tin phụ */
+    margin-bottom: 32px;
+}
+
+.page-section .intro {
+    font-size: 1.1rem;
+    color: #344054;
+    margin-bottom: 24px;
+}
+
+.page-section h2 {
+    color: var(--fourth-color);
+    font-size: 1.5rem;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #EAECF0;
+
+}
+
+.page-section p {
+    margin-bottom: 16px;
+}
+
+.page-section ul {
+    margin-left: 20px;
+    margin-bottom: 16px;
+}
+
+.page-section li {
+    margin-bottom: 10px;
+    padding-left: 8px;
+}
+
+.page-section a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.page-section a:hover {
+    text-decoration: underline;
+}
