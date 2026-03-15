@@ -22,10 +22,10 @@
         <div class="footer-col">
             <h4 class="footer-heading">Pháp Lý</h4>
             <ul>
-                <li><a href="${pageContext.request.contextPath}/privacy-policy.jsp">Chính Sách Bảo Mật</a></li>
-                <li><a href="${pageContext.request.contextPath}/policies-and-services.jsp">Điều Khoản & Dịch Vụ</a></li>
-                <li><a href="${pageContext.request.contextPath}/return-policy.jsp">Đổi Trả</a></li>
-                <li><a href="${pageContext.request.contextPath}/guarantee.jsp">Bảo Hành</a></li>
+                <li><a href="${pageContext.request.contextPath}/privacy-policy">Chính Sách Bảo Mật</a></li>
+                <li><a href="${pageContext.request.contextPath}/policies-and-services">Điều Khoản & Dịch Vụ</a></li>
+                <li><a href="${pageContext.request.contextPath}/return-policy">Đổi Trả</a></li>
+                <li><a href="${pageContext.request.contextPath}/guarantee">Bảo Hành</a></li>
             </ul>
         </div>
 

@@ -43,7 +43,7 @@
                 không gian làm việc hiệu quả. Chất lượng cao, đáng tin cậy và giá cả phải chăng</p>
             <div class="introduce-btn">
                 <a href="${pageContext.request.contextPath}/printer" class="btn btn-primary">Mua ngay</a>
-                <a href="${pageContext.request.contextPath}/about.jsp" class="btn btn-secondary">Tìm hiểu thêm</a>
+                <a href="${pageContext.request.contextPath}/about" class="btn btn-secondary">Tìm hiểu thêm</a>
             </div>
         </div>
     </div>
