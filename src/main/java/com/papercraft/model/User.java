@@ -2,7 +2,7 @@ package com.papercraft.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class User implements Serializable {
     public int id;
@@ -16,11 +16,12 @@ public class User implements Serializable {
     public Boolean status;
     public Timestamp createdAt;
     public String fullname;
-    private BigDecimal totalSpending;
+    private double totalSpending;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(int id, String fname, String lname, String email, String passwordHash, String phoneNumber, String role, String gender, Boolean status, Timestamp createdAt, String fullname, BigDecimal totalSpending) {
+    public User(int id, String fname, String lname, String email, String passwordHash, String phoneNumber, String role, String gender, Boolean status, Timestamp createdAt, String fullname, double totalSpending) {
         this.id = id;
         this.fname = fname;
         this.lname = lname;
@@ -123,11 +124,11 @@ public class User implements Serializable {
         this.fullname = fullname;
     }
 
-    public BigDecimal getTotalSpending() {
+    public double getTotalSpending() {
         return totalSpending;
     }
 
-    public void setTotalSpending(BigDecimal totalSpending) {
+    public void setTotalSpending(double totalSpending) {
         this.totalSpending = totalSpending;
     }
 }
