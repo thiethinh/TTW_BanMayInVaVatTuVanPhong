@@ -1,7 +1,7 @@
 package com.papercraft.model;
 
 import java.io.Serializable;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Blog implements Serializable {
     public int id;
@@ -94,6 +94,8 @@ public class Blog implements Serializable {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    public boolean getStatus() { return status; }
 
     public String getThumbnail() {
         return thumbnail;
