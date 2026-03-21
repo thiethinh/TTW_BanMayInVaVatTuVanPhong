@@ -2,7 +2,7 @@ package com.papercraft.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Payment implements Serializable {
     public int id;
