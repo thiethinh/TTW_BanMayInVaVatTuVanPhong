@@ -1,4 +1,4 @@
-package com.papercraft.controller;
+package com.papercraft.controller.client;
 
 import com.papercraft.dao.OrderDAO;
 import com.papercraft.model.Order;
