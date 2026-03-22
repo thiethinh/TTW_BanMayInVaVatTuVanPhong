@@ -19,7 +19,6 @@ public class ContactDAO {
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Xử lý user_id -> Nếu null thì set Null trong SQL
             if (c.getUserId() != null) {
                 ps.setInt(1, c.getUserId());
             } else {
