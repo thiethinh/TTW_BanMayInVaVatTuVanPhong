@@ -1,0 +1,65 @@
+package com.papercraft.controller.admin;
+
+import com.papercraft.dao.ContactDAO;
+import com.papercraft.model.Contact;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.List;
+
+@WebServlet(name = "AdminContact", value = "/admin-contacts")
+public class AdminContact extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        ContactDAO contactDAO = new ContactDAO();
+
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) keyword = "";
+
+        String reply = request.getParameter("reply");
+        int replied = -1;
+
+        if (reply != null && !reply.isEmpty()) {
+            try {
+                replied = Integer.parseInt(reply);
+            } catch (NumberFormatException e) {
+                System.out.println("format error at admin contact");
+                e.printStackTrace();
+            }
+        }
+
+        String action = request.getParameter("action");
+        if ("toggle".equals(action)) {
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                boolean currentStatus = Boolean.parseBoolean(request.getParameter("status"));
+                contactDAO.updateStatus(id, !currentStatus);
+
+                String redirectUrl = "admin-contacts?keyword=" + URLEncoder.encode(keyword, "UTF-8");
+                if (replied != -1) {
+                    redirectUrl += "&replied=" + replied;
+                }
+                response.sendRedirect(redirectUrl);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<Contact> contacts = contactDAO.getContact(keyword, replied);
+
+        request.setAttribute("contacts", contacts);
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("currentReplied", replied);
+        request.getRequestDispatcher("/WEB-INF/views/admin/admin-contacts.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Code xử lý yêu cầu POST
+    }
+}

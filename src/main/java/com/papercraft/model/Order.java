@@ -2,7 +2,8 @@ package com.papercraft.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Order implements Serializable {
@@ -18,9 +19,10 @@ public class Order implements Serializable {
     public Timestamp createdAt;
     public List<OrderItem> orderItems;
 
-    public Order() {}
+    public Order() {
+    }
 
-    public Order(int id, Integer userId, String status, BigDecimal totalPrice, String note, BigDecimal shippingFee, String shippingName, String shippingPhone, String shippingAddress, Timestamp createdAt, List<OrderItem> orderItems) {
+    public Order(int id, Integer userId, String status, BigDecimal totalPrice, String note, BigDecimal shippingFee, String shippingName, String shippingPhone, String shippingAddress, Timestamp createdAt) {
         this.id = id;
         this.userId = userId;
         this.status = status;
@@ -31,7 +33,7 @@ public class Order implements Serializable {
         this.shippingPhone = shippingPhone;
         this.shippingAddress = shippingAddress;
         this.createdAt = createdAt;
-        this.orderItems = orderItems;
+        this.orderItems = new ArrayList<>();
     }
 
     public int getId() {

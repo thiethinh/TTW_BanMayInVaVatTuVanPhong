@@ -189,4 +189,11 @@ public class Product implements Serializable {
         this.quantity += qty;
 
     }
+
+    public double getSalePrice() {
+        if (this.originPrice > 0 && this.discount > 0 && this.discount < 1) {
+            return this.originPrice * (1.0 - this.discount);
+        }
+        return (this.originPrice > 0) ? this.originPrice : this.price;
+    }
 }

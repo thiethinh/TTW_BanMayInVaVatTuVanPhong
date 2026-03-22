@@ -1,7 +1,7 @@
 package com.papercraft.model;
 
 import java.io.Serializable;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Review implements Serializable {
     public int id;
