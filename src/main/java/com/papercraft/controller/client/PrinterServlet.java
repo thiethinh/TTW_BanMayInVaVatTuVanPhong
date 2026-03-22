@@ -1,7 +1,6 @@
-package com.papercraft.controller;
+package com.papercraft.controller.client;
 
 import com.papercraft.dao.ProductDAO;
-import com.papercraft.model.Category;
 import com.papercraft.model.Product;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
