@@ -1,4 +1,4 @@
-package com.papercraft.controller;
+package com.papercraft.controller.client;
 
 import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.UserDAO;

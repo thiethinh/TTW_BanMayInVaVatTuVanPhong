@@ -1,4 +1,4 @@
-package com.papercraft.controller;
+package com.papercraft.controller.client;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

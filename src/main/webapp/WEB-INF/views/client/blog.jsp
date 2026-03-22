@@ -21,7 +21,7 @@
 <jsp:include page="../includes/header.jsp"/>
 
 <div class="search-section">
-    <img src="images/blog-bg.webp" alt="" class="search-section-bg" fetchpriority="high" width="1920" height="1080">
+    <img src="${pageContext.request.contextPath}/images/blog-bg.webp" alt="" class="search-section-bg" fetchpriority="high" width="1920" height="1080">
     <div class="content-container">
         <h3 class="title">BLOG PAPERCRAFT</h3>
         <p class="sub-title">Kiến thức, tin tức và mẹo hữu ích về in ấn & văn phòng phẩm</p>
