@@ -1,9 +1,9 @@
-<%@ page import="com.papercraft.model.Product" %>
-<%@ page import="java.util.List" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="com.papercraft.model.Product" %>
+<%@ page import="java.util.List" %>
 <c:set var="context" value="${pageContext.request.contextPath}"/>
 
 
@@ -25,8 +25,11 @@
     <link rel="stylesheet" href="${context}/css/printer-stationery.css?v=1">
 </head>
 
-<body data-context="${context}">
-<jsp:include page="${context}/WEB-INF/views/includes/header.jsp"/>
+<body data-context="${context}"
+      data-category-id="${categoryId}"
+      data-brand="${brand}"
+      data-sort="${sort}">
+<jsp:include page="/WEB-INF/views/includes/header.jsp"/>
 
 <div class="container">
     <div class="content">
@@ -48,47 +51,47 @@
                     <input type="text" name="search" id="search" value="${search}" placeholder="Tìm kiếm sản phẩm...">
                 </div>
 
-                <input type="hidden" name="category" id="categoryInput" value="${empty categoryId ? 0 : categoryId }">
+                <input type="hidden" name="category" id="category-input" value="${empty categoryId ? 0 : categoryId }">
                 <div class="custom-dropdown child">
                     <div class="select-trigger">
-                        <span class="selected-value" id="categoryLabel">Tất Cả Danh Mục</span>
+                        <span class="selected-value" id="category-label">Tất Cả Danh Mục</span>
                         <span class="arrow">▼</span>
                     </div>
 
                     <div class="option-value">
-                        <div class="option-item title-dropdown" data-id="0">Tất Cả Danh Mục</div>
-                        <c:forEach items="${categories}" var="category">
-                            <div class="option-item" data-id="${category.id}">${category.categoryName}</div>
-                        </c:forEach>
+                        <div class="option-item title-dropdown" data-value="0">Tất Cả Danh Mục</div>
+                        <%--                        <c:forEach items="${categories}" var="category">--%>
+                        <%--                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>--%>
+                        <%--                        </c:forEach>--%>
                     </div>
                 </div>
 
-                <input type="hidden" name="sort" id="sortInput" value="${empty sort ? "rating" : sort}">
+                <input type="hidden" name="sort" id="sort-input" value="${empty sort ? "rating" : sort}">
                 <div class="custom-dropdown child">
                     <div class="select-trigger">
-                        <span class="selected-value" id="sortLabel">Mức giá</span>
+                        <span class="selected-value" id="sort-label">Mức giá</span>
                         <span class="arrow">▼</span>
                     </div>
 
-                    <div class="option-value" name="sortBy">
+                    <div class="option-value">
                         <div class="option-item title-dropdown" data-value="rating"> Mức giá</div>
                         <div class="option-item" data-value="priceDesc"> Giá: Cao đến Thấp</div>
                         <div class="option-item" data-value="priceAsc"> Giá: Thấp đến Cao</div>
                     </div>
                 </div>
 
-                <input type="hidden" name="brand" id="brand" value="${brand}">
+                <input type="hidden" name="brand" id="brand-input" value="${brand}">
                 <div class="custom-dropdown child">
                     <div class="select-trigger">
-                        <span class="selected-value" id="brandLabel">Tất cả thương hiệu</span>
+                        <span class="selected-value" id="brand-label">Tất cả thương hiệu</span>
                         <span class="arrow">▼</span>
                     </div>
 
-                    <div class="option-value" name="brand">
-                        <div class="option-item title-dropdown" data-brand=""> Tất cả thương hiệu</div>
-                        <c:forEach items="${brands}" var="b">
-                            <div class="option-item" data-brand="${b}"> Máy in ${b}</div>
-                        </c:forEach>
+                    <div class="option-value">
+                        <div class="option-item title-dropdown" data-value=""> Tất cả thương hiệu</div>
+                        <%--                        <c:forEach items="${brands}" var="b">--%>
+                        <%--                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>--%>
+                        <%--                        </c:forEach>--%>
 
                     </div>
                 </div>
@@ -127,7 +130,8 @@
                 </ul>
 
 
-                <div class="product-price-box" style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
+                <div class="product-price-box"
+                     style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
                     <c:if test="${p.discount > 0.0}">
                             <span class="old-price"
                                   style="text-decoration: line-through; color: #888; font-size: 14px; margin-right: 8px;">
@@ -170,8 +174,10 @@
 <div class="pagination"></div>
 </div>
 
-<jsp:include page="${context}/WEB-INF/views/includes/footer.jsp"/>
+<jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 <script type="module" src="${context}/js/main.js"></script>
+<script type="module" src="${context}/js/printer-stationery.js"></script>
+
 </body>
 
 </html>

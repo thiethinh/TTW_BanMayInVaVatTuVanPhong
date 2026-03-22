@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('.product-container')) {
         import('./printer-stationery.js')
             .then(module => {
-                module.initilizePrinterStationery();
+                module.initializePrinterStationery();
             })
     }
 
