@@ -29,7 +29,7 @@
             <p>Mọi thứ bạn cần cho môi trường văn phòng hiệu quả</p>
         </div>
 
-        <form action="${pageContext.request.contextPath}/stationary" method="get">
+        <form action="${pageContext.request.contextPath}/stationery" method="get">
             <div class="search-container">
                 <button type="submit" class="bt-search">
                     <i class='bx bx-search icon'></i>
@@ -49,9 +49,9 @@
 
                     <div class="option-value">
                         <div class="option-item title-dropdown" data-value="0">Tất Cả Danh Mục</div>
-                        <%--                        <c:forEach items="${categories}" var="category">--%>
-                        <%--                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>--%>
-                        <%--                        </c:forEach>--%>
+                        <c:forEach items="${categories}" var="category">
+                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>
+                        </c:forEach>
                     </div>
                 </div>
 
@@ -78,9 +78,9 @@
 
                     <div class="option-value">
                         <div class="option-item title-dropdown" data-value=""> Tất cả thương hiệu</div>
-                        <%--                        <c:forEach items="${brands}" var="b">--%>
-                        <%--                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>--%>
-                        <%--                        </c:forEach>--%>
+                        <c:forEach items="${brands}" var="b">
+                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>
+                        </c:forEach>
 
                     </div>
                 </div>
@@ -165,7 +165,7 @@
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"></jsp:include>
 <script type="module" src="${context}/js/main.js"></script>
 <script src="${context}/js/printer-stationery.js"></script>
-<script src="${pageContext.request.contextPath}/js/cart.js"></script>
+<script src="${context}/js/cart.js"></script>
 
 </body>
 </html>

@@ -60,9 +60,9 @@
 
                     <div class="option-value">
                         <div class="option-item title-dropdown" data-value="0">Tất Cả Danh Mục</div>
-                        <%--                        <c:forEach items="${categories}" var="category">--%>
-                        <%--                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>--%>
-                        <%--                        </c:forEach>--%>
+                        <c:forEach items="${categories}" var="category">
+                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>
+                        </c:forEach>
                     </div>
                 </div>
 
@@ -89,9 +89,9 @@
 
                     <div class="option-value">
                         <div class="option-item title-dropdown" data-value=""> Tất cả thương hiệu</div>
-                        <%--                        <c:forEach items="${brands}" var="b">--%>
-                        <%--                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>--%>
-                        <%--                        </c:forEach>--%>
+                        <c:forEach items="${brands}" var="b">
+                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>
+                        </c:forEach>
 
                     </div>
                 </div>
@@ -177,6 +177,7 @@
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 <script type="module" src="${context}/js/main.js"></script>
 <script type="module" src="${context}/js/printer-stationery.js"></script>
+<script type="module" src="${context}/js/cart.js"></script>
 
 </body>
 

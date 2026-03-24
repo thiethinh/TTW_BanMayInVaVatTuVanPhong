@@ -248,6 +248,84 @@ public class ProductDAO {
         }
     }
 
+    public List<Product> filterProduct(String type, String search, int categoryId, String brand, String sort){
+        List<Product> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                """
+                    SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,  p.origin_price,p.discount,p.price, i.img_name, AVG(r.rating) as avg_rating
+                    FROM product p
+                    JOIN category c ON p.category_id = c.id
+                    JOIN image i ON p.id = i.entity_id
+                    LEFT JOIN review r ON r.product_id = p.id
+                    WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
+                """
+        );
+
+        List<Object> params = new ArrayList<>();
+        params.add(type);
+        if (search != null) {
+            sql.append(" AND p.product_name LIKE ?");
+            params.add("%" + search + "%");
+        }
+
+        if (categoryId > 0) {
+            sql.append(" AND p.category_id = ?");
+            params.add(categoryId);
+        }
+        if (brand != null) {
+            sql.append(" AND p.brand = ?");
+            params.add(brand);
+        }
+
+        sql.append(" GROUP BY p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.origin_price,p.discount,p.price, i.img_name");
+
+        switch (sort) {
+            case "priceAsc" -> sql.append(" ORDER BY p.price ASC");
+            case "priceDesc" -> sql.append(" ORDER BY p.price DESC");
+            default -> sql.append(" ORDER BY avg_rating IS NULL, avg_rating DESC"); // ORDER BY avg_rating IS NULL,
+        }
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try(ResultSet rs = ps.executeQuery();){
+                while (rs.next()) {
+                    Product p = new Product();
+
+
+                    p.setId(rs.getInt("id"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    p.setBrand(rs.getString("brand"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setAvgRating(rs.getBigDecimal("avg_rating"));
+                    p.setDiscount(rs.getDouble("discount"));
+
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
+
+                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                    } else {
+                        p.setThumbnail("images/logo.webp"); // Ảnh mặc định nếu thiếu
+                    }
+
+                    list.add(p);
+
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
     //======= countProducts =====
     public int countProducts(String keyword) {
         String sql = """
@@ -276,8 +354,27 @@ public class ProductDAO {
     // ===== getProductsPagination =========
 // ======= getAllBrandByType =========
     public Set<String> getAllBrandByType(String type) {
-        //TODO
-        return Set.of();
+        Set<String> brands = new TreeSet<>();
+        String sql = """
+                SELECT DISTINCT p.brand
+                FROM product p
+                JOIN category c on c.id = p.category_id
+                WHERE c.type = ?
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    brands.add(rs.getString("brand"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return brands;
     }
 // ========== searchProductForAdmin ========
 //======= filterProduct =========

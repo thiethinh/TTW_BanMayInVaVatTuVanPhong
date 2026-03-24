@@ -152,8 +152,10 @@ function assignFilterProduct() {
                     hiddenInput.value = value
                 }
                 if (selectedValue) {
-                    selectedValue.innerText = value.trim();
+                    selectedValue.innerText = item.innerText;
                 }
+                console.log("value:", value);
+                console.log("text:", item.innerText);
 
                 dropdown.classList.remove("open");
             })
