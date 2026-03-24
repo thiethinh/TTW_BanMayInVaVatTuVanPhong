@@ -1,10 +1,8 @@
 package com.papercraft.dao;
 
-import com.mysql.cj.jdbc.ConnectionImpl;
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,8 +127,28 @@ public class ProductDAO {
 
             throw new RuntimeException("Database error occurred while adding a new product.", e);
         }
-    }// ========= getFeaturedProductsByType ========
+    }
 
+    // =========== delete product ============
+    public boolean deleteProductById(int id) {
+        String sql = """
+                DELETE FROM product
+                WHERE id =?
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int rowDeleted = ps.executeUpdate();
+            return rowDeleted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ========= getFeaturedProductsByType ========
     public List<Product> getFeaturedProductsByType(String type) {
         List<Product> list = new ArrayList<>();
 
@@ -186,14 +204,14 @@ public class ProductDAO {
     public Product getProductById(int id) {
         Product p = null;
         String sql = """
-            SELECT p.*, i.img_name, c.type
-            FROM product p
-            JOIN category c ON p.category_id = c.id
-            LEFT JOIN image i ON p.id = i.entity_id
-            AND i.is_thumbnail = 1
-            AND i.entity_type = 'Product'
-            WHERE p.id = ?
-            """;
+                SELECT p.*, i.img_name, c.type
+                FROM product p
+                JOIN category c ON p.category_id = c.id
+                LEFT JOIN image i ON p.id = i.entity_id
+                AND i.is_thumbnail = 1
+                AND i.entity_type = 'Product'
+                WHERE p.id = ?
+                """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -221,7 +239,7 @@ public class ProductDAO {
     }
 
     // =========UpdateProduct =========
-    public boolean UpdateProduct(Product p) {
+    public boolean updateProduct(Product p) {
         String sql = """
                 UPDATE product
                         SET category_id = ?, product_name = ?, product_description = ?, product_detail = ?,
@@ -376,10 +394,112 @@ public class ProductDAO {
         }
         return brands;
     }
-// ========== searchProductForAdmin ========
+
+    // ========== searchProductForAdmin ========
 //======= filterProduct =========
 //======= searchProduct ==========
 //=== getProductForManagement=======
-//=========== getProductForEditById ==========
-// ========== insertImage ============
+
+    //=========== getProductForEditById ==========
+    public Product getProductForEditById(int idProduct) {
+        String sql = """
+                    SELECT p.id, p.category_id, p.product_name, p.price, p.origin_price, p.discount,
+                           p.description_thumbnail, p.product_description, p.product_detail, p.stock_quantity,
+                           c.type,
+                           i.img_name
+                    FROM product p
+                    JOIN category c ON c.id = p.category_id
+                    LEFT JOIN image i ON i.entity_id = p.id
+                        AND i.entity_type = 'Product'
+                        AND i.is_thumbnail = 1
+                    WHERE p.id = ?
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idProduct);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Product product = new Product();
+                    product.setId(rs.getInt("id"));
+                    product.setCategoryId(rs.getInt("category_id"));
+                    product.setProductName(rs.getString("product_name"));
+                    product.setPrice(rs.getDouble("price"));
+                    product.setOriginPrice(rs.getDouble("origin_price"));
+                    product.setDiscount(rs.getDouble("discount"));
+                    product.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    product.setProductDescription(rs.getString("product_description"));
+                    product.setProductDetail(rs.getString("product_detail"));
+                    product.setStockQuantity(rs.getInt("stock_quantity"));
+                    product.setType(rs.getString("type"));
+
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
+                        product.setThumbnail("images/upload/" + imgName.trim());
+                    } else {
+                        product.setThumbnail("logo.webp");
+                    }
+
+                    return product;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Lấy danh sách sản phẩm có Phân trang & Tìm kiếm
+    public List<Product> getProductsPagination(String keyword, int page, int pageSize) {
+        List<Product> list = new ArrayList<>();
+
+        // Tính vị trí bắt đầu( số sp_trang cần bỏ qua để đến trang cần tìm)
+        int offset = (page - 1) * pageSize; // (page -1): tính từ trang 0
+
+        String sql = """
+                    SELECT p.id, p.product_name, p.price, p.stock_quantity, c.type, i.img_name
+                    FROM product p
+                    JOIN category c ON c.id = p.category_id
+                    LEFT JOIN image i 
+                           ON i.entity_id = p.id 
+                          AND i.entity_type = 'Product'
+                          AND i.is_thumbnail = 1
+                    WHERE p.product_name LIKE ?
+                    ORDER BY p.id DESC
+                    LIMIT ? OFFSET ?
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim() + "%";
+
+            ps.setString(1, search);
+            ps.setInt(2, pageSize); // số dòng lấy
+            ps.setInt(3, offset);   // số dòng bỏ qua
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+                    p.setId(rs.getInt("id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setStockQuantity(rs.getInt("stock_quantity"));
+                    p.setType(rs.getString("type"));
+
+                    String imgName = rs.getString("img_name");
+                    p.setThumbnail((imgName != null && !imgName.isEmpty()) ? "images/upload/" + imgName.trim() : "images/logo.webp");
+
+                    list.add(p);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
+
+// ========== insertImage ============
