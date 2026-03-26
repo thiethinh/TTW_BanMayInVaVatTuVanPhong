@@ -94,7 +94,7 @@ public class ProductDAO {
 
         try (
                 Connection conn = DBConnect.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); // Lấy ID tự tăng
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); // lấy ID tự tăng
         ) {
 
             ps.setInt(1, product.getCategoryId());
@@ -114,7 +114,7 @@ public class ProductDAO {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int generatedId = rs.getInt(1);
-                        product.setId(generatedId); // Gán ID mới cho đối tượng Product
+                        product.setId(generatedId); // gán ID mới cho đối tượng Product
                     }
                 }
                 return true;
@@ -219,11 +219,21 @@ public class ProductDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     p = new Product();
-                    // ... (giữ nguyên các phần set khác) ...
+                    p.setId(rs.getInt("id"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setDiscount(rs.getDouble("discount"));
+                    p.setStockQuantity(rs.getInt("stock_quantity"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    p.setProductDescription(rs.getString("product_description"));
+                    p.setProductDetail(rs.getString("product_detail"));
+                    p.setBrand(rs.getString("brand"));
                     p.setCreatedAt(rs.getTimestamp("created_at"));
                     p.setType(rs.getString("type"));
 
-                    // Xử lý ảnh an toàn giống hàm getAllProduct
+
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
                         p.setThumbnail(ROOT_PATH + imgName.trim());
@@ -301,7 +311,7 @@ public class ProductDAO {
         switch (sort) {
             case "priceAsc" -> sql.append(" ORDER BY p.price ASC");
             case "priceDesc" -> sql.append(" ORDER BY p.price DESC");
-            default -> sql.append(" ORDER BY avg_rating IS NULL, avg_rating DESC"); // ORDER BY avg_rating IS NULL,
+            default -> sql.append(" ORDER BY avg_rating IS NULL, avg_rating DESC");
         }
 
         try (Connection conn = DBConnect.getConnection();
@@ -331,7 +341,7 @@ public class ProductDAO {
 
                         p.setThumbnail("images/upload/" + rs.getString("img_name"));
                     } else {
-                        p.setThumbnail("images/logo.webp"); // Ảnh mặc định nếu thiếu
+                        p.setThumbnail("images/logo.webp"); // Ảnh mặc định
                     }
 
                     list.add(p);

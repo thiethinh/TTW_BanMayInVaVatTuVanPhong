@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%--<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>--%>
+<%--<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>--%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
@@ -71,21 +73,40 @@
 
             <h1 class="product-name">${p.productName}</h1>
 
-            <div class="price">
-                    <span class="original-price">
-                        <fmt:formatNumber value="${p.originPrice}" type="number" groupingUsed="true"/>₫
-                    </span>
-                <span id="discount">
-                        -<fmt:formatNumber value="${p.discount * 100}" maxFractionDigits="0"/>%
-                    </span>
-                <br/>
-            </div>
-
-            <p class="info-description">
+            <p class="info-description" style="padding-left: 20px ">
                 <c:forTokens items="${p.descriptionThumbnail}" delims="#" var="feature">
                     - ${feature.trim()} <br/>
                 </c:forTokens>
             </p>
+
+            <div class="price-container" style="padding-left: 20px; padding-bottom: 30px;">
+                <c:choose>
+                    <%-- SP có Discount --%>
+                    <c:when test="${p.discount > 0}">
+            <span class="current-price" style=" font-weight: bold">
+                <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/>₫
+            </span>
+
+                        <span class="original-price" style="text-decoration: line-through; color: #888; margin-left: 8px;">
+                <fmt:formatNumber value="${p.originPrice}" type="number" groupingUsed="true"/>₫
+            </span>
+
+                        <span id="discount" class="badge bg-danger" style="margin-left: 5px; color: red">
+                <%-- xử lý nếu discount < 1 --%>
+                ( -<fmt:formatNumber value="${p.discount < 1 ? p.discount * 100 : p.discount}" maxFractionDigits="0"/>% )
+            </span>
+                    </c:when>
+
+                    <%-- Sp không discount --%>
+                    <c:otherwise>
+            <span class="current-price" style="font-weight: bold; font-size: 1.2rem;">
+                <fmt:formatNumber value="${p.originPrice}" type="number" groupingUsed="true"/>₫
+            </span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+
 
             <form action="add-to-cart" method="post">
                 <input type="hidden" name="productId" value="${p.id}">
@@ -104,8 +125,9 @@
                                     class="fa-solid fa-basket-shopping"></i></button>
                         </c:when>
                         <c:otherwise>
-                            <button type="button" class="bt-add-cart" disabled
-                                    style="opacity: 0.6; cursor: not-allowed; background-color: #888;">Hết Hàng
+                            <button class="btn ${p.stockQuantity > 0 ? 'btn-primary' : 'btn-secondary'}"
+                                ${p.stockQuantity <= 0 ? 'disabled' : ''}>
+                                    ${p.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
                             </button>
                         </c:otherwise>
                     </c:choose>

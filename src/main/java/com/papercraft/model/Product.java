@@ -106,7 +106,14 @@ public class Product implements Serializable {
     }
 
     public double getPrice() {
-        return price;
+        if(this.originPrice > 0 && this.discount >0){
+            if(this.discount < 1){
+                return this.originPrice * (1.0-this.discount);
+            }else{
+                return this.originPrice * (1.0 - (this.discount/100.0));
+            }
+        }
+        return this.originPrice;
     }
 
     public void setPrice(double price) {
@@ -190,10 +197,4 @@ public class Product implements Serializable {
 
     }
 
-    public double getSalePrice() {
-        if (this.originPrice > 0 && this.discount > 0 && this.discount < 1) {
-            return this.originPrice * (1.0 - this.discount);
-        }
-        return (this.originPrice > 0) ? this.originPrice : this.price;
-    }
 }

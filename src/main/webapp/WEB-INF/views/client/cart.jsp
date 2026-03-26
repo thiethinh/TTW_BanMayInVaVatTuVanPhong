@@ -96,7 +96,7 @@
                             <div class="item-cost">
                                 <span class="label">Giá:</span>
                                 <span class="price">
-                                    <fmt:formatNumber value="${item.getSalePrice() * item.quantity}" pattern="#,###"/> ₫
+                                    <fmt:formatNumber value="${item.getPrice() * item.quantity}" pattern="#.###"/> ₫
                                 </span>
                             </div>
                         </div>
@@ -110,19 +110,19 @@
 
                     <p>Tạm tính:
                         <span>
-                            <fmt:formatNumber value="${subTotal}" pattern="#,###"/> ₫
+                            <fmt:formatNumber value="${subTotal}" pattern="#.###"/> ₫
                         </span>
                     </p>
 
                     <p>VAT (5%):
                         <span>
-                            <fmt:formatNumber value="${vat}" pattern="#,###"/> ₫
+                            <fmt:formatNumber value="${vat}" pattern="#.###"/> ₫
                         </span>
                     </p>
 
                     <h2>Tổng cộng:
                         <span>
-                            <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
+                            <fmt:formatNumber value="${grandTotal}" pattern="#.###"/> ₫
 
                         </span>
                     </h2>
