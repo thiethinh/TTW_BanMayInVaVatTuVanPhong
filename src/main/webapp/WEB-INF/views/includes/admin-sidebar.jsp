@@ -52,6 +52,12 @@
                     <i class="fa-solid fa-message"></i> Tin Nhắn Liên Hệ
                 </a>
             </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin-setting"
+                   class="${fn:contains(uri, 'admin-setting') ? 'active' : ''}">
+                    <i class="fa-solid fa-gear"></i> Cài Đặt Website
+                </a>
+            </li>
         </ul>
     </nav>
 
