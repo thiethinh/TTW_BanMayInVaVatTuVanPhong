@@ -3,7 +3,10 @@
 <%--<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>--%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -16,6 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
 
     <link rel="icon" href="${pageContext.request.contextPath}/images/logo.webp"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
@@ -108,8 +112,9 @@
 
 
 
-            <form action="add-to-cart" method="post">
+            <form id="addToCartForm" action="cart" method="post">
                 <input type="hidden" name="productId" value="${p.id}">
+                <input type="hidden" name="action" value="add">
 
                 <div class="block-quatity-cart">
                     <div class="quantity">
@@ -121,8 +126,9 @@
 
                     <c:choose>
                         <c:when test="${p.stockQuantity > 0}">
-                            <button type="submit" class="bt-add-cart">Thêm Vào Giỏ Hàng <i
-                                    class="fa-solid fa-basket-shopping"></i></button>
+                            <button type="button" class="bt-add-cart" onclick="handleAddToCart()">
+                                Thêm Vào Giỏ Hàng <i class="fa-solid fa-basket-shopping"></i>
+                            </button>
                         </c:when>
                         <c:otherwise>
                             <button class="btn ${p.stockQuantity > 0 ? 'btn-primary' : 'btn-secondary'}"
@@ -264,9 +270,35 @@
         const newVal = parseInt(input.value) + val;
         if (newVal >= 1 && newVal <= parseInt(input.getAttribute('max'))) input.value = newVal;
     }
+    function handleAddToCart(){
+        const isLoggedIn = ${not empty sessionScope.acc ? 'true' : 'false'};
+
+        // === Chưa login
+        if(isLoggedIn){
+            Swal.fire({
+                title: 'Yêu cầu đăng nhập',
+                text: "Bạn cần đăng nhập để thực hiện chức năng thêm vào giỏ hàng!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#165FF2',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Đăng nhập ngay',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if(result.isConfirmed){
+                    window.location.href = '${pageContext.request.contextPath}/login';
+                }
+            });
+        }else  {
+            document.getElementById('addToCartForm').submit();
+        }
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

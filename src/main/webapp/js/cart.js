@@ -3,29 +3,45 @@ const contextPath = document.body.getAttribute('data-context') || "";
 
 
 function addToCart(productId, quantity = 1) {
-    fetch(`${contextPath}/cart`, {
+    // check đăng nhập
+    if (!IS_LOGGED_IN) {
+        Swal.fire({
+            title: 'Bạn chưa đăng nhập!',
+            text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#165FF2',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đăng nhập ngay',
+            cancelButtonText: 'Để sau',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = CONTEXT_PATH + "/login";
+            }
+        });
+        return;
+    }
+
+    // đã login-> gửi AJAX đến CartServlet
+    fetch(CONTEXT_PATH + "/cart", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `action=add&id=${productId}&quantity=${quantity}`
     })
         .then(res => {
             if (res.ok) {
-                updateCartCount(); // Cập nhật số sp trong giỏ hàng
-
-                // Dùng - "SweetAlert2" - để thông báo thành công
+                updateCartCount(); //cập nhật Badge cart
                 Swal.fire({
                     icon: 'success',
                     title: 'Đã thêm vào giỏ!',
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 1000
                 });
-            } else {
-                alert("Không thể thêm sản phẩm.");
             }
-        })
-        .catch(err => console.error("Lỗi:", err));
+        });
 }
 
 // === Update ====

@@ -28,23 +28,16 @@
 
                     <%-- ================= CART ================= --%>
 
-                    <c:set var="cartCount" value="0"/>
-                    <c:if test="${not empty sessionScope.cart}">
-                        <span id="cartCount">${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}</span>
-                    </c:if>
+                        <c:set var="cartCount" value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
 
-                    <a href="${pageContext.request.contextPath}/cart"
-                       id="nav-cart"
-                       class="cart-btn">
+                        <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
+                            <i class="fa-solid fa-cart-shopping"></i>
 
-                        <i class="fa-solid fa-cart-shopping"></i>
-
-                        <span id="cartCount"
-                              class="cart-count"
-                              style="${cartCount == 0 ? 'display:none' : ''}">
-                            ${cartCount}
-                        </span>
-                    </a>
+                            <span id="cartCount" class="cart-count"
+                                  style="display: ${cartCount > 0 ? 'flex' : 'none'};">
+                                ${cartCount}
+                            </span>
+                        </a>
 
                     <%-- =============== LOGIN / USER ================= --%>
 
@@ -79,5 +72,9 @@
         </div>
     </nav>
 </header>
+<script>
+    const IS_LOGGED_IN = ${not empty sessionScope.acc ? 'true' : 'false'};
+    const CONTEXT_PATH = "${pageContext.request.contextPath}";
+</script>
 //debug cart
 <input type="hidden" id="globalContextPath" value="${pageContext.request.contextPath}">
