@@ -32,15 +32,15 @@
         <div class="footer-col">
             <h4 class="footer-heading">Theo Dõi Chúng Tôi</h4>
             <div class="social-icons">
-                <a href="${applicationScope.GLOBAL_SETTINGS.facebook}" target="_blank">
+                <a href="${applicationScope.GLOBAL_SETTINGS.facebook}" target="_blank" title="Facebook">
                     <i class="fab fa-facebook-f"></i>
                 </a>
 
-                <a href="${applicationScope.GLOBAL_SETTINGS.twitter}" target="_blank">
+                <a href="${applicationScope.GLOBAL_SETTINGS.twitter}" target="_blank" title="Twitter">
                     <i class="fab fa-twitter"></i>
                 </a>
 
-                <a href="${applicationScope.GLOBAL_SETTINGS.instagram}" target="_blank">
+                <a href="${applicationScope.GLOBAL_SETTINGS.instagram}" target="_blank" title="Instagram">
                     <i class="fab fa-instagram"></i>
                 </a>
             </div>
