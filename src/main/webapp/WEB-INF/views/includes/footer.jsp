@@ -4,7 +4,7 @@
     <div class="footer-container">
         <div class="footer-col footer-col-info">
             <div class="footer-logo">
-                <img src="${pageContext.request.contextPath}/images/logo.webp" height="80" width="80" />
+                <img src="${pageContext.request.contextPath}/images/logo.webp" height="80" width="80"/>
             </div>
             <p class="footer-description">
                 Đối tác tin cậy cho máy in và văn phòng phẩm từ năm 2010.
@@ -32,9 +32,17 @@
         <div class="footer-col">
             <h4 class="footer-heading">Theo Dõi Chúng Tôi</h4>
             <div class="social-icons">
-                <i class="fab fa-facebook-f"></i>
-                <i class="fab fa-twitter"></i>
-                <i class="fab fa-instagram"></i>
+                <a href="${applicationScope.GLOBAL_SETTINGS.facebook}" target="_blank" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+
+                <a href="${applicationScope.GLOBAL_SETTINGS.twitter}" target="_blank" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+
+                <a href="${applicationScope.GLOBAL_SETTINGS.instagram}" target="_blank" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
             </div>
         </div>
     </div>
@@ -43,5 +51,6 @@
         <p>&copy; 2025 PaperCraft. All rights reserved.</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <%--thư viện popup --%>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%--thư viện popup --%>
 </footer>

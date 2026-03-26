@@ -78,7 +78,7 @@
                     </div>
                     <div class="info-text">
                         <h3 class="info-title">Email</h3>
-                        <a href="#" class="info-link">hotro@papercraft.com</a>
+                        <a href="#" class="info-link">${applicationScope.GLOBAL_SETTINGS.email}</a>
                     </div>
                 </div>
 
@@ -88,7 +88,7 @@
                     </div>
                     <div class="info-text">
                         <h3 class="info-title">Số điện thoại</h3>
-                        <a href="#" class="info-link">(+84) 123 456 789</a>
+                        <a href="#" class="info-link">${applicationScope.GLOBAL_SETTINGS.phone}</a>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@
                     </div>
                     <div class="info-text">
                         <h3 class="info-title">Địa chỉ</h3>
-                        <a href="#" class="info-link">159 QL1K, P.Đông Hòa,Dĩ An, TP.HCM</a>
+                        <a href="#" class="info-link">${applicationScope.GLOBAL_SETTINGS.address}</a>
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
                     </div>
                     <div class="info-text">
                         <h3 class="info-title">Giờ làm việc</h3>
-                        <a href="#" class="info-link">Từ thứ 2- thứ 6: 9h-18h</a>
+                        <a href="#" class="info-link">${applicationScope.GLOBAL_SETTINGS.working_hours}</a>
                     </div>
                 </div>
 
