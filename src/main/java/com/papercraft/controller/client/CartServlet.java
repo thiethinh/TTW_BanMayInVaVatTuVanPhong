@@ -21,6 +21,12 @@ public class CartServlet extends HttpServlet {
         String action= request.getParameter("action");
         HttpSession session = request.getSession();
 
+        //== check login mới được thêm vào gior hàng( chặn từ server) ===
+        if (session.getAttribute("acc") == null && !"count".equals(action)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         Cart cart = (Cart) session.getAttribute("cart");
         if(cart == null){
             cart= new Cart();
@@ -36,6 +42,7 @@ public class CartServlet extends HttpServlet {
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
+                int qty = Integer.parseInt(request.getParameter("quantity"));
                 ProductDAO dao = new ProductDAO();
                 Product p = dao.getProductById(id);
                 if (p != null){
@@ -56,13 +63,16 @@ public class CartServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
         //=== Bill ====
-        double subTotal= cart.total();
-        double vat= subTotal * 0.05;
-        double grandTotal = subTotal + vat;
+        double subTotal= Math.round(cart.total());
+        double shippingFee = (subTotal > 5000000 || subTotal ==0) ? 0 : 30000;
+        double vat= Math.round(subTotal * 0.05);
+        double grandTotal = Math.round(subTotal + vat + shippingFee);
+
 
         //set sang JSP
         request.setAttribute("items", cart.list());
         request.setAttribute("subTotal", subTotal);
+        request.setAttribute("shippingFee", shippingFee);
         request.setAttribute("vat",vat);
         request.setAttribute("grandTotal", grandTotal);
 

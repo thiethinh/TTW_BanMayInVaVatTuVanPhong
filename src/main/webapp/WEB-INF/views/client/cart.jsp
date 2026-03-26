@@ -1,6 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%--Fomat Price--%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN"/>
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -96,7 +95,8 @@
                             <div class="item-cost">
                                 <span class="label">Giá:</span>
                                 <span class="price">
-                                    <fmt:formatNumber value="${item.getPrice() * item.quantity}" pattern="#.###"/> ₫
+                                    <fmt:formatNumber value="${item.price * item.quantity}" type="number"
+                                                      groupingUsed="true"/> ₫
                                 </span>
                             </div>
                         </div>
@@ -110,21 +110,34 @@
 
                     <p>Tạm tính:
                         <span>
-                            <fmt:formatNumber value="${subTotal}" pattern="#.###"/> ₫
+                            <fmt:formatNumber value="${subTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                        </span>
+                    </p>
+
+                    <p>Phí vận chuyển:
+                        <span>
+                            <c:choose>
+                                <c:when test="${shippingFee == 0}">
+                                    <strong style="color: #165FF2;">Miễn phí</strong>
+                                </c:when>
+                                <c:otherwise>
+                                    <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                                </c:otherwise>
+                            </c:choose>
                         </span>
                     </p>
 
                     <p>VAT (5%):
                         <span>
-                            <fmt:formatNumber value="${vat}" pattern="#.###"/> ₫
+                            <fmt:formatNumber value="${vat}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
                         </span>
                     </p>
 
                     <h2>Tổng cộng:
-                        <span>
-                            <fmt:formatNumber value="${grandTotal}" pattern="#.###"/> ₫
-
-                        </span>
+                        <p style="color: var(--danger-color);">
+                            <strong><fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/>
+                                ₫</strong>
+                        </p>
                     </h2>
 
                     <a href="${pageContext.request.contextPath}/checkout"

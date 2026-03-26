@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <%@ page import="com.papercraft.model.Product" %>
 <%@ page import="java.util.List" %>
 <c:set var="context" value="${pageContext.request.contextPath}"/>
@@ -177,7 +178,7 @@
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 <script type="module" src="${context}/js/main.js"></script>
 <script type="module" src="${context}/js/printer-stationery.js"></script>
-<script type="module" src="${context}/js/cart.js"></script>
+<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 
 </body>
 
