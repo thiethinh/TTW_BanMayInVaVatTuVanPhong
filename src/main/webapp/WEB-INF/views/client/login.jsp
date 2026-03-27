@@ -30,8 +30,8 @@
                 <c:if test="${not empty msg}">
                     <p style="color: red; text-align: center; margin-bottom: 10px;">${msg}</p>
                 </c:if>
-
-                <input type="hidden" name="redirect" value="${param.redirect}">
+            <%--  redirect--%>
+                <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
                     <input type="email" name="email" class="input-field" placeholder="Email" required value="${email}">

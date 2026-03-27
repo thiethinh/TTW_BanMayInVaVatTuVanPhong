@@ -40,10 +40,16 @@
                         </a>
 
                     <%-- =============== LOGIN / USER ================= --%>
+                        <%-- lấy đường dẫn hiện tại   --%>
+                        <c:set var="uri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
+                        <%-- Laây stham số --%>
+                        <c:set var="query" value="${pageContext.request.queryString}"/>
+                        <%-- Gộp lại thành URL hoàn chỉnh ...?id=... --%>
+                        <c:set var="currentUrl" value="${not empty query ? uri.concat('?').concat(query) : uri}"/>
 
                     <c:if test="${empty sessionScope.acc}">
                         <a class="login-btn"
-                           href="${pageContext.request.contextPath}/login">
+                           href="${pageContext.request.contextPath}/login?redirect=${currentUrl}"> <%-- đính kèm lên URL--%>
                             Đăng Nhập
                         </a>
                     </c:if>

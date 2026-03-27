@@ -7,7 +7,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -91,7 +90,8 @@
                 <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/>₫
             </span>
 
-                        <span class="original-price" style="text-decoration: line-through; color: #888; margin-left: 8px;">
+                        <span class="original-price"
+                              style="text-decoration: line-through; color: #888; margin-left: 8px;">
                 <fmt:formatNumber value="${p.originPrice}" type="number" groupingUsed="true"/>₫
             </span>
 
@@ -111,9 +111,8 @@
             </div>
 
 
-
             <form id="addToCartForm" action="cart" method="post">
-                <input type="hidden" name="productId" value="${p.id}">
+                <input type="hidden" name="id" value="${p.id}">
                 <input type="hidden" name="action" value="add">
 
                 <div class="block-quatity-cart">
@@ -132,7 +131,7 @@
                         </c:when>
                         <c:otherwise>
                             <button class="btn ${p.stockQuantity > 0 ? 'btn-primary' : 'btn-secondary'}"
-                                ${p.stockQuantity <= 0 ? 'disabled' : ''}>
+                                ${p.stockQuantity <= 0 ? 'disabled' : ''} onclick="addToCartFromDetail(${p.id})">
                                     ${p.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
                             </button>
                         </c:otherwise>
@@ -270,11 +269,12 @@
         const newVal = parseInt(input.value) + val;
         if (newVal >= 1 && newVal <= parseInt(input.getAttribute('max'))) input.value = newVal;
     }
-    function handleAddToCart(){
+
+    function handleAddToCart() {
         const isLoggedIn = ${not empty sessionScope.acc ? 'true' : 'false'};
 
         // === Chưa login
-        if(isLoggedIn){
+        if (!isLoggedIn) {
             Swal.fire({
                 title: 'Yêu cầu đăng nhập',
                 text: "Bạn cần đăng nhập để thực hiện chức năng thêm vào giỏ hàng!",
@@ -286,12 +286,48 @@
                 cancelButtonText: 'Hủy',
                 reverseButtons: true
             }).then((result) => {
-                if(result.isConfirmed){
-                    window.location.href = '${pageContext.request.contextPath}/login';
+                if (result.isConfirmed) {
+                    const currentUrl = encodeURIComponent(window.location.href);
+                    window.location.href = '${pageContext.request.contextPath}/login?redirect=' + currentUrl;
                 }
             });
-        }else  {
-            document.getElementById('addToCartForm').submit();
+        } else {
+            //document.getElementById('addToCartForm').submit();
+            const form = document.getElementById('addToCartForm');
+            // lấy data
+            const formData = new FormData(form);
+            const pagram = new URLSearchParams(formData);
+
+            fetch('${pageContext.request.contextPath}/cart', {
+                method: 'POST',
+                headers: {
+                    'context-type': 'application/x-www-form-urlencoded'
+                },
+                body: pagram.toString()
+            }).then(res => {
+                if (res.ok) {
+                    if (typeof updateCartCount == 'function') {
+                        updateCartCount();
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đã thêm vào giỏ!',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại!',
+                        text: 'Có lỗi xảy ra khi thêm vào gi hàng!'
+                    });
+                }
+            })
+                .catch(err => {
+                    console.error("Lỗi Fetch: ", err);
+                });
         }
     }
 </script>
