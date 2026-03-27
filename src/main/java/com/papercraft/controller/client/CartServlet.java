@@ -33,12 +33,6 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("cart",cart);
         }
 
-        if ("count".equals(action)) {
-            response.setContentType("text/plain");
-            response.getWriter().print(cart.getTotalQuantity());
-            return;
-        }
-
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
@@ -46,18 +40,32 @@ public class CartServlet extends HttpServlet {
                 ProductDAO dao = new ProductDAO();
                 Product p = dao.getProductById(id);
                 if (p != null){
-                    p.setQuantity(1);
+                    p.setQuantity(qty);
                     cart.put(p);
+                    session.setAttribute("cart", cart);
                 }
+                //update sluong moi
+                response.getWriter().print(cart.getTotalQuantity());
+                return;
+            }
+            else if ("count".equals(action)) {
+                response.getWriter().print(cart.getTotalQuantity());
+                return;
             }
             else if ("remove".equals(action)){
                 int id = Integer.parseInt(request.getParameter("id"));
                 cart.remove(id);
+                session.setAttribute("cart", cart);
+                response.getWriter().print(cart.getTotalQuantity());
+                return;
             }
             else if("update".equals(action)){
                 int id= Integer.parseInt(request.getParameter("id"));
                 int quantity= Integer.parseInt(request.getParameter("quantity"));
                 cart.update(id,quantity);
+                session.setAttribute("cart", cart);
+                response.getWriter().print(cart.getTotalQuantity());
+                return;
             }
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);

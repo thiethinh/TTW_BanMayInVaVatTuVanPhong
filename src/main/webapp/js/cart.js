@@ -17,7 +17,8 @@ function addToCart(productId, quantity = 1) {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = CONTEXT_PATH + "/login";
+                const currentPath = window.location.pathname + window.location.search;
+                window.location.href = CONTEXT_PATH + "/login?redirect=" + encodeURIComponent(currentPath);
             }
         });
         return;

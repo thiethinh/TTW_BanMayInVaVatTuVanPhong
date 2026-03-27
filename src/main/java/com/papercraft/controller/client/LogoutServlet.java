@@ -12,8 +12,16 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession();
-        session.removeAttribute("acc");
-        response.sendRedirect("home");
+        request.getSession().removeAttribute("acc");
+
+        // Lấy CurentPage trước khi nhấn Logout
+        String referer = request.getHeader("Referer");
+
+        //nếu có trang trước đó thì quay lại, không thì về home
+        if (referer != null && !referer.contains("/logout")) {
+            response.sendRedirect(referer);
+        } else {
+            response.sendRedirect("home");
+        }
     }
 }
