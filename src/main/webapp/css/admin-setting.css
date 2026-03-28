@@ -137,3 +137,7 @@
         transform: translateY(0);
     }
 }
+
+.cke_notification_warning {
+    display: none !important;
+}
