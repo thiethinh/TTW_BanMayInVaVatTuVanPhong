@@ -6,8 +6,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 public class EmailUtils {
-    private static final String FROM_EMAIL = "papercraftmain@gmail.com";
-    private static final String PASSWORD = "tbgj xkow uatn qtfv";
+    private static final String FROM_EMAIL = "papercraft1784@gmail.com";
+    private static final String PASSWORD = "akmu dgzk mxcd uprd";
 
     public static String generateOTP() {
         Random random = new Random();
