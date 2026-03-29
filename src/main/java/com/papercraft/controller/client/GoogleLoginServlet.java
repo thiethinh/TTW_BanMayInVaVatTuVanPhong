@@ -51,8 +51,8 @@ public class GoogleLoginServlet extends HttpServlet {
                     newUser.setFname(fullname.substring(0, fullname.lastIndexOf(" ")));
                     newUser.setLname(fullname.substring(fullname.lastIndexOf(" ") + 1));
                 } else {
-                    newUser.setFname(fullname != null ? fullname : " ");
-                    newUser.setLname("");
+                    newUser.setFname("");
+                    newUser.setLname(fullname != null ? fullname : " ");
                 }
 
                 newUser.setPhoneNumber("");

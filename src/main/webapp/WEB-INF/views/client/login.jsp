@@ -29,7 +29,7 @@
 
             <form action="login" method="post" class="two-forms">
                 <c:if test="${not empty msg}">
-                    <p style="color: red; text-align: center; margin-bottom: 10px;">${msg}</p>
+                    <p style="color: red; text-align: center; margin-top: -10px; margin-bottom: 10px;">${msg}</p>
                 </c:if>
 
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
