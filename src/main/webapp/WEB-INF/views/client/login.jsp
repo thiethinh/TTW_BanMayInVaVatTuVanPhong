@@ -67,11 +67,14 @@
                 <div class="social-login">
                     <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=http://localhost:8080/papercraft/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
                        class="btn btn-google">
-                        <img src="${pageContext.request.contextPath}/images/google-logo.svg" alt="Đăng nhập bằng Google">
+                        <img src="${pageContext.request.contextPath}/images/google-logo.svg"
+                             alt="Đăng nhập bằng Google">
                     </a>
 
-                    <a href="" class="btn btn-facebook">
-                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg" alt="Đăng nhập bằng Facebook">
+                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &edirect_uri=http://localhost:8080/papercraft/facebook-login&scope=email,public_profile"
+                       class="btn btn-facebook">
+                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg"
+                             alt="Đăng nhập bằng Facebook">
                     </a>
                 </div>
             </form>
@@ -163,11 +166,14 @@
                 <div class="social-login">
                     <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=http://localhost:8080/papercraft/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
                        class="btn btn-google">
-                        <img src="${pageContext.request.contextPath}/images/google-logo.svg" alt="Đăng nhập bằng Google">
+                        <img src="${pageContext.request.contextPath}/images/google-logo.svg"
+                             alt="Đăng nhập bằng Google">
                     </a>
 
-                    <a href="" class="btn btn-facebook">
-                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg" alt="Đăng nhập bằng Facebook">
+                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &edirect_uri=http://localhost:8080/papercraft/facebook-login&scope=email,public_profile"
+                       class="btn btn-facebook">
+                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg"
+                             alt="Đăng nhập bằng Facebook">
                     </a>
                 </div>
             </form>
