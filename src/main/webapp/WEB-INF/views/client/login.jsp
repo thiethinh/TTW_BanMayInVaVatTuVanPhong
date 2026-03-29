@@ -18,7 +18,8 @@
 <jsp:include page="../includes/header.jsp"/>
 
 <div class="form-wrapper">
-    <img src="${pageContext.request.contextPath}/images/login-bg.webp" alt="" class="login-background-image" fetchpriority="high" width="1920"
+    <img src="${pageContext.request.contextPath}/images/login-bg.webp" alt="" class="login-background-image"
+         fetchpriority="high" width="1920"
          height="1080">
     <div class="form-box">
         <div class="login-container" id="login">
@@ -30,7 +31,7 @@
                 <c:if test="${not empty msg}">
                     <p style="color: red; text-align: center; margin-bottom: 10px;">${msg}</p>
                 </c:if>
-            <%--  redirect--%>
+
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
@@ -61,6 +62,17 @@
 
                 <div class="bottom">
                     <span>Bạn chưa có tài khoản? <a href="#" id="register-trigger">Đăng ký</a></span>
+                </div>
+
+                <div class="social-login">
+                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=http://localhost:8080/papercraft/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
+                       class="btn btn-google">
+                        <img src="${pageContext.request.contextPath}/images/google-logo.svg" alt="Đăng nhập bằng Google">
+                    </a>
+
+                    <a href="" class="btn btn-facebook">
+                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg" alt="Đăng nhập bằng Facebook">
+                    </a>
                 </div>
             </form>
         </div>
@@ -144,13 +156,22 @@
                     <input type="submit" class="submit" value="Đăng ký">
                 </div>
 
+                <div class="bottom">
+                    <span>Bạn đã có tài khoản? <a href="#" id="login-trigger">Đăng nhập</a></span>
+                </div>
+
+                <div class="social-login">
+                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=http://localhost:8080/papercraft/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
+                       class="btn btn-google">
+                        <img src="${pageContext.request.contextPath}/images/google-logo.svg" alt="Đăng nhập bằng Google">
+                    </a>
+
+                    <a href="" class="btn btn-facebook">
+                        <img src="${pageContext.request.contextPath}/images/facebook-logo.svg" alt="Đăng nhập bằng Facebook">
+                    </a>
+                </div>
             </form>
-
-            <div class="bottom">
-                <span>Bạn đã có tài khoản? <a href="#" id="login-trigger">Đăng nhập</a></span>
-            </div>
         </div>
-
     </div>
 </div>
 
@@ -176,7 +197,8 @@
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <a href="${pageContext.request.contextPath}/login" style="text-decoration: none; color: #555;">Quay lại</a>
+                    <a href="${pageContext.request.contextPath}/login" style="text-decoration: none; color: #555;">Quay
+                        lại</a>
                 </div>
             </form>
         </div>

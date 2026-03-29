@@ -351,4 +351,31 @@ public class UserDAO {
         }
         return false;
     }
+
+    // Lấy thông tin User bằng Email
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setFname(rs.getString("fname"));
+                user.setLname(rs.getString("lname"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setGender(rs.getString("gender"));
+                user.setRole(rs.getString("role"));
+                user.setPasswordHash(rs.getString("password_hash"));
+                user.setStatus(rs.getBoolean("status"));
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
