@@ -32,10 +32,6 @@
 
         <form action="${pageContext.request.contextPath}/stationery" method="get">
             <div class="search-container">
-                <button type="submit" class="bt-search">
-                    <i class='bx bx-search icon'></i>
-                    Tìm kiếm
-                </button>
 
                 <div class="search-box child">
                     <input type="text" name="search" id="search" value="${search}" placeholder="Tìm kiếm sản phẩm...">
@@ -85,6 +81,10 @@
 
                     </div>
                 </div>
+                <button type="submit" class="bt-search">
+                    <i class='bx bx-search icon'></i>
+                    Tìm kiếm
+                </button>
             </div>
         </form>
 

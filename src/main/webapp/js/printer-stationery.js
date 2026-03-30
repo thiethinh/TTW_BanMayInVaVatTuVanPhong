@@ -14,11 +14,13 @@ function initDropdown() {
         trigger.addEventListener("click", (e) => {
             e.stopPropagation();
             document.querySelectorAll(".option-value.open").forEach(openedMenu => {
-                if (openedMenu !== menu) openedMenu.classList.remove("open")
+                if (openedMenu !== menu){
+                    openedMenu.classList.remove("open")
+                }
             })
 
             document.querySelectorAll(".arrow.open").forEach(openedArrow => {
-                if (openedArrow !== arrow) arrow.classList.remove("open")
+                if (openedArrow !== arrow) openedArrow.classList.remove("open")
             })
 
             const isOpen = menu.classList.toggle("open")
@@ -44,6 +46,13 @@ function initDropdown() {
         menu.addEventListener("mouseleave", () => {
             menu.classList.remove("open")
             arrow.classList.remove("open")
+        })
+
+        document.addEventListener("click" , (e) => {
+           if(!menu.contains(e.target)){
+               menu.classList.remove("open")
+               arrow.classList.remove("open")
+           }
         })
     })
 }
@@ -89,6 +98,38 @@ function initPagination() {
         //reset inner code
         paginationContainer.innerHTML = '';
 
+        const visiblePage = 5;
+
+        function addPage(i) {
+            const pageLink = document.createElement('a');
+            pageLink.href = "#";
+            pageLink.innerText = i;
+            pageLink.classList.add("page-link");
+            if (i === current) pageLink.classList.add("active-page");
+            pageLink.dataset.page = i;
+            paginationContainer.appendChild(pageLink);
+        }
+
+        function addDot() {
+            const dot = document.createElement('a');
+            dot.innerText = "...";
+            dot.classList.add("page-link","dot");
+            dot.style.pointerEvents ='none'
+            dot.style.cursor = 'default'
+            paginationContainer.appendChild(dot);
+        }
+
+        const firstLink = document.createElement('a')
+        firstLink.href="#"
+        firstLink.innerHTML = "<<"
+        firstLink.classList.add("page-link", "pre-first")
+        if (current === 1) {
+            firstLink.classList.add("disabled");
+            firstLink.style.pointerEvents = 'none';
+        }
+        firstLink.dataset.page = 1;
+        paginationContainer.appendChild(firstLink)
+
         const preLink = document.createElement('a')
         preLink.href = '#'
         preLink.innerHTML = "<i class='bx bx-chevron-left'></i>"
@@ -100,14 +141,20 @@ function initPagination() {
         preLink.dataset.page = current - 1;
         paginationContainer.appendChild(preLink)
 
-        for (let i = 1; i <= totalPage; i++) {
-            const pageLink = document.createElement('a')
-            pageLink.href = "#"
-            pageLink.innerText = i;
-            pageLink.classList.add("page-link")
-            if (i === current) pageLink.classList.add("active-page")
-            pageLink.dataset.page = i
-            paginationContainer.appendChild(pageLink)
+        let start = Math.max(1, current - 1);
+        let end = start + visiblePage - 1;
+
+        if (end > totalPage) {
+            end = totalPage;
+            start = Math.max(1, end - visiblePage + 1);
+        }
+
+        for (let i = start; i <= end; i++) {
+            addPage(i);
+        }
+
+        if (end < totalPage) {
+            addDot();
         }
 
         const nextLink = document.createElement("a")
@@ -120,7 +167,20 @@ function initPagination() {
         }
         nextLink.dataset.page = current + 1
         paginationContainer.appendChild(nextLink)
+
+        const lastLink = document.createElement('a')
+        lastLink.href="#"
+        lastLink.innerHTML = ">>"
+        lastLink.classList.add("page-link", "pre-first")
+        if (current === totalPage) {
+            lastLink.classList.add("disabled");
+            lastLink.style.pointerEvents = 'none';
+        }
+        lastLink.dataset.page = totalPage;
+        paginationContainer.appendChild(lastLink)
     }
+
+
 
     paginationContainer.addEventListener("click", function (e) {
         //chan reload, js xử lí bên trong từ danh sách product
@@ -132,6 +192,10 @@ function initPagination() {
                 currentPage = newPage
                 createPagination(totalPage, currentPage)
                 showPage(currentPage)
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             }
 
         }
