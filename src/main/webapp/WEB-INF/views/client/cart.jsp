@@ -84,6 +84,9 @@
                                         </button>
                                     </div>
                                 </div>
+                                <span class="stock-hint">
+                                    Còn lại trong kho: <strong>${item.stockQuantity}</strong>
+                                </span>
 
                                 <a href="${pageContext.request.contextPath}/cart?action=remove&id=${item.id}">
 

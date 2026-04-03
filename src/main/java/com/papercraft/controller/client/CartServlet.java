@@ -1,6 +1,9 @@
 package com.papercraft.controller.client;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.papercraft.dao.ProductDAO;
 import com.papercraft.model.Cart;
@@ -18,6 +21,7 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setCharacterEncoding("UTF-8");
         String action= request.getParameter("action");
         HttpSession session = request.getSession();
 
@@ -32,20 +36,28 @@ public class CartServlet extends HttpServlet {
             cart= new Cart();
             session.setAttribute("cart",cart);
         }
-
+        ProductDAO dao = new ProductDAO();
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
                 int qty = Integer.parseInt(request.getParameter("quantity"));
-                ProductDAO dao = new ProductDAO();
+
                 Product p = dao.getProductById(id);
                 if (p != null){
-                    p.setQuantity(qty);
-                    cart.put(p);
-                    session.setAttribute("cart", cart);
+                    sendJson(response, false, "Sản phẩm không tồn tại", cart.getTotalQuantity());
+                    return;
+
                 }
-                //update sluong moi
-                response.getWriter().print(cart.getTotalQuantity());
+                p.setQuantity(qty);
+                String error = cart.putWithCheckStock(p, p.getStockQuantity());
+                session.setAttribute("cart", cart);
+
+                if(error != null){
+                    sendJson(response, false, error, cart.getTotalQuantity());
+                }else{
+                    sendJson(response, true, error, cart.getTotalQuantity());
+
+                }
                 return;
             }
             else if ("count".equals(action)) {
@@ -62,14 +74,28 @@ public class CartServlet extends HttpServlet {
             else if("update".equals(action)){
                 int id= Integer.parseInt(request.getParameter("id"));
                 int quantity= Integer.parseInt(request.getParameter("quantity"));
-                cart.update(id,quantity);
+
+                Product p = dao.getProductById(id);
+                if (p == null){
+                    sendJson(response, false, "Sản phẩm không tồn tại!", cart.getTotalQuantity());
+                    return;
+                }
+                String error = cart.updateWithStock(id, quantity, p.getStockQuantity());
                 session.setAttribute("cart", cart);
-                response.getWriter().print(cart.getTotalQuantity());
+
+                if (error != null){
+                    sendJson(response, false, error,cart.getTotalQuantity());
+                }else{
+                    sendJson(response,true, null, cart.getTotalQuantity());
+                }
                 return;
             }
+
         } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
+            sendJson(response, false, "Dữ liệu không hợp lệ!", 0);
+            return;
         }
+
         //=== Bill ====
         double subTotal= Math.round(cart.total());
         double shippingFee = (subTotal > 5000000 || subTotal ==0) ? 0 : 30000;
@@ -78,7 +104,15 @@ public class CartServlet extends HttpServlet {
 
 
         //set sang JSP
-        request.setAttribute("items", cart.list());
+        List<Product> items= new ArrayList<>(cart.list());
+        for (Product item : items){
+            Product fresh = dao.getProductById(item.getId());
+            if (fresh != null ){
+                item.setStockQuantity(fresh.getStockQuantity());
+            }
+        }
+        request.setAttribute("items", items);
+
         request.setAttribute("subTotal", subTotal);
         request.setAttribute("shippingFee", shippingFee);
         request.setAttribute("vat",vat);
@@ -92,5 +126,15 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
 
         doGet(request, response);
+    }
+    private void sendJson (HttpServletResponse response, boolean success,
+                           String message, int cartCount) throws IOException{
+        response.setContentType("application/json; charset=UTF-8");
+        String msg= (message != null)? message.replace("\"","'") : "";
+        response.getWriter().print(
+          "{\"success\":" +success +
+          ",\"message\":\"" +msg +
+          ",\"cartCount\":\"" +cartCount + "}"
+        );
     }
 }

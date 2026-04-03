@@ -1,5 +1,7 @@
 package com.papercraft.model;
 
+import org.checkerframework.checker.units.qual.Current;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -61,4 +63,39 @@ public class Cart implements Serializable {
             data.get(id).setQuantity(quantity);
         }
     }
+
+    //===== PUT into cart with check stock ===
+    public String putWithCheckStock (Product item, int stockInDB) {
+        int currentQty = 0;
+        if (data.containsKey(item.getId())) {
+            currentQty = data.get(item.getId()).getQuantity();
+        }
+        int newQty = currentQty + item.getQuantity();
+
+        if (newQty > stockInDB){
+            int canAdd= stockInDB - currentQty;
+            if (canAdd <= 0 ){
+                return "Sản phẩm đã đạt giới hạn tồn kho (" + stockInDB + " sản phẩm)";
+            }
+            return "Chỉ có thể thêm tối đa "+ canAdd + " sản phảm ( Tồn kho: " + stockInDB+ ")";
+        }
+        if (data.containsKey(item.getId())){
+            data.get(item.getId()).quantityUp(item.getQuantity());
+        }else{
+            data.put(item.getId(), item);
+        }
+        return null;
+    }
+
+    // ======= UPDATE with check stock ====
+    public String updateWithStock ( int id, int newQty, int stockInDB){
+        if(newQty > stockInDB){
+            return "Số lượng tồn kho không đủ ("+ stockInDB + " sản phẩm)";
+        }
+        if(data.containsKey(id)){
+            data.get(id).setQuantity(newQty);
+        }
+        return null;
+    }
+
 }
