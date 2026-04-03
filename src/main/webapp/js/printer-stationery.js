@@ -262,9 +262,10 @@ function reassignFilterProduct() {
     }
 }
 
-export function initializePrinterStationery() {
+ function initializePrinterStationery() {
     initDropdown();
     initPagination();
     assignFilterProduct();
     reassignFilterProduct();
 }
+window.initializePrinterStationery = initializePrinterStationery;

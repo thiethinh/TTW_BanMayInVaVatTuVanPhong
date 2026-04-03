@@ -332,6 +332,11 @@
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="${pageContext.request.contextPath}/js/printer-stationery.js"></script>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        initializePrinterStationery();
+    });
+</script>
 </body>
 
 </html>

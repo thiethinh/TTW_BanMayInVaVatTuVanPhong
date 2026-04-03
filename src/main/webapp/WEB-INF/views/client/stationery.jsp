@@ -167,6 +167,11 @@
 <script type="module" src="${context}/js/main.js"></script>
 <script src="${context}/js/printer-stationery.js"></script>
 <script src="${context}/js/cart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        initializePrinterStationery();
+    });
+</script>
 
 </body>
 </html>

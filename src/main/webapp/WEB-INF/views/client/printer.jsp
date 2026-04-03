@@ -178,8 +178,13 @@
 
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 <script type="module" src="${context}/js/main.js"></script>
-<script type="module" src="${context}/js/printer-stationery.js"></script>
+<script src="${context}/js/printer-stationery.js"></script>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        initializePrinterStationery();
+    });
+</script>
 
 </body>
 
