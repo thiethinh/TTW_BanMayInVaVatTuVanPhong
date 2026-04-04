@@ -75,8 +75,14 @@
                                                id="qty-${item.id}"
                                                value="${item.quantity}"
                                                min="1"
+                                               maxlength="2"
+                                               max="${item.stockQuantity}"
                                                class="input-qty"
-                                               onchange="updateQuantity(${item.id}, 0)">
+                                               onchange="updateQuantity(${item.id}, 0)"
+                                               oninput="
+                                                       this.value = this.value.replace(/\D/g,'').slice(0,2);
+                                                       this.value = Math.min(Math.max(1, this.value || 1), ${p.stockQuantity})"
+                                        />
 
                                         <button type="button" class="btn-qty"
                                                 onclick="updateQuantity(${item.id}, 1)">
@@ -88,12 +94,10 @@
                                     Còn lại trong kho: <strong>${item.stockQuantity}</strong>
                                 </span>
 
-                                <a href="${pageContext.request.contextPath}/cart?action=remove&id=${item.id}">
-
-                                    <button id="bt-remove">
+                                    <button id="bt-remove" onclick="removeItem(${item.id})">
                                         <i class="fa fa-trash-can"></i> Xoá
                                     </button>
-                                </a>
+
                             </div>
 
                             <div class="item-cost">

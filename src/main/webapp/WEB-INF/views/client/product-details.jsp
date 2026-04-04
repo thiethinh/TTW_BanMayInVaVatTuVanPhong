@@ -118,8 +118,20 @@
                 <div class="block-quatity-cart">
                     <div class="quantity">
                         <button type="button" id="bt-down" class="qty-btn minus" onclick="updateQty(-1)">-</button>
-                        <input type="text" name="quantity" class="qty-input" id="qty-input" value="1" min="1"
-                               max="${p.stockQuantity > 0 ? p.stockQuantity : 1}"/>
+                        <input type="number"
+                               name="quantity"
+                               class="qty-input"
+                               id="qty-input"
+                               value="1"
+                               min="1"
+                               max="${p.stockQuantity > 0 ? p.stockQuantity : 1}"
+                               oninput="
+                                    this.value = this.value.replace(/\D/g,'').slice(0,2);
+                                    if(this.value === '' || this.value < 1) this.value = '';"
+                               onblur="
+                                       if(this.value === '' || parseInt(this.value) < 1) this.value = 1;
+                                       if(parseInt(this.value) > ${p.stockQuantity}) this.value = ${p.stockQuantity};
+                                       "/>
                         <button type="button" id="bt-up" class="qty-btn plus" onclick="updateQty(1)">+</button>
                     </div>
 
@@ -266,75 +278,38 @@
 
     function updateQty(val) {
         const input = document.getElementById('qty-input');
-        const newVal = parseInt(input.value) + val;
-        if (newVal >= 1 && newVal <= parseInt(input.getAttribute('max'))) input.value = newVal;
+        const max = parseInt(input.max) || 99;
+        const current = parseInt(input.value) || 1;
+        const newVal = current + val;
+
+        if (newVal < 1) return;
+
+        if (newVal > max) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Giới hạn tồn kho',
+                text: 'Chỉ còn ${max} sản phẩm trong kho',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+            return;
+        }
+        input.value = newVal;
     }
 
     function handleAddToCart() {
-        const isLoggedIn = ${not empty sessionScope.acc ? 'true' : 'false'};
-
-        // === Chưa login
-        if (!isLoggedIn) {
-            Swal.fire({
-                title: 'Yêu cầu đăng nhập',
-                text: "Bạn cần đăng nhập để thực hiện chức năng thêm vào giỏ hàng!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#165FF2',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Đăng nhập ngay',
-                cancelButtonText: 'Hủy',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const currentUrl = encodeURIComponent(window.location.href);
-                    window.location.href = '${pageContext.request.contextPath}/login?redirect=' + currentUrl;
-                }
-            });
-        } else {
-            //document.getElementById('addToCartForm').submit();
-            const form = document.getElementById('addToCartForm');
-            // lấy data
-            const formData = new FormData(form);
-            const pagram = new URLSearchParams(formData);
-
-            fetch('${pageContext.request.contextPath}/cart', {
-                method: 'POST',
-                headers: {
-                    'context-type': 'application/x-www-form-urlencoded'
-                },
-                body: pagram.toString()
-            }).then(res => {
-                if (res.ok) {
-                    if (typeof updateCartCount == 'function') {
-                        updateCartCount();
-                    }
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Đã thêm vào giỏ!',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                } else {
-                    swal.fire({
-                        icon: 'error',
-                        title: 'Thất bại!',
-                        text: 'Có lỗi xảy ra khi thêm vào gi hàng!'
-                    });
-                }
-            })
-                .catch(err => {
-                    console.error("Lỗi Fetch: ", err);
-                });
-        }
+        const qty = parseInt(document.getElementById('qty-input').value);
+        const productId = ${p.id};
+        addToCart(productId, qty);
     }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 
 </body>
 </html>
