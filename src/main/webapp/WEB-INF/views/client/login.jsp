@@ -198,7 +198,7 @@
                 </div>
 
                 <c:if test="${not empty errorVerify}">
-                    <p class="error-msg">${errorVerify}</p>
+                    <p class="error-msg" style="color: red">${errorVerify}</p>
                 </c:if>
 
                 <div class="input-box" style="margin-top: 20px;">
