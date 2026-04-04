@@ -1,10 +1,7 @@
 package com.papercraft.controller.client;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
@@ -12,12 +9,25 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        request.getSession().removeAttribute("acc");
+        // Xoá session
+        request.getSession().invalidate();
 
-        // Lấy CurentPage trước khi nhấn Logout
+        // Xóa Cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("cEmail".equals(cookie.getName()) || "cPassword".equals(cookie.getName())) {
+                    Cookie c = new Cookie(cookie.getName(), "");
+                    c.setMaxAge(0);
+                    c.setPath("/");
+                    response.addCookie(c);
+                }
+            }
+        }
+
         String referer = request.getHeader("Referer");
-
-        //nếu có trang trước đó thì quay lại, không thì về home
+        HttpSession session = request.getSession();
+        session.setAttribute("success", "Đăng xuất thành công");
         if (referer != null && !referer.contains("/logout")) {
             response.sendRedirect(referer);
         } else {

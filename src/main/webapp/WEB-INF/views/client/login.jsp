@@ -35,19 +35,20 @@
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
-                    <input type="email" name="email" class="input-field" placeholder="Email" required value="${email}">
+                    <input type="email" name="email" class="input-field" placeholder="Email" required value="${cEmail != null ? cEmail : ''}">
                     <i class="bx bx-user"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required>
+                    <input type="password" name="password" id="login-password" class="input-field" placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('login-password', this)"></i>
                 </div>
 
                 <div class="two-col">
                     <div class="one">
-                        <input type="checkbox" name="remember" id="login-check">
-                        <label for="login-check">Ghi nhớ mật khẩu</label>
+                        <input type="checkbox" name="remember" id="login-check" ${cRemember}>
+                        <label for="login-check">Ghi nhớ tôi</label>
                     </div>
 
                     <div class="two">
@@ -133,14 +134,16 @@
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required>
+                    <input type="password" name="password" id="register-password" class="input-field" placeholder="Mật khẩu" required>
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="confirmPassword" class="input-field" placeholder="Nhập lại mật khẩu"
+                    <input type="password" name="confirmPassword" id="confirm-password" class="input-field" placeholder="Nhập lại mật khẩu"
                            required>
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
                 </div>
 
                 <div class="two-col">
@@ -195,7 +198,7 @@
                 </div>
 
                 <c:if test="${not empty errorVerify}">
-                    <p class="error-msg">${errorVerify}</p>
+                    <p class="error-msg" style="color: red">${errorVerify}</p>
                 </c:if>
 
                 <div class="input-box" style="margin-top: 20px;">

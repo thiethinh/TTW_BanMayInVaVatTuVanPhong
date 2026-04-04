@@ -281,3 +281,27 @@ header {
 .social-login .btn:hover {
     background-color: rgb(248 249 250 / 0.86);
 }
+
+/*---------------- TOGGLE PASSWORD ----------------*/
+.input-box {
+    position: relative;
+}
+
+.input-box i.toggle-password {
+    position: absolute;
+    left: auto;
+    right: 17px;
+    top: 17px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+}
+
+.input-box i.toggle-password:hover {
+    color: var(--primary-color);
+}
+
+.input-box input[type="password"],
+.input-box input[type="text"] {
+    padding-right: 50px;
+}
