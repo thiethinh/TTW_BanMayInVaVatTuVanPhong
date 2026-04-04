@@ -40,8 +40,9 @@
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
+                    <input type="password" name="password" id="login-password" class="input-field" placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('login-password', this)"></i>
                 </div>
 
                 <div class="two-col">
@@ -133,14 +134,16 @@
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required>
+                    <input type="password" name="password" id="register-password" class="input-field" placeholder="Mật khẩu" required>
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="confirmPassword" class="input-field" placeholder="Nhập lại mật khẩu"
+                    <input type="password" name="confirmPassword" id="confirm-password" class="input-field" placeholder="Nhập lại mật khẩu"
                            required>
                     <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
                 </div>
 
                 <div class="two-col">
