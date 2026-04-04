@@ -63,12 +63,9 @@ function updateQuantity(productId, change) {
     let newQty = (change === 0) ? parseInt(input.value) : parseInt(input.value) +change;
 
     // Nếu giảm xuống dưới 1 -> Hỏi để xóa
-    if (newQty < 1) {
-        if (confirm("Bạn muốn xóa sản phẩm này?")) {
-            window.location.href = `${contextPath}/cart?action=remove&id=${productId}`;
-        } else {
-            input.value = 1;
-        }
+    if (newQty < 1 ) {
+        removeItem(productId);
+        input.value = 1;
         return;
     }
 
@@ -84,7 +81,7 @@ function updateQuantity(productId, change) {
                 location.reload();
             }else{
                 // reset input và hiện cảnh báo
-                input.value = newQty - change;
+                input.value = parseInt(input.value) - change || 1 ;
                 Swal.fire({
                     icon: 'warning',
                     title: 'Vượt quá số lượng tồn kho',
@@ -95,6 +92,23 @@ function updateQuantity(productId, change) {
         })
         .catch(err => console.error("Lỗi:", err));
 }
+// Validate input
+// document.querySelectorAll(".input-qty").forEach(input => {
+//     input.addEventListener("input", () => {
+//         // chỉ nhận số
+//         input.value = input.value.replace(/\D/g, "");
+//         //bỏ trống
+//         if(input.value.length = ""){
+//             input.value =1;
+//         }
+//         // length = 2
+//         if (input.value.length > 2) {
+//             input.value = input.value.slice(0, 2);
+//         }
+//         // không nhập < 1
+//         if (input.value < 1 || isNaN(input.value)) ;
+//     });
+// });
 
 // === update sluong treen icon gio hang ====
 function updateCartBadge(count){
@@ -111,5 +125,30 @@ function updateCartCount() {
         .then(res => res.text())
         .then(count => updateCartBadge(parseInt(count)) || 0);
 }
+
+// ==== remove Item
+function removeItem (productId){
+    Swal.fire({
+        title: 'Xóa sản phẩm?',
+        text: 'Bạn có chắc muốn xóa sản phẩm này không?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e53e3e',
+        cancelButtonColor: '#718096',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`${contextPath}/cart`,{
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded" },
+                body: `action=remove&id=${productId}`
+            })
+                .then(() => location.reload());
+        }
+    });
+}
+
 
 document.addEventListener("DOMContentLoaded", updateCartCount);

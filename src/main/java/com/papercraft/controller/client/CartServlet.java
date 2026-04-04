@@ -40,10 +40,12 @@ public class CartServlet extends HttpServlet {
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
+                System.out.println("Debug: id = " + id);
                 int qty = Integer.parseInt(request.getParameter("quantity"));
 
                 Product p = dao.getProductById(id);
-                if (p != null){
+                System.out.println("Debug: product = " + p);
+                if (p == null){
                     sendJson(response, false, "Sản phẩm không tồn tại", cart.getTotalQuantity());
                     return;
 
@@ -127,14 +129,22 @@ public class CartServlet extends HttpServlet {
 
         doGet(request, response);
     }
-    private void sendJson (HttpServletResponse response, boolean success,
-                           String message, int cartCount) throws IOException{
+    private void sendJson(HttpServletResponse response, boolean success,
+                          String message, int cartCount) throws IOException {
         response.setContentType("application/json; charset=UTF-8");
-        String msg= (message != null)? message.replace("\"","'") : "";
-        response.getWriter().print(
-          "{\"success\":" +success +
-          ",\"message\":\"" +msg +
-          ",\"cartCount\":\"" +cartCount + "}"
+
+        //=== Escape all ký tự nguy hiểm trong message
+        String safeMsg = (message == null) ? "" : message
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
+
+        String json = String.format(
+                "{\"success\":%b,\"message\":\"%s\",\"cartCount\":%d}",
+                success, safeMsg, cartCount
         );
+
+        response.getWriter().print(json);
     }
 }
