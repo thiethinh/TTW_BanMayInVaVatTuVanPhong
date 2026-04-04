@@ -35,19 +35,19 @@
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
-                    <input type="email" name="email" class="input-field" placeholder="Email" required value="${email}">
+                    <input type="email" name="email" class="input-field" placeholder="Email" required value="${cEmail != null ? cEmail : ''}">
                     <i class="bx bx-user"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required>
+                    <input type="password" name="password" class="input-field" placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
                     <i class="bx bx-lock-alt"></i>
                 </div>
 
                 <div class="two-col">
                     <div class="one">
-                        <input type="checkbox" name="remember" id="login-check">
-                        <label for="login-check">Ghi nhớ mật khẩu</label>
+                        <input type="checkbox" name="remember" id="login-check" ${cRemember}>
+                        <label for="login-check">Ghi nhớ tôi</label>
                     </div>
 
                     <div class="two">

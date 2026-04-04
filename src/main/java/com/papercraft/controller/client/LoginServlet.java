@@ -13,8 +13,19 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("cEmail".equals(cookie.getName())) {
+                    request.setAttribute("cEmail", cookie.getValue());
+                }
+                if ("cPassword".equals(cookie.getName())) {
+                    request.setAttribute("cPassword", cookie.getValue());
+                    request.setAttribute("cRemember", "checked");
+                }
+            }
+        }
         request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
-
     }
 
     @Override
@@ -22,8 +33,6 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String remember = request.getParameter("remember");
-
-
 
         UserDAO userDAO = new UserDAO();
         String passwordHash = MD5.getMD5(password);
@@ -35,6 +44,10 @@ public class LoginServlet extends HttpServlet {
 
             Cookie uEmail = new Cookie("cEmail", email);
             Cookie uPassword = new Cookie("cPassword", password);
+            uEmail.setHttpOnly(true);
+            uPassword.setHttpOnly(true);
+            uEmail.setPath("/");
+            uPassword.setPath("/");
 
             if ("on".equals(remember)) {
                 uEmail.setMaxAge(60 * 60 * 24 * 7);
@@ -49,42 +62,27 @@ public class LoginServlet extends HttpServlet {
 
             String redirectUrl = request.getParameter("redirect");
             String contextPath = request.getContextPath();
-            //debug
-            System.out.println("Debug: Redirect Url la: [" + redirectUrl + "]");
+
             if (redirectUrl != null && !redirectUrl.trim().isEmpty() && !redirectUrl.equalsIgnoreCase("null")) {
                 String finalRedirect;
                 if (redirectUrl.startsWith("http") || redirectUrl.startsWith(contextPath)) {
                     finalRedirect = redirectUrl;
                 } else {
-                    // thêm dấu gạch chéo giữa contextPath & redirectUrl
                     finalRedirect = contextPath + (redirectUrl.startsWith("/") ? "" : "/") + redirectUrl;
                 }
-
-                System.out.println("Debug: chuyen huong den: " + finalRedirect);
                 response.sendRedirect(finalRedirect);
-                return;
-
             } else {
-                // xly điều hướng mặc định theo role nếu không có redirectUrl
-                User acc = (User) session.getAttribute("acc");
-
-                if (acc != null && "ADMIN".equalsIgnoreCase(acc.getRole())) {
+                if ("ADMIN".equalsIgnoreCase(user.getRole())) {
                     response.sendRedirect(contextPath + "/admin");
                 } else {
                     response.sendRedirect(contextPath + "/home");
                 }
-                return;
             }
         } else {
             request.setAttribute("msg", "Tài khoản hoặc mật khẩu không đúng!");
             request.setAttribute("email", email);
-
-            // Gửi lại (tham số redirect) cho form hidden trong login.jsp để không bị mất dấu trang cũ
-            String redirectParam = request.getParameter("redirect");
-            request.setAttribute("redirect", redirectParam);
-
+            request.setAttribute("redirect", request.getParameter("redirect"));
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
-
         }
     }
 }
