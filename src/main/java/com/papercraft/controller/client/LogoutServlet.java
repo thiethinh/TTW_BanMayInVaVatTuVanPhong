@@ -26,6 +26,8 @@ public class LogoutServlet extends HttpServlet {
         }
 
         String referer = request.getHeader("Referer");
+        HttpSession session = request.getSession();
+        session.setAttribute("success", "Đăng xuất thành công");
         if (referer != null && !referer.contains("/logout")) {
             response.sendRedirect(referer);
         } else {
