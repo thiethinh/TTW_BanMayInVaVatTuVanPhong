@@ -11,6 +11,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'stationery': 'nav-stationery'
     };
 
+    const menuResponsive = document.querySelector('.menu-responsive');
+    const overlay = document.querySelector('.menu-overlay');
+    const navWrapper = document.querySelector('.nav-wrapper');
+
+    if (menuResponsive && overlay && navWrapper) {
+        menuResponsive.addEventListener('click', (e) => {
+            e.stopPropagation()
+            overlay.appendChild(navWrapper);
+            navWrapper.style.display = 'block';
+            overlay.classList.add('active');
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target !== menuResponsive && !overlay.contains(e.target)) {
+            overlay.classList.remove('active');
+        }
+    });
+
     document.querySelectorAll('.menu, .login-btn').forEach(link => {
         link.classList.remove('active-menu');
     });

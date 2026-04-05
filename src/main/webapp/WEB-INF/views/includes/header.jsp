@@ -2,8 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <header class="main-header">
+    <div class="menu-overlay"></div>
     <nav>
         <div class="header-container">
+
+            <div class="menu-responsive">
+                <i class="fas fa-bars"></i>
+            </div>
 
             <!-- LOGO -->
             <a href="${pageContext.request.contextPath}/home" class="logo">
@@ -11,12 +16,14 @@
                      height="80" width="80"/>
             </a>
 
+
             <!-- MENU -->
             <div class="nav-wrapper">
                 <div class="menu-bar">
                     <a class="menu" id="nav-home" href="${pageContext.request.contextPath}/home">Trang Chủ</a>
                     <a class="menu" id="nav-printer" href="${pageContext.request.contextPath}/printer">Máy In</a>
-                    <a class="menu" id="nav-stationery" href="${pageContext.request.contextPath}/stationery">Văn Phòng Phẩm</a>
+                    <a class="menu" id="nav-stationery" href="${pageContext.request.contextPath}/stationery">Văn Phòng
+                        Phẩm</a>
                     <a class="menu" id="nav-blog" href="${pageContext.request.contextPath}/blog">Blog</a>
                     <a class="menu" id="nav-contact" href="${pageContext.request.contextPath}/contact">Liên Hệ</a>
                 </div>
@@ -28,24 +35,25 @@
 
                     <%-- ================= CART ================= --%>
 
-                        <c:set var="cartCount" value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
+                    <c:set var="cartCount"
+                           value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
 
-                        <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
-                            <i class="fa-solid fa-cart-shopping"></i>
+                    <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
 
-                            <span id="cartCount" class="cart-count"
-                                  style="display: ${cartCount > 0 ? 'flex' : 'none'};">
-                                ${cartCount}
-                            </span>
-                        </a>
+                        <span id="cartCount" class="cart-count"
+                              style="display: ${cartCount > 0 ? 'flex' : 'none'};">
+                            ${cartCount}
+                        </span>
+                    </a>
 
                     <%-- =============== LOGIN / USER ================= --%>
-                        <%-- lấy đường dẫn hiện tại   --%>
-                        <c:set var="uri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
-                        <%-- Laây stham số --%>
-                        <c:set var="query" value="${pageContext.request.queryString}"/>
-                        <%-- Gộp lại thành URL hoàn chỉnh ...?id=... --%>
-                        <c:set var="currentUrl" value="${not empty query ? uri.concat('?').concat(query) : uri}"/>
+                    <%-- lấy đường dẫn hiện tại   --%>
+                    <c:set var="uri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
+                    <%-- Laây stham số --%>
+                    <c:set var="query" value="${pageContext.request.queryString}"/>
+                    <%-- Gộp lại thành URL hoàn chỉnh ...?id=... --%>
+                    <c:set var="currentUrl" value="${not empty query ? uri.concat('?').concat(query) : uri}"/>
 
                     <c:if test="${empty sessionScope.acc}">
                         <a class="login-btn"
@@ -74,7 +82,6 @@
 
                 </div>
             </div>
-
         </div>
     </nav>
 </header>
@@ -82,5 +89,5 @@
     const IS_LOGGED_IN = ${not empty sessionScope.acc ? 'true' : 'false'};
     const CONTEXT_PATH = "${pageContext.request.contextPath}";
 </script>
-//debug cart
+<%--//debug cart--%>
 <input type="hidden" id="globalContextPath" value="${pageContext.request.contextPath}">
