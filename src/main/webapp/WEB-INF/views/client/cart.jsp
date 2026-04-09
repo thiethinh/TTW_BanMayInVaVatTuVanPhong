@@ -81,7 +81,11 @@
                                                onchange="updateQuantity(${item.id}, 0)"
                                                oninput="
                                                        this.value = this.value.replace(/\D/g,'').slice(0,2);
-                                                       this.value = Math.min(Math.max(1, this.value || 1), ${p.stockQuantity})"
+                                                       this.value = Math.min(Math.max(1, this.value || 1), ${item.stockQuantity})"
+                                               onblur="
+                                                       if(this.value === '' || parseInt(this.value) < 1) this.value = 1;
+                                                       if(parseInt(this.value) > ${item.stockQuantity}) this.value = ${item.stockQuantity};
+                                                       "
                                         />
 
                                         <button type="button" class="btn-qty"
