@@ -44,12 +44,10 @@ public class ForgotPasswordServlet extends HttpServlet {
 
                     response.getWriter().write("Thành công");
                 } else {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.getWriter().write("Gửi email thất bại! Vui lòng kiểm tra lại kết nối hoặc email.");
+                    session.setAttribute("error", "Gửi email thất bại! Vui lòng kiểm tra lại kết nối hoặc email");
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("Email không tồn tại trong hệ thống!");
+                session.setAttribute("error", "Email không tồn tại trong hệ thống!");
             }
         } else {
             request.getRequestDispatcher("/WEB-INF/views/client/forgot-password.jsp").forward(request, response);
@@ -63,14 +61,14 @@ public class ForgotPasswordServlet extends HttpServlet {
         Long createTime = (Long) session.getAttribute("OTP_createTime");
 
         if (systemOtp == null || createTime == null) {
-            request.setAttribute("message", "Phiên giao dịch đã hết hạn hoặc không hợp lệ. Vui lòng lấy lại mã.");
+            request.setAttribute("error", "Phiên giao dịch đã hết hạn hoặc không hợp lệ. Vui lòng lấy lại mã.");
             request.getRequestDispatcher("/WEB-INF/views/client/forgot-password.jsp").forward(request, response);
             return;
         }
 
         if (System.currentTimeMillis() - createTime > 300000) {
             session.removeAttribute("OTP_CODE");
-            request.setAttribute("message", "Mã OTP đã hết hạn!");
+            request.setAttribute("error", "Mã OTP đã hết hạn!");
             request.getRequestDispatcher("/WEB-INF/views/client/forgot-password.jsp").forward(request, response);
             return;
         }
@@ -82,7 +80,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             session.setAttribute("IS_VERIFIED", true);
             response.sendRedirect("reset-password");
         } else {
-            request.setAttribute("message", "Mã OTP sai hoặc đã hết hạn!");
+            request.setAttribute("error", "Mã OTP sai hoặc đã hết hạn!");
             request.getRequestDispatcher("/WEB-INF/views/client/forgot-password.jsp").forward(request, response);
         }
     }

@@ -46,7 +46,8 @@
 
 
                 <div class="search-box child">
-                    <input type="text" name="search" id="search" value="${search}" placeholder="Nhập từ khóa tìm kiếm...">
+                    <input type="text" name="search" id="search" value="${search}"
+                           placeholder="Nhập từ khóa tìm kiếm...">
                 </div>
 
                 <input type="hidden" name="category" id="category-input" value="${empty categoryId ? 0 : categoryId }">
@@ -120,6 +121,7 @@
 
                 <h3 class="product-name">
                     <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
+                       class="stretched-link"
                        style="text-decoration: none; color: inherit;">
                             ${p.productName}
                     </a>
@@ -153,15 +155,14 @@
                 </div>
 
                 <div class="action">
-                    <button class="add-cart" type="button" onclick="addToCart(${p.id})"><span><i
+                    <button class="add-cart relative-btn" type="button" onclick="addToCart(${p.id})"><span><i
                             class='bx bx-cart'></i></span>
                         <p>Thêm Vào Giỏ</p>
                     </button>
 
-
                     <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
                        style="text-decoration: none;">
-                        <button class="bt-detail">Xem</button>
+                        <button class="bt-detail relative-btn">Xem</button>
                     </a>
                 </div>
             </div>
