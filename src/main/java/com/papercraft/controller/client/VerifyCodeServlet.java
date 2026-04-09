@@ -27,6 +27,15 @@ public class VerifyCodeServlet extends HttpServlet {
             return;
         }
 
+        Long createTime = (Long) session.getAttribute("REG_OTP_createTime");
+        if (createTime != null && (System.currentTimeMillis() - createTime) > 300000) {
+            request.setAttribute("error", "OTP đã hết hạn! Vui lòng bấm gửi lại mã");
+            request.setAttribute("showVerifyModal", true);
+            request.setAttribute("activeTab", "register");
+            request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
+            return;
+        }
+
         if (inputOTP.equals(serverOTP)) {
             UserDAO dao = new UserDAO();
             dao.signup(tempUser);
@@ -35,11 +44,14 @@ public class VerifyCodeServlet extends HttpServlet {
             session.removeAttribute("tempUser");
             session.removeAttribute("REG_OTP_createTime");
 
+            session.removeAttribute("OTP_resend_count");
+            session.removeAttribute("OTP_lockout_time");
+
             session.setAttribute("msg", "Đăng ký thành công! Bạn có thể đăng nhập");
 
             response.sendRedirect(request.getContextPath() + "/login");
         } else {
-            request.setAttribute("errorVerify", "Mã OTP không đúng");
+            request.setAttribute("error", "Mã OTP không đúng");
             request.setAttribute("showVerifyModal", true);
             request.setAttribute("activeTab", "register");
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);

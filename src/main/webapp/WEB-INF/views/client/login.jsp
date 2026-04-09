@@ -35,12 +35,14 @@
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
-                    <input type="email" name="email" class="input-field" placeholder="Email" required value="${cEmail != null ? cEmail : ''}">
+                    <input type="email" name="email" class="input-field" placeholder="Email" required
+                           value="${cEmail != null ? cEmail : ''}">
                     <i class="bx bx-user"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" id="login-password" class="input-field" placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
+                    <input type="password" name="password" id="login-password" class="input-field"
+                           placeholder="Mật khẩu" required value="${cPassword != null ? cPassword : ''}">
                     <i class="bx bx-lock-alt"></i>
                     <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('login-password', this)"></i>
                 </div>
@@ -134,13 +136,15 @@
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="password" id="register-password" class="input-field" placeholder="Mật khẩu" required>
+                    <input type="password" name="password" id="register-password" class="input-field"
+                           placeholder="Mật khẩu" required>
                     <i class="bx bx-lock-alt"></i>
                     <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
                 </div>
 
                 <div class="input-box">
-                    <input type="password" name="confirmPassword" id="confirm-password" class="input-field" placeholder="Nhập lại mật khẩu"
+                    <input type="password" name="confirmPassword" id="confirm-password" class="input-field"
+                           placeholder="Nhập lại mật khẩu"
                            required>
                     <i class="bx bx-lock-alt"></i>
                     <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
@@ -193,13 +197,20 @@
             <p>Mã OTP đã gửi đến: <strong>${tempUser.email}</strong></p>
 
             <form action="verify-code" method="post">
-                <div class="input-box">
-                    <input type="text" name="otp" class="input-field" placeholder="Nhập mã 6 số" required maxlength="6">
-                </div>
+                <p id="status-msg" style="text-align: center;">
+                    <c:if test="${not empty error}">
+                        <span style="color: red;">${error}</span>
+                    </c:if>
+                    <c:if test="${not empty success}">
+                        <span style="color: green;">${success}</span>
+                    </c:if>
+                </p>
 
-                <c:if test="${not empty errorVerify}">
-                    <p class="error-msg" style="color: red">${errorVerify}</p>
-                </c:if>
+                <div class="otp-input-row">
+                    <input type="text" name="otp" class="input-field" placeholder="Nhập mã 6 số" required maxlength="6">
+
+                    <button type="button" class="resend-otp" id="btn-resend-otp" disabled>Gửi lại mã (30s)</button>
+                </div>
 
                 <div class="input-box" style="margin-top: 20px;">
                     <input type="submit" class="submit" value="Xác nhận">
@@ -212,6 +223,60 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const resendBtn = document.getElementById("btn-resend-otp");
+            const statusMsg = document.getElementById("status-msg");
+            let timer;
+
+            function startTimer() {
+                let timeLeft = 30;
+                resendBtn.disabled = true;
+                resendBtn.style.cursor = "not-allowed";
+                resendBtn.style.opacity = "0.7";
+
+                timer = setInterval(() => {
+                    timeLeft--;
+                    resendBtn.innerText = "Gửi lại mã (" + timeLeft + "s)";
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        resendBtn.disabled = false;
+                        resendBtn.style.cursor = "pointer";
+                        resendBtn.style.opacity = "1";
+                        resendBtn.innerText = "Gửi lại mã"
+                    }
+                }, 1000);
+            }
+
+            if (resendBtn) {
+                startTimer();
+                resendBtn.addEventListener("click", function () {
+                    resendBtn.disabled = true;
+                    resendBtn.innerText = "Đang gửi lại mã";
+
+                    fetch("${pageContext.request.contextPath}/resend-otp", {
+                        method: "POST",
+                    }).then(response => response.json()).then(data => {
+                        statusMsg.innerHTML = data.message;
+                        if (data.status === "success") {
+                            statusMsg.style.color = "green";
+                            startTimer();
+                        } else {
+                            statusMsg.style.color = "red";
+                            if (!data.message.includes("phút")) {
+                                resendBtn.disabled = false;
+                            }
+                        }
+                    }).catch(e => {
+                        statusMsg.innerHTML = '<span style="color: red;">Lỗi kết nối máy chủ!</span>';
+                        resendBtn.disabled = false;
+                    })
+                });
+            }
+        });
+    </script>
 </c:if>
 </body>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
