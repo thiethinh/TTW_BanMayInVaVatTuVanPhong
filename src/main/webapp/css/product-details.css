@@ -11,10 +11,11 @@
     margin-top: 10px;
     display: flex;
     gap: 30px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 40px;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 /* =========Img selected================= */
@@ -22,6 +23,8 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    flex-shrink: 0;
+    width: 80px;
 }
 
 .product-details-main .product-details nav .img-select {
@@ -61,7 +64,8 @@
 
 /* ================Img-Main======================= */
 .product-details-main .product-details .img-main {
-    width: fit-content;
+    width: 500px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,6 +95,7 @@
 
 .product-details-main .product-details .info-product {
     max-width: 450px;
+    min-width: 0;
     padding: 0 20px;
     flex: 1;
 }

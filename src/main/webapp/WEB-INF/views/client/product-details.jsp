@@ -118,7 +118,7 @@
                 <div class="block-quatity-cart">
                     <div class="quantity">
                         <button type="button" id="bt-down" class="qty-btn minus" onclick="updateQty(-1)">-</button>
-                        <input type="number"
+                        <input type="text"
                                name="quantity"
                                class="qty-input"
                                id="qty-input"
