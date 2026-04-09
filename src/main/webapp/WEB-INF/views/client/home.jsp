@@ -72,6 +72,7 @@
 
                         <h3 class="product-name">
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
+                               class="stretched-link"
                                style="text-decoration: none; color: inherit;">
                                     ${p.productName}
                             </a>
@@ -83,7 +84,8 @@
                             </c:forTokens>
                         </ul>
 
-                        <div class="product-price-box" style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
+                        <div class="product-price-box"
+                             style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
                             <c:if test="${p.discount > 0.0}">
                             <span class="old-price"
                                   style="text-decoration: line-through; color: #888; font-size: 14px; margin-right: 8px;">
@@ -104,14 +106,14 @@
                         </div>
 
                         <div class="action">
-                            <button class="add-cart" type="button" onclick="addToCart(${p.id})"><span><i
+                            <button class="add-cart relative-btn" type="button" onclick="addToCart(${p.id})"><span><i
                                     class='bx bx-cart'></i></span>
                                 <p>Thêm Vào Giỏ</p>
                             </button>
 
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
                                style="text-decoration: none;">
-                                <button class="bt-detail">Xem</button>
+                                <button class="bt-detail relative-btn">Xem</button>
                             </a>
                         </div>
                     </div>
@@ -154,6 +156,7 @@
 
                         <h3 class="product-name">
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
+                               class="stretched-link"
                                style="text-decoration: none; color: inherit;">
                                     ${p.productName}
                             </a>
@@ -165,7 +168,8 @@
                             </c:forTokens>
                         </ul>
 
-                        <div class="product-price-box" style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
+                        <div class="product-price-box"
+                             style="display: flex;margin: 0 25px 10px 10px;padding :5px; justify-content: right;">
                             <c:if test="${p.discount > 0.0}">
                             <span class="old-price"
                                   style="text-decoration: line-through; color: #888; font-size: 14px; margin-right: 8px;">
@@ -186,14 +190,14 @@
                         </div>
 
                         <div class="action">
-                            <button class="add-cart" type="button" onclick="addToCart(${p.id})"><span><i
+                            <button class="add-cart relative-btn" type="button" onclick="addToCart(${p.id})"><span><i
                                     class='bx bx-cart'></i></span>
                                 <p>Thêm Vào Giỏ</p>
                             </button>
 
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${p.id}"
                                style="text-decoration: none;">
-                                <button class="bt-detail">Xem</button>
+                                <button class="bt-detail relative-btn" type="button">Xem</button>
                             </a>
                         </div>
                     </div>
@@ -310,7 +314,7 @@
     if (msg != null) {
 %>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         Swal.fire({
             title: 'Thành công!',
             text: '<%= msg %>',

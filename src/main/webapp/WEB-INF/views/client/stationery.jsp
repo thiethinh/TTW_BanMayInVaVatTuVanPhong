@@ -107,6 +107,7 @@
 
                         <h3 class="product-name">
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${s.id}"
+                               class="stretched-link"
                                style="text-decoration: none; color: inherit;">
                                     ${s.productName}
                             </a>
@@ -140,7 +141,7 @@
                         </div>
 
                         <div class="action">
-                            <button class="add-cart" type="button" onclick="addToCart(${s.id})"><span><i
+                            <button class="add-cart relative-btn" type="button" onclick="addToCart(${s.id})"><span><i
                                     class='bx bx-cart'></i></span>
                                 <p>Thêm Vào Giỏ</p>
                             </button>
@@ -148,7 +149,7 @@
 
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${s.id}"
                                style="text-decoration: none;">
-                                <button class="bt-detail">Xem</button>
+                                <button class="bt-detail relative-btn">Xem</button>
                             </a>
                         </div>
                     </div>
