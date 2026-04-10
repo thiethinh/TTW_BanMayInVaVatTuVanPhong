@@ -21,8 +21,14 @@
 
 
     <link rel="icon" href="${pageContext.request.contextPath}/images/logo.webp"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/product-details.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/product-details.css"/>
+
+    <meta property="og:title" content="${p.productName}" />
+    <meta property="og:description" content="${p.descriptionThumbnail}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.requestURI}" />
+    <meta property="og:image" content="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}/${p.thumbnail}" />
 </head>
 
 <body data-context="${pageContext.request.contextPath}">
@@ -35,20 +41,20 @@
             <div class="img-select">
                 <button class="bt-img-0 selected" type="button"
                         onclick="changeMainImage('${pageContext.request.contextPath}/${p.thumbnail}', this)">
-                    <img src="${pageContext.request.contextPath}/${p.thumbnail}" alt="Main Thumb">
+                    <img src="${pageContext.request.contextPath}/${p.thumbnail}" alt="Main Thumb"/>
                 </button>
 
                 <c:forEach var="imgName" items="${listImages}" varStatus="loop" begin="1">
                     <button class="bt-img-0" type="button"
                             onclick="changeMainImage('${pageContext.request.contextPath}/${imgName}', this)">
-                        <img src="${pageContext.request.contextPath}/${imgName}" alt="Gallery ${loop.index}">
+                        <img src="${pageContext.request.contextPath}/${imgName}" alt="Gallery ${loop.index}"/>
                     </button>
                 </c:forEach>
             </div>
         </nav>
 
         <div class="img-main">
-            <img id="main-image-display" src="${pageContext.request.contextPath}/${p.thumbnail}" alt="${p.productName}">
+            <img id="main-image-display" src="${pageContext.request.contextPath}/${p.thumbnail}" alt="${p.productName}"/>
         </div>
 
         <div class="info-product">
@@ -153,10 +159,9 @@
 
             <div class="product-share">
                 <span>Chia sẻ:</span>
-                <i id="fb" class="fa-brands fa-facebook-f"></i>
-                <i id="twitter" class="fa-brands fa-twitter"></i>
-                <i id="instagram" class="fa-brands fa-instagram"></i>
-                <i id="pinterest" class="fa-brands fa-pinterest-p"></i>
+                <i id="fb" class="fa-brands fa-facebook-f" onclick="shareTo('facebook')"></i>
+                <i id="twitter" class="fa-brands fa-twitter" onclick="shareTo('twitter')"></i>
+                <i id="pinterest" class="fa-brands fa-pinterest-p" onclick="shareTo('pinterest')"></i>
             </div>
         </div>
     </section>
@@ -288,7 +293,7 @@
             Swal.fire({
                 icon: 'warning',
                 title: 'Giới hạn tồn kho',
-                text: 'Chỉ còn ${max} sản phẩm trong kho',
+                text: 'Chỉ còn +${max}+ sản phẩm trong kho',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -304,12 +309,26 @@
         const productId = ${p.id};
         addToCart(productId, qty);
     }
+
+    function shareTo(platform) {
+        const productUrl = encodeURIComponent(window.location.href);
+
+        const links = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${productUrl}`,
+            twitter: `https://twitter.com/intent/tweet?url=${productUrl}`,
+            pinterest: `https://pinterest.com/pin/create/button/?url=${productUrl}`
+        };
+
+        window.open(links[platform], '_blank', 'width=700,height=500');
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
+
+
 
 </body>
 </html>
