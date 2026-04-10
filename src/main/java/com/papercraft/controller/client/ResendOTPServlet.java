@@ -16,10 +16,12 @@ public class ResendOTPServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         HttpSession session = request.getSession();
-        User tempUser = (User) session.getAttribute("tempUser");
 
-        if (tempUser == null) {
-            response.getWriter().write("{\"status\": \"error\", \"message\": \"Phiên đăng ký hết hạn, vui lòng đăng ký lại!\"}");
+        User tempUser = (User) session.getAttribute("tempUser");
+        String resetEmail = (String) session.getAttribute("RESET_EMAIL");
+
+        if (tempUser == null && resetEmail == null) {
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Phiên giao dịch hết hạn, vui lòng thao tác lại!\"}");
             return;
         }
 
@@ -48,10 +50,16 @@ public class ResendOTPServlet extends HttpServlet {
         }
 
         String newOTP = EmailUtils.generateOTP();
-        boolean isSent = EmailUtils.sendRegisterOTP(tempUser.getEmail(), newOTP);
+        boolean isSent = false;
+        if (tempUser != null) {
+            isSent = EmailUtils.sendRegisterOTP(tempUser.getEmail(), newOTP);
+            if (isSent) session.setAttribute("authCode", newOTP);
+        } else if (resetEmail != null) {
+            isSent = EmailUtils.sendForgotPasswordOTP(resetEmail, newOTP);
+            if (isSent) session.setAttribute("OTP_CODE", newOTP);
+        }
 
         if (isSent) {
-            session.setAttribute("authCode", newOTP);
             session.setAttribute("OTP_resend_count", resendCount + 1);
             session.setAttribute("REG_OTP_createTime", currentTime);
             response.getWriter().write("{\"status\": \"success\", \"message\": \"Gửi lại mã thành công\"}");
