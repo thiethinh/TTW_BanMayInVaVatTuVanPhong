@@ -38,14 +38,24 @@
                     <c:set var="cartCount"
                            value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
 
-                    <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
-                        <i class="fa-solid fa-cart-shopping"></i>
-
-                        <span id="cartCount" class="cart-count"
-                              style="display: ${cartCount > 0 ? 'flex' : 'none'};">
-                            ${cartCount}
-                        </span>
-                    </a>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.acc}">
+                            <%-- Đã login - cho vào --%>
+                            <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span id="cartCount" class="cart-count"
+                                      style="display: ${cartCount > 0 ? 'flex' : 'none'};">
+                                        ${cartCount}
+                                </span>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <%--  Chưa login => hiện swal--%>
+                            <a href="#" onclick="requireLoginForCart()" id="nav-cart" class="cart-btn">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
 
                     <%-- =============== LOGIN / USER ================= --%>
                     <%-- lấy đường dẫn hiện tại   --%>
@@ -88,6 +98,24 @@
 <script>
     const IS_LOGGED_IN = ${not empty sessionScope.acc ? 'true' : 'false'};
     const CONTEXT_PATH = "${pageContext.request.contextPath}";
+
+    function requireLoginForCart(){
+        Swal.fire({
+            title: 'Bạn chưa đăng nhập!',
+            text: 'Vui lòng đăng nhập để xem giỏ hàng',
+            icon:'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#165FF2',
+            cancelButtonColor: '#718096',
+            confirmButtonText:'Đăng nhập ngay',
+            cancelButtonText:'Để sau',
+            reverseButtons: true
+        }).then((result => {
+            if (result.isConfirmed){
+                window.location.href= CONTEXT_PATH + '/login?redirect=/cart';
+            }
+        }));
+    }
 </script>
 <%--//debug cart--%>
 <input type="hidden" id="globalContextPath" value="${pageContext.request.contextPath}">

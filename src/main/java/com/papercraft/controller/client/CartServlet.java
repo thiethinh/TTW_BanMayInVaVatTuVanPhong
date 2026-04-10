@@ -27,9 +27,14 @@ public class CartServlet extends HttpServlet {
 
         //== check login mới được thêm vào gior hàng( chặn từ server) ===
         if (session.getAttribute("acc") == null && !"count".equals(action)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if(action ==null){
+                response.sendRedirect((request.getContextPath() + "/login?redirect=/cart"));
+            }else{
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
             return;
         }
+
 
         Cart cart = (Cart) session.getAttribute("cart");
         if(cart == null){
