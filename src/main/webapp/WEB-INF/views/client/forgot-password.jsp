@@ -130,11 +130,47 @@
                 });
             </script>
         </div>
-
     </div>
 </div>
 
 <jsp:include page="../includes/footer.jsp"/>
+
+<c:if test="${IS_VERIFIED}">
+    <div class="reset-password-overlay">
+        <div class="reset-password-box">
+            <h3>Đổi mật khẩu mới</h3>
+
+            <form action="reset-password" method="post">
+                <p id="status-msg" style="text-align: center">
+                    <c:if test="${not empty error}">
+                        <span style="color: red;">${error}</span>
+                    </c:if>
+                    <c:if test="${not empty success}">
+                        <span style="color: green;">${success}</span>
+                    </c:if>
+                </p>
+
+                <div class="input-box">
+                    <input type="password" class="input-field" name="newPass" id="new-pass" placeholder="Nhập mật khẩu mới" required>
+                    <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('new-pass', this)"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="password" name="confirmPassword" id="confirm-password" class="input-field"
+                           placeholder="Nhập lại mật khẩu"
+                           required>
+                    <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
+                </div>
+
+                <div class="input-box">
+                    <input type="submit" class="submit" value="Cập nhật mật khẩu">
+                </div>
+            </form>
+        </div>
+    </div>
+</c:if>
 </body>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 

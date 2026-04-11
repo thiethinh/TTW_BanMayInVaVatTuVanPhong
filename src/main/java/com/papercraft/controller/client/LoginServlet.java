@@ -79,7 +79,7 @@ public class LoginServlet extends HttpServlet {
                 }
             }
         } else {
-            request.setAttribute("msg", "Tài khoản hoặc mật khẩu không đúng!");
+            request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng!");
             request.setAttribute("email", email);
             request.setAttribute("redirect", request.getParameter("redirect"));
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);

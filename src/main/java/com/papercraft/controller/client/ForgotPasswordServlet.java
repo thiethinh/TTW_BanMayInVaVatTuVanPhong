@@ -83,9 +83,9 @@ public class ForgotPasswordServlet extends HttpServlet {
         if (systemOtp.equals(otp)) {
             session.removeAttribute("OTP_CODE");
             session.removeAttribute("OTP_createTime");
-
+            session.setAttribute("success", "Nhập OTP thành công, vui lòng nhập mật khẩu mới");
             session.setAttribute("IS_VERIFIED", true);
-            response.sendRedirect(request.getContextPath() + "/reset-password");
+            response.sendRedirect(request.getContextPath() + "/forgot-password");
         } else {
             request.setAttribute("error", "Mã OTP không chính xác!");
             request.setAttribute("showOTPField", true);
