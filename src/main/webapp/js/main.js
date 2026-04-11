@@ -42,6 +42,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.togglePassword = function (inputId, icon) {
+        const input = document.getElementById(inputId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye-slash")
+            icon.classList.add("fa-eye")
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        }
+    }
+
     // IMPORT MODULE
     if (document.querySelector('.hero-slider.swiper')) {
         import('./swiper.js')
@@ -61,13 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         import('./blog.js')
             .then(module => {
                 module.initializeBlogNavigation();
-            })
-    }
-
-    if (document.querySelector('.stats-section') || document.querySelector('.values-section')) {
-        import('./about.js')
-            .then(module => {
-                module.initializeScrollAnimations();
             })
     }
 

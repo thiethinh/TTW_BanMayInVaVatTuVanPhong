@@ -22,7 +22,7 @@ public class VerifyCodeServlet extends HttpServlet {
         User tempUser = (User) session.getAttribute("tempUser");
 
         if (serverOTP == null || tempUser == null) {
-            request.setAttribute("msg", "Phiên giao dịch hết hạn vui lòng đăng ký lại");
+            request.setAttribute("error", "Phiên giao dịch hết hạn vui lòng đăng ký lại");
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
             return;
         }

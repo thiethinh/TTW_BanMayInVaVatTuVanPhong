@@ -41,6 +41,7 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("acc", user);
+            session.setAttribute("success", "Bạn đã đăng nhập thành công!");
 
             Cookie uEmail = new Cookie("cEmail", email);
             Cookie uPassword = new Cookie("cPassword", password);
@@ -79,7 +80,7 @@ public class LoginServlet extends HttpServlet {
                 }
             }
         } else {
-            request.setAttribute("msg", "Tài khoản hoặc mật khẩu không đúng!");
+            request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng!");
             request.setAttribute("email", email);
             request.setAttribute("redirect", request.getParameter("redirect"));
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
