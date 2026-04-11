@@ -254,7 +254,7 @@
                             </c:when>
                             <c:otherwise>
                                 <a href="javascript:void(0)" class="bt-submit-review"
-                                   onclick="window.location.href='login.jsp?redirect='+encodeURIComponent(window.location.href)">Đăng
+                                   onclick="window.location.href='login?redirect='+encodeURIComponent(window.location.href)">Đăng
                                     nhập để đánh giá</a>
                             </c:otherwise>
                         </c:choose>
