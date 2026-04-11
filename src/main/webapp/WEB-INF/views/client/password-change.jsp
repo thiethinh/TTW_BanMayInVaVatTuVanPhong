@@ -39,22 +39,28 @@
                 <form action="change-password" method="post" class="account-form">
 
                     <div class="form-group">
-                        <label for="phone">Mật Khẩu cũ</label>
+                        <label for="oldPassword">Mật Khẩu cũ</label>
                         <input type="password" id="oldPassword" name="oldPassword" placeholder="Mật khẩu cũ" required>
+                        <i class="bx bx-lock-alt"></i>
+                        <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('oldPassword', this)"></i>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mật khẩu mới</label>
+                        <label for="newPassword">Mật khẩu mới</label>
                         <input type="password" id="newPassword" name="newPassword" placeholder="Mật khẩu mới" required>
+                        <i class="bx bx-lock-alt"></i>
+                        <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('newPassword', this)"></i>
                     </div>
+
                     <div class="form-group">
-                        <label for="password">Xác nhận mật khẩu</label>
+                        <label for="confirmPassword">Xác nhận mật khẩu</label>
                         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                        <i class="bx bx-lock-alt"></i>
+                        <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
-
 
             </section>
         </div>

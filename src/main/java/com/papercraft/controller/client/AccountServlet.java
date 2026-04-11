@@ -23,7 +23,7 @@ public class AccountServlet extends HttpServlet {
         AddressDAO addressDAO = new AddressDAO();
 
         if (user == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -67,7 +67,7 @@ public class AccountServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
