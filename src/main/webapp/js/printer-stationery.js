@@ -211,12 +211,12 @@ function assignFilterProduct() {
 
         dropdown.querySelectorAll('.option-item').forEach(item => {
             item.addEventListener('click', () => {
-                let value = item.dataset.value
+                let value = item.dataset.value.trim()
                 if (hiddenInput && hiddenInput.type === "hidden") {
                     hiddenInput.value = value
                 }
                 if (selectedValue) {
-                    selectedValue.innerText = item.innerText;
+                    selectedValue.innerText = item.innerText.trim();
                 }
                 console.log("value:", value);
                 console.log("text:", item.innerText);
@@ -237,7 +237,7 @@ function reassignFilterProduct() {
         const selected = document.querySelector(`.option-item[data-value="${categoryId}"]`)
 
         if (selected) {
-            document.getElementById("category-label").innerText = selected.innerText;
+            document.getElementById("category-label").innerText = selected.innerText.trim();
             document.getElementById("category-input").value = categoryId;
         }
     }
@@ -245,7 +245,7 @@ function reassignFilterProduct() {
     if (sort) {
         const selected = document.querySelector(`.option-item[data-value="${sort}"]`)
         if (selected) {
-            document.getElementById("sort-label").innerText = selected.innerText;
+            document.getElementById("sort-label").innerText = selected.innerText.trim();
             document.getElementById("sort-input").value = sort;
         }
     }
@@ -253,7 +253,7 @@ function reassignFilterProduct() {
     if (brand) {
         const selected = document.querySelector(`.option-item[data-value="${brand}"]`)
         if (selected) {
-            document.getElementById("brand-label").innerText = selected.innerText;
+            document.getElementById("brand-label").innerText = selected.innerText.trim();
             document.getElementById("brand-input").value = brand;
         }
     }
@@ -285,11 +285,69 @@ function clearFilter() {
     })
 
 }
+
+function suggestSearch() {
+    const input = document.getElementById("search");
+    const suggestBox = document.getElementById("suggest-box");
+    let timeout;
+    if (!input || !suggestBox) return;
+
+    input.addEventListener("input", () => {
+        clearTimeout(timeout);
+        const keyword = input.value.trim();
+        const type = document.body.dataset.type.trim();
+        const context = document.body.dataset.context;
+
+        if (!keyword) {
+            suggestBox.style.display = "none";
+            return;
+        }
+
+        timeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`${context}/suggest?keyword=${encodeURIComponent(keyword)}&type=${type}`);
+                const data = await res.json();
+                renderSuggest(data);
+            } catch (err) {
+                console.error("Lỗi fetch nè fix:", err);
+            }
+        }, 300);
+    });
+
+    function renderSuggest(list) {
+        if (!list || !list.length) {
+            suggestBox.style.display = "none";
+            return;
+        }
+
+        suggestBox.innerHTML = list.map(item => `
+            <div class="suggest-item">${item}</div>
+        `).join("");
+
+        suggestBox.style.display = "block";
+
+        //click lấy item gán vào inout
+        suggestBox.querySelectorAll(".suggest-item").forEach(el => {
+            el.onclick = () => {
+                input.value = el.innerText;
+                suggestBox.style.display = "none";
+                input.focus();
+            };
+        });
+    }
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-box")) {
+            suggestBox.style.display = "none";
+        }
+    });
+}
  function initializePrinterStationery() {
     initDropdown();
     initPagination();
     assignFilterProduct();
     reassignFilterProduct();
     clearFilter();
+    suggestSearch();
 }
 window.initializePrinterStationery = initializePrinterStationery;

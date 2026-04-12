@@ -18,6 +18,7 @@
 
 </head>
 <body data-context="${context}"
+      data-type ="Stationery"
       data-category-id="${categoryIdReturn}"
       data-brand="${brandReturn}"
       data-sort="${sortReturn}">
@@ -37,8 +38,9 @@
 
                     <div class="search-box">
                         <input type="text" name="search" id="search"
-                               value="${empty searchReturn? '':searchReturn}"
-                               placeholder="Nhập từ khóa tìm kiếm...">
+                               value="${empty searchReturn ? '':searchReturn}"
+                               placeholder="Nhập từ khóa tìm kiếm..." autocomplete="off">
+                        <div id="suggest-box" class="suggest-box"></div>
                     </div>
 
                     <button type="submit" class="btn bt-search">

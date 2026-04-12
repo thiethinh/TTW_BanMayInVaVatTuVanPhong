@@ -510,6 +510,34 @@ public class ProductDAO {
         }
         return list;
     }
+
+    public List<String> findTop5NameProductMatchest(String keyword, String type) {
+        List<String> names = new ArrayList<>();
+
+        String sql = """
+                SELECT p.product_name
+                FROM product p
+                JOIN category c ON c.id = p.category_id
+                WHERE p.product_name LIKE ? COLLATE utf8mb4_general_ci AND c.type = ?
+                LIMIT 5
+                """;
+        try(Connection conn = DBConnect.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, "%"+keyword+"%");
+            ps.setString(2, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    names.add(rs.getString("product_name").trim());
+                }
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return names;
+    }
 }
 
 // ========== insertImage ============

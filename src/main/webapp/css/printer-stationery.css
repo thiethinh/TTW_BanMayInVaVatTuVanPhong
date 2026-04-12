@@ -34,12 +34,6 @@
     box-shadow: 0.5px 3px 4px 3px #E3E5E7;
 }
 
-/*.child {*/
-/*    flex: 1;*/
-/*    background-color: #F3F3F5 !important;*/
-/*    border-radius: 5px;*/
-/*    margin: 10px 0;*/
-/*}*/
 
 .search-top {
     display: flex;
@@ -60,6 +54,38 @@
     border: none;
     background: transparent;
     outline: none;
+}
+
+.search-box {
+    position: relative;
+    width: 300px; /* Hoặc độ rộng bạn muốn */
+}
+
+.suggest-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 2;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.suggest-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.suggest-item:hover {
+    background: #f0f7ff;
+    color: #007bff;
 }
 
 .btn {
@@ -109,11 +135,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    height: 44px;
+    padding: 0 16px;
     background-color: #F3F3F5;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.selected-value {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
 }
 
 .title-dropdown {
