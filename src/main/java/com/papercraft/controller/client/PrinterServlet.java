@@ -55,10 +55,10 @@ public class PrinterServlet extends HttpServlet {
         Set<String> brands = productDAO.getAllBrandByType("Printer");
 
 
-        request.setAttribute("search", search);
-        request.setAttribute("categoryId", categoryId);
-        request.setAttribute("sort", sort);
-        request.setAttribute("brand", brand);
+        request.setAttribute("searchReturn", search);
+        request.setAttribute("categoryIdReturn", categoryId);
+        request.setAttribute("sortReturn", sort);
+        request.setAttribute("brandReturn", brand);
 
 
         request.setAttribute("printers",printers);

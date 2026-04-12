@@ -23,6 +23,7 @@
 /* css for search container */
 .search-container {
     display: flex;
+    flex-direction: column;
     gap: 2rem;
     border: solid #ccc;
     padding: 16px;
@@ -33,80 +34,75 @@
     box-shadow: 0.5px 3px 4px 3px #E3E5E7;
 }
 
-.child {
-    flex: 1;
-    background-color: #F3F3F5 !important;
-    border-radius: 5px;
-    margin: 10px 0;
-}
+/*.child {*/
+/*    flex: 1;*/
+/*    background-color: #F3F3F5 !important;*/
+/*    border-radius: 5px;*/
+/*    margin: 10px 0;*/
+/*}*/
 
-@media (max-width: 1400px) {
-    .search-container {
-        width: 100%;
-        gap: 1rem;
-        display: block;
-        padding: 5px 10px;
-
-    }
+.search-top {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 
-/* css for search box */
 .search-box {
-    border: none;
-    background-color: inherit;
+    flex: 1;
+    background: #F3F3F5;
     border-radius: 8px;
-    padding: 0.4rem;
-    font-size: 14px;
-    display: flex;
-    justify-content: start;
-    align-content: center;
+    padding: 10px;
 }
 
-.search-box #search {
-    display: flex;
+.search-box input {
+    width: 100%;
     border: none;
-    float: right;
-    width: 90%;
-    background-color: inherit;
-}
-
-.search-box #search:focus {
-    border-style: none;
+    background: transparent;
     outline: none;
 }
 
-.search-box i {
-    display: flex;
-    width: 10%;
-    font-size: 1rem;
-    justify-content: center;
-    align-items: center;
-}
-
-
-/* css for dropdown*/
-.custom-dropdown {
-    position: relative;
-}
-
-.search-container .bt-search {
-    position: relative;
-    display: flex;
-    background-color: #165FF2FF !important;
+.btn {
+    padding: 10px 16px;
     border-radius: 8px;
-    color: white;
-    padding: 0.4rem 10px !important;
-    margin: 10px 5px !important;
-    justify-content: center;
-    align-items: center;
     border: none;
     cursor: pointer;
-    font-size: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.bt-search {
+    background: #165FF2;
+    color: #fff;
 }
 
 .bt-search i {
     margin: 5px;
+}
+
+
+.bt-clear {
+    background: transparent;
+    border: 1px solid #ddd;
+}
+
+.bt-clear:hover {
+    background: #f1f1f1;
+}
+
+.search-bottom {
+    display: flex;
+    gap: 15px;
+}
+.search-bottom .custom-dropdown {
+    flex: 1;
+}
+
+/* css for dropdown*/
+.custom-dropdown {
+    position: relative;
 }
 
 .select-trigger {
@@ -173,6 +169,22 @@
 .option-item.selected::after {
     content: '✓';
     font-size: 16px;
+}
+
+@media (min-width: 1201px) and  (max-width: 1400px) {
+    .search-container {
+        width: 100%;
+        gap: 1rem;
+        display: block;
+        padding: 5px 10px;
+
+    }
+}
+
+@media(max-width: 1200px ){
+    .search-bottom {
+        flex-direction: column !important;
+    }
 }
 
 /* ---product container-----*/

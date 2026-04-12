@@ -68,10 +68,10 @@ public class StationeryServlet extends HttpServlet {
         request.setAttribute("brands", brands);
 
         // Gửi lại các giá trị cũ để giữ trạng thái cho các ô input trên giao diện
-        request.setAttribute("search", search);
-        request.setAttribute("categoryId", categoryId);
-        request.setAttribute("sort", sort);
-        request.setAttribute("brand", brand);
+        request.setAttribute("searchReturn", search);
+        request.setAttribute("categoryIdReturn", categoryId);
+        request.setAttribute("sortReturn", sort);
+        request.setAttribute("brandReturn", brand);
 
         request.getRequestDispatcher("/WEB-INF/views/client/stationery.jsp").forward(request, response);
 

@@ -27,9 +27,9 @@
 </head>
 
 <body data-context="${context}"
-      data-category-id="${categoryId}"
-      data-brand="${brand}"
-      data-sort="${sort}">
+      data-category-id="${categoryIdReturn}"
+      data-brand="${brandReturn}"
+      data-sort="${sortReturn}">
 <jsp:include page="/WEB-INF/views/includes/header.jsp"/>
 
 <div class="container">
@@ -39,65 +39,83 @@
             <h1>Tất Cả Máy In</h1>
             <p>Tìm máy in hoàn hảo cho nhu cầu của bạn</p>
         </div>
-
         <form action="${pageContext.request.contextPath}/printer" method="get">
 
             <div class="search-container">
+                <div class="search-top">
 
+                    <div class="search-box">
+                        <input type="text" name="search" id="search"
+                               value="${empty searchReturn? '':searchReturn}"
+                               placeholder="Nhập từ khóa tìm kiếm...">
+                    </div>
 
-                <div class="search-box child">
-                    <input type="text" name="search" id="search" value="${search}"
-                           placeholder="Nhập từ khóa tìm kiếm...">
+                    <button type="submit" class="btn bt-search">
+                        <i class='bx bx-search'></i>
+                        Tìm kiếm
+                    </button>
+
+                    <button type="button" class="btn bt-clear">✖ Xóa lọc</button>
+
+                </div>
+                <div class="search-bottom">
+                    <input type="hidden" name="category" id="category-input"
+                           value="${empty categoryIdReturn ? 0 : categoryIdReturn }">
+
+                    <div class="custom-dropdown">
+                        <div class="select-trigger">
+                            <span class="selected-value" id="category-label">Tất Cả Danh Mục</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div class="option-value">
+                            <div class="option-item title-dropdown" data-value="0">Tất Cả Danh Mục</div>
+                            <c:forEach items="${categories}" var="category">
+                                <div class="option-item" data-value="${category.id}">
+                                        ${category.categoryName}
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="sort" id="sort-input"
+                           value="${empty sortReturn ? 'rating' : sortReturn}">
+
+                    <div class="custom-dropdown">
+                        <div class="select-trigger">
+                            <span class="selected-value" id="sort-label">Mức giá</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div class="option-value">
+                            <div class="option-item title-dropdown" data-value="rating">Mức giá</div>
+                            <div class="option-item" data-value="priceDesc">Giá: Cao đến Thấp</div>
+                            <div class="option-item" data-value="priceAsc">Giá: Thấp đến Cao</div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="brand" id="brand-input" value="${empty brandReturn ? "" :brandReturn}">
+
+                    <div class="custom-dropdown">
+                        <div class="select-trigger">
+                            <span class="selected-value" id="brand-label"> Tất cả thương hiệu</span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div class="option-value">
+                            <div class="option-item title-dropdown" data-value="">
+                                Tất cả thương hiệu
+                            </div>
+                            <c:forEach items="${brands}" var="b">
+                                <div class="option-item" data-value="${b}">
+                                    Máy in ${b}
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </div>
+
                 </div>
 
-                <input type="hidden" name="category" id="category-input" value="${empty categoryId ? 0 : categoryId }">
-                <div class="custom-dropdown child">
-                    <div class="select-trigger">
-                        <span class="selected-value" id="category-label">Tất Cả Danh Mục</span>
-                        <span class="arrow">▼</span>
-                    </div>
-
-                    <div class="option-value">
-                        <div class="option-item title-dropdown" data-value="0">Tất Cả Danh Mục</div>
-                        <c:forEach items="${categories}" var="category">
-                            <div class="option-item" data-value="${category.id}">${category.categoryName}</div>
-                        </c:forEach>
-                    </div>
-                </div>
-
-                <input type="hidden" name="sort" id="sort-input" value="${empty sort ? "rating" : sort}">
-                <div class="custom-dropdown child">
-                    <div class="select-trigger">
-                        <span class="selected-value" id="sort-label">Mức giá</span>
-                        <span class="arrow">▼</span>
-                    </div>
-
-                    <div class="option-value">
-                        <div class="option-item title-dropdown" data-value="rating"> Mức giá</div>
-                        <div class="option-item" data-value="priceDesc"> Giá: Cao đến Thấp</div>
-                        <div class="option-item" data-value="priceAsc"> Giá: Thấp đến Cao</div>
-                    </div>
-                </div>
-
-                <input type="hidden" name="brand" id="brand-input" value="${brand}">
-                <div class="custom-dropdown child">
-                    <div class="select-trigger">
-                        <span class="selected-value" id="brand-label">Tất cả thương hiệu</span>
-                        <span class="arrow">▼</span>
-                    </div>
-
-                    <div class="option-value">
-                        <div class="option-item title-dropdown" data-value=""> Tất cả thương hiệu</div>
-                        <c:forEach items="${brands}" var="b">
-                            <div class="option-item" data-value="${b}"> Máy in ${b}</div>
-                        </c:forEach>
-
-                    </div>
-                </div>
-                <button type="submit" class="bt-search">
-                    <i class='bx bx-search icon'></i>
-                    Tìm kiếm
-                </button>
             </div>
         </form>
     </div>
@@ -173,7 +191,7 @@
     <div class="swiper-pagination"></div>
 
 </div>
-
+[
 <div class="pagination"></div>
 </div>
 

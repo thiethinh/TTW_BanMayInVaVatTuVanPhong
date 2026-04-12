@@ -228,12 +228,12 @@ function assignFilterProduct() {
 }
 
 function reassignFilterProduct() {
+    const search = document.body.dataset.search
     const brand = document.body.dataset.brand
     const categoryId = document.body.dataset.categoryId
     const sort = document.body.dataset.sort
 
-    // CATEGORY
-    if (categoryId || categoryId !== "0") {
+    if (categoryId ) {
         const selected = document.querySelector(`.option-item[data-value="${categoryId}"]`)
 
         if (selected) {
@@ -242,30 +242,54 @@ function reassignFilterProduct() {
         }
     }
 
-
-    //sort
     if (sort) {
         const selected = document.querySelector(`.option-item[data-value="${sort}"]`)
         if (selected) {
             document.getElementById("sort-label").innerText = selected.innerText;
-            document.getElementById("sort-input").value = categoryId;
+            document.getElementById("sort-input").value = sort;
         }
     }
 
-    //brand
     if (brand) {
         const selected = document.querySelector(`.option-item[data-value="${brand}"]`)
         if (selected) {
             document.getElementById("brand-label").innerText = selected.innerText;
-            document.getElementById("brand-input").value = categoryId;
+            document.getElementById("brand-input").value = brand;
         }
     }
 }
 
+
+function clearFilter() {
+    const btClearFilter = document.querySelector(".bt-clear");
+    if (!btClearFilter) return;
+
+    btClearFilter.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("category-input").value = "0";
+        document.getElementById("sort-input").value = "rating";
+        document.getElementById("brand-input").value = "";
+
+        document.getElementById("category-label").innerText = "Tất Cả Danh Mục";
+        document.getElementById("sort-label").innerText = "Mức giá";
+        document.getElementById("brand-label").innerText = "Tất cả thương hiệu";
+
+
+        document.getElementById("search").value = "";
+
+        document.querySelectorAll(".custom-dropdown").forEach(d => {
+            d.classList.remove("open");
+        });
+
+        document.querySelector("form").submit();
+    })
+
+}
  function initializePrinterStationery() {
     initDropdown();
     initPagination();
     assignFilterProduct();
     reassignFilterProduct();
+    clearFilter();
 }
 window.initializePrinterStationery = initializePrinterStationery;
