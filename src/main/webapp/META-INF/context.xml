@@ -6,7 +6,7 @@
             type="javax.sql.DataSource"
             factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
             driverClassName="com.mysql.cj.jdbc.Driver"
-            url="jdbc:mysql://localhost:3306/papercraft_db?useSSL=false&amp;allowPublicKeyRetrieval=true"
+            url="jdbc:mysql://db:3306/papercraft_db?useSSL=false&amp;allowPublicKeyRetrieval=true"
 
             username="root"
             password="1"
