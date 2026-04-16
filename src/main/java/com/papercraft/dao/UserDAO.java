@@ -90,13 +90,14 @@ public class UserDAO {
         }
     }
 
-    public User login(String email, String passwordHash) {
-        String sql = "SELECT * FROM users WHERE email = ? AND password_hash = ?";
+    public User login(String account, String passwordHash) {
+        String sql = "SELECT * FROM users WHERE (email = ? OR phone_number = ?) AND password_hash = ?";
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, email);
-            ps.setString(2, passwordHash);
+            ps.setString(1, account);
+            ps.setString(2, account);
+            ps.setString(3, passwordHash);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {

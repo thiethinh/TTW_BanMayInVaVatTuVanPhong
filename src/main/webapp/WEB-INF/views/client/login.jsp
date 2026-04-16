@@ -40,7 +40,7 @@
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
-                    <input type="email" name="email" class="input-field" placeholder="Email" required
+                    <input type="text" name="email" class="input-field" placeholder="Email hoặc Số điện thoại" required
                            value="${cEmail != null ? cEmail : ''}">
                     <i class="bx bx-user"></i>
                 </div>
