@@ -71,6 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })
     }
 
+    if (document.querySelector('.form-box')) {
+        import('./register.js')
+            .then(module => {
+                module.initializeRegister();
+        })
+    }
+
     if (document.querySelector('.blog-nav')) {
         import('./blog.js')
             .then(module => {
