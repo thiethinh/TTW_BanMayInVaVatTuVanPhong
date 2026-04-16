@@ -29,18 +29,18 @@
 
             <form action="login" method="post" class="two-forms">
                 <p style="text-align: center; margin-top: -10px; margin-bottom: 10px;">
-                <c:if test="${not empty msg}">
-                    <span style="color: green;">${msg}</span>
-                </c:if>
-                <c:if test="${not empty error}">
-                    <span style="color: red;">${error}</span>
-                </c:if>
+                    <c:if test="${not empty msg}">
+                        <span style="color: green;">${msg}</span>
+                    </c:if>
+                    <c:if test="${not empty error}">
+                        <span style="color: red;">${error}</span>
+                    </c:if>
                 </p>
 
                 <input type="hidden" name="redirect" value="${not empty param.redirect ? param.redirect : redirect}">
 
                 <div class="input-box">
-                    <input type="email" name="email" class="input-field" placeholder="Email" required
+                    <input type="text" name="email" class="input-field" placeholder="Email hoặc Số điện thoại" required
                            value="${cEmail != null ? cEmail : ''}">
                     <i class="bx bx-user"></i>
                 </div>
@@ -93,7 +93,7 @@
                 <header>Đăng Ký</header>
             </div>
 
-            <form action="register" method="post" class="two-forms">
+            <form action="register" method="post" class="two-forms" id="register-form">
                 <c:if test="${not empty errorRegister}">
                     <div class="error-box">
                         <c:forEach items="${errorRegister}" var="err">
@@ -105,57 +105,70 @@
                 <input type="hidden" name="redirect" value="${param.redirect}">
 
                 <div class="two-row">
-                    <div class="input-box">
-                        <input type="text" name="firstname" class="input-field" value="${requestScope.valueFName}"
+                    <div class="input-box" style="position: relative;">
+                        <input type="text" name="firstname" id="reg-fname" class="input-field"
+                               value="${requestScope.valueFName}"
                                placeholder="Họ" required>
                         <i class="bx bx-user"></i>
+                        <span class="error-text" id="err-fname"
+                              style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
                     </div>
 
-                    <div class="input-box">
-                        <input type="text" name="lastname" class="input-field" value="${requestScope.valueLName}"
+                    <div class="input-box" style="position: relative;">
+                        <input type="text" name="lastname" id="reg-lname" class="input-field"
+                               value="${requestScope.valueLName}"
                                placeholder="Tên" required>
                         <i class="bx bx-user"></i>
+                        <span class="error-text" id="err-lname"
+                              style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
                     </div>
                 </div>
 
-                <div class="input-box">
-                    <input type="text" name="email" class="input-field" value="${requestScope.valueEmail}"
+                <div class="input-box" style="position: relative; margin-top: 15px;">
+                    <input type="email" name="email" id="reg-email" class="input-field"
+                           value="${requestScope.valueEmail}"
                            placeholder="Email" required>
                     <i class="bx bx-envelope"></i>
+                    <span class="error-text" id="err-email" style="color: red;"></span>
                 </div>
 
-                <div class="input-box">
-                    <input type="tel" name="phone" class="input-field" value="${requestScope.valuePhone}"
+                <div class="input-box" style="position: relative; margin-top: 15px;">
+                    <input type="tel" name="phone" id="reg-phone" class="input-field" value="${requestScope.valuePhone}"
                            placeholder="Số điện thoại" required>
                     <i class="bx bx-phone"></i>
+                    <span class="error-text" id="err-phone"
+                          style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
                 </div>
 
-                <div class="input-box select-box">
-                    <select name="gender" class="input-field" id="gender-select" required>
+                <div class="input-box select-box" style="position: relative; margin-top: 15px;">
+                    <select name="gender" id="reg-gender" class="input-field" required>
                         <option value="" disabled ${empty requestScope.valueGender ? 'selected' : ''}>Giới tính</option>
                         <option value="male" ${requestScope.valueGender == 'male' ? 'selected' : ''}>Nam</option>
                         <option value="female" ${requestScope.valueGender == 'female' ? 'selected' : ''}>Nữ</option>
                         <option value="other" ${requestScope.valueGender == 'other' ? 'selected' : ''}>Khác</option>
                     </select>
                     <i class="bx bx-user-check"></i>
+                    <span class="error-text" id="err-gender" style="color: red;"></span>
                 </div>
 
-                <div class="input-box">
+                <div class="input-box" style="position: relative; margin-top: 15px;">
                     <input type="password" name="password" id="register-password" class="input-field"
                            placeholder="Mật khẩu" required>
                     <i class="bx bx-lock-alt"></i>
                     <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
+                    <span class="error-text" id="err-password" style="color: red;"></span>
                 </div>
 
-                <div class="input-box">
+                <div class="input-box" style="position: relative; margin-top: 15px;">
                     <input type="password" name="confirmPassword" id="confirm-password" class="input-field"
                            placeholder="Nhập lại mật khẩu"
                            required>
                     <i class="bx bx-lock-alt"></i>
                     <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
+                    <span class="error-text" id="err-confirm-pwd" style="color: red;"></span>
                 </div>
 
-                <div class="two-col">
+                <div class="two-col" style="margin-top: 15px;">
                     <div class="one">
                         <input type="checkbox" id="register-check" required>
                         <label for="register-check">Tôi đã đọc và đồng ý với</label>
@@ -168,7 +181,7 @@
                 </div>
 
                 <div class="input-box">
-                    <input type="submit" class="submit" value="Đăng ký">
+                    <input type="submit" class="submit" value="Đăng ký" id="btn-register">
                 </div>
 
                 <div class="bottom">
@@ -182,7 +195,7 @@
                              alt="Đăng nhập bằng Google">
                     </a>
 
-                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &edirect_uri=http://localhost:8080/papercraft/facebook-login&scope=email,public_profile"
+                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &redirect_uri=http://localhost:8080/papercraft/facebook-login&scope=email,public_profile"
                        class="btn btn-facebook">
                         <img src="${pageContext.request.contextPath}/images/facebook-logo.svg"
                              alt="Đăng nhập bằng Facebook">
