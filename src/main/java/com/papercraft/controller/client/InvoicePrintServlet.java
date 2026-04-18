@@ -50,9 +50,8 @@ public class InvoicePrintServlet extends HttpServlet {
         }
 
         boolean isAdmin = "admin".equalsIgnoreCase(currentUser.getRole());
-        boolean isuser = order.getUserId() == currentUser.getId();
-
-        if (!isAdmin && !isuser) {
+        boolean isOwner = order.getUserId() != null && order.getUserId() == currentUser.getId();
+        if (!isAdmin && !isOwner) {
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
