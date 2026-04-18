@@ -13,7 +13,7 @@
 
 <div class="print-btn">
     <button onclick="window.print()">🖨️ In hóa đơn</button>
-    <button onclick="history.back()" style="margin-left:10px; background:#999;">← Quay lại</button>
+<%--    <button onclick="history.back()" style="margin-left:10px; background:#999;">← Quay lại</button>--%>
 </div>
 
 <div class="invoice-header">
