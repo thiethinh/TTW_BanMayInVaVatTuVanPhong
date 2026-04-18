@@ -3,7 +3,7 @@ USER root
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN chmod +x gradlew
-RUN gradle war --no-daemon
+RUN ./gradlew war --no-daemon
 
 FROM tomcat:10.1.49-jdk21
 RUN rm -rf /usr/local/tomcat/webapps/*
