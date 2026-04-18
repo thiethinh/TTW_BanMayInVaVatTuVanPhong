@@ -1,5 +1,6 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -12,7 +13,7 @@
 
 <div class="print-btn">
     <button onclick="window.print()">🖨️ In hóa đơn</button>
-    <button onclick="window.close()" style="margin-left:10px; background:#999;">✕ Đóng</button>
+<%--    <button onclick="history.back()" style="margin-left:10px; background:#999;">← Quay lại</button>--%>
 </div>
 
 <div class="invoice-header">
@@ -23,8 +24,8 @@
 
 <div class="invoice-meta">
     <div>
-        <p><strong>Khách hàng:</strong> ${user.fullname}</p>
-        <p><strong>Số điện thoại:</strong> ${user.phoneNumber}</p>
+        <p><strong>Khách hàng:</strong> ${order.shippingName}</p>
+        <p><strong>Số điện thoại:</strong> ${order.shippingPhone}</p>
         <p><strong>Email:</strong> ${user.email}</p>
         <p><strong>Địa chỉ:</strong> ${order.shippingAddress}</p>
     </div>
@@ -69,7 +70,7 @@
                 <fmt:formatNumber value="${oi.price}" pattern="#,###"/> VNĐ
             </td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${oi.total}" pattern="#,###"/> VNĐ
             </td>
         </tr>
     </c:forEach>
@@ -106,7 +107,6 @@
 <c:if test="${not empty order.note}">
     <p style="margin-top:16px;"><strong>Ghi chú:</strong> ${order.note}</p>
 </c:if>
-net
 <div class="footer-note">
     <p>Cảm ơn quý khách đã mua hàng tại PaperCraft!</p>
     <p>Mọi thắc mắc xin liên hệ: support@papercraft.vn</p>
