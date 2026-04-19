@@ -1,7 +1,9 @@
 // Coi trước ảnh
+const previewWrapper = document.getElementById('preview-wrapper');
 const thumnailInput = document.getElementById('thumbnail-input');
 const thumbnailPreview = document.getElementById('thumbnail-preview');
 const uploadLabel = document.querySelector('.upload-label');
+const removeThumbBtn = document.getElementById('remove-thumb-btn');
 
 if (thumnailInput) {
     thumnailInput.addEventListener('change', e => {
@@ -10,14 +12,23 @@ if (thumnailInput) {
             const reader = new FileReader();
             reader.onload = function (event) {
                 thumbnailPreview.src = event.target.result;
-                thumbnailPreview.style.display = 'block';
+                previewWrapper.style.display = 'block';
                 uploadLabel.textContent = file.name;
             }
             reader.readAsDataURL(file);
         } else {
-            thumbnailPreview.style.display = 'none';
+            previewWrapper.style.display = 'none';
             uploadLabel.textContent = 'Chọn ảnh..';
         }
+    });
+}
+
+if (removeThumbBtn) {
+    removeThumbBtn.addEventListener('click', e => {
+       thumnailInput.value = '';
+       previewWrapper.style.display = 'none';
+       uploadLabel.textContent = 'Chọn ảnh..';
+       validateThumbnail()
     });
 }
 

@@ -101,7 +101,7 @@
     border-color: var(--primary-color);
 }
 
-/*------------ Nút chọn ảnh  */
+/*------------ Nút chọn ảnh  ------------*/
 .blog-create-wrapper .upload-label {
     display: inline-block;
     padding: 10px 20px;
@@ -117,18 +117,48 @@
     background: #eceff2;
 }
 
-/* Ảnh preview */
-.blog-create-wrapper .thumb-preview {
+/*------------  Ảnh preview ------------*/
+.blog-create-wrapper .preview-wrapper {
+    position: relative;
+    display: none;
     margin-top: 18px;
+    width: max-content;
+}
+
+.blog-create-wrapper .thumb-preview {
     width: 260px;
     height: 160px;
     object-fit: cover;
     border-radius: 12px;
-    display: none;
+    display: block;
     border: 1px solid #ddd;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09);
 }
 
+.blog-create-wrapper .remove-thumb-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    background-color: var(--fourth-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.blog-create-wrapper .remove-thumb-btn:hover {
+    background-color: red;
+    transition: background-color 0.2s ease;
+}
+
+/*------------  Lỗi ------------*/
 .error-text {
     color: red;
     font-size: 12px;

@@ -56,7 +56,12 @@
                     <input type="file" name="image" id="thumbnail-input" accept="image/*" hidden>
                 </div>
 
-                <img id="thumbnail-preview" class="thumb-preview" alt="Preview"/>
+                <div class="preview-wrapper" id="preview-wrapper">
+                    <img id="thumbnail-preview" class="thumb-preview" alt="Preview"/>
+                    <button type="button" class="remove-thumb-btn" id="remove-thumb-btn" title="Xóa ảnh">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
                 <span class="error-text" id="err-thumbnail"></span>
             </div>
 
