@@ -33,8 +33,8 @@
             <p style="color: red; text-align: center;">${failedMsg}</p>
             <c:remove var="failedMsg" scope="session"/>
         </c:if>
-        <c:if test="${not empty successMsg}">
-            <p style="color: green; text-align: center;">${succMsg}</p>
+        <c:if test="${not empty success}">
+            <p style="color: green; text-align: center;">${success}</p>
             <c:remove var="succMsg" scope="session"/>
         </c:if>
 

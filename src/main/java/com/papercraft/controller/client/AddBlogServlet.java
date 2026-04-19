@@ -54,8 +54,8 @@ public class AddBlogServlet extends HttpServlet {
         boolean result = blogDao.addBlog(blog, fileName);
 
         if (result) {
-            session.setAttribute("successMsg", "Đăng bài thành công, bạn hãy đợi admin duyệt nhé!");
-            response.sendRedirect("blog.jsp");
+            session.setAttribute("success", "Đăng bài thành công, bạn hãy đợi admin duyệt nhé!");
+            response.sendRedirect("blog");
         } else {
             session.setAttribute("failedMsg", "Có lỗi xảy ra, vui lòng thử lại");
             response.sendRedirect("create-blog");
