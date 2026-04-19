@@ -21,14 +21,116 @@ if (thumnailInput) {
     });
 }
 
-// Xử lý khi nhấn submit
+// Validation
+const title = document.getElementById('blog-title');
+const description = document.getElementById('blog-desc');
+const tags = document.getElementById('blog-tags');
+const content = document.getElementById('blog-editor');
 const blogForm = document.getElementById('blog-form');
+
+function showError(inputId, errorId, message) {
+    const errorElement = document.getElementById(errorId);
+    if (errorElement) {
+        errorElement.innerText = message;
+        errorElement.style.display = 'block';
+    }
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+        inputElement.style.border = '2px solid red';
+    }
+}
+
+function clearError(inputId, errorId) {
+    const errorElement = document.getElementById(errorId);
+    if (errorElement) {
+        errorElement.innerText = '';
+        errorElement.style.display = 'none';
+    }
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+        inputElement.style.border = '';
+    }
+}
+
+function validateTitle() {
+    if (title.value.trim() === '') {
+        showError('blog-title', 'err-title', 'Tiêu đề không được để trống');
+        return false;
+    }
+    clearError('blog-title', 'err-title');
+    return true;
+}
+
+function validateThumbnail() {
+    if (thumnailInput.files.length === 0) {
+        showError('upload-box', 'err-thumbnail', 'Vui lòng chọn ảnh Thumbnail');
+        return false;
+    }
+    clearError('upload-box', 'err-thumbnail');
+    return true;
+}
+
+function validateDescription() {
+    if (description.value.trim() === '') {
+        showError('blog-desc', 'err-description');
+        return false;
+    }
+    clearError('blog-desc', 'err-description');
+    return true;
+}
+
+function validateTags() {
+    if (tags.value === '') {
+        showError('blog-tags', 'err-tags', 'Vui lòng chọn thẻ');
+        return false;
+    }
+    clearError('blog-tags', 'err-tags');
+    return true;
+}
+
+function validateContent() {
+    const contentData = CKEDITOR.instances['blog-editor'].getData().trim();
+    if (contentData === '') {
+        showError('blog-editor', 'err-content');
+
+        const editorUI = document.getElementById('cke_blog-editor');
+        if (editorUI) editorUI.style.border = '2px solid red';
+        return false;
+    }
+    clearError(null, 'err-content');
+    return true;
+}
+
+title.addEventListener('blur', validateTitle);
+title.addEventListener('input', () => clearError('blog-title', 'err-title'));
+
+thumnailInput.addEventListener('blur', validateThumbnail);
+thumnailInput.addEventListener('input', () => clearError('upload-box', 'err-thumbnail'));
+
+description.addEventListener('blur', validateDescription);
+description.addEventListener('input', () => clearError('blog-desc', 'err-description'));
+
+tags.addEventListener('change', validateTags);
+
+CKEDITOR.on('instanceReady', function (evt) {
+    evt.editor.on('change', function () {
+        clearError(null, 'err-content');
+        const editorUI = document.getElementById('cke_blog-editor');
+        if (editorUI) editorUI.style.border = '';
+    });
+});
+
+// Xử lý khi nhấn submit
 if (blogForm) {
     blogForm.addEventListener('submit', function (e) {
-        const contentData = CKEDITOR.instances['blog-editor'].getData();
-        if (contentData.trim() === '') {
+        const isTitleValid = validateTitle();
+        const isThumbnailValid = validateThumbnail();
+        const isDescriptionValid = validateDescription();
+        const isTagsValid = validateTags();
+        const isContentValid = validateContent();
+
+        if (!isTitleValid || !isThumbnailValid || !isDescriptionValid || !isTagsValid || !isContentValid) {
             e.preventDefault();
-            alert("Vui lòng nhập nội dung bài viết!");
         }
     });
 }

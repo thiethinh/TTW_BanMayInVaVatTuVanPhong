@@ -27,7 +27,8 @@
 }
 
 .blog-create-wrapper form.blog-form .form-group {
-    margin-bottom: 22px;
+    position: relative;
+    margin-bottom: 30px;
 }
 
 .blog-create-wrapper .form-group label {
@@ -128,91 +129,11 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09);
 }
 
-
-/* Quill editor */
-.blog-create-wrapper #blog-editor {
-    height: 600px;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Merriweather:wght@400;700&display=swap');
-
-#blog-editor {
-    height: 400px;
-    background: #fff;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.ql-font-roboto {
-    font-family: 'Roboto', sans-serif;
-}
-
-.ql-font-merriweather {
-    font-family: 'Merriweather', serif;
-}
-
-.ql-font-arial {
-    font-family: 'Arial', sans-serif;
-}
-
-.ql-font-times {
-    font-family: 'Times New Roman', serif;
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item::before {
-    content: 'Normal';
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label[data-value="1.0"]::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.0"]::before {
-    content: '1.0';
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label[data-value="1.2"]::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.2"]::before {
-    content: '1.2';
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label[data-value="1.5"]::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="1.5"]::before {
-    content: '1.5';
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label[data-value="2.0"]::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="2.0"]::before {
-    content: '2.0';
-}
-
-.ql-snow .ql-picker.ql-line-height .ql-picker-label[data-value="3.0"]::before,
-.ql-snow .ql-picker.ql-line-height .ql-picker-item[data-value="3.0"]::before {
-    content: '3.0';
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="roboto"]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="roboto"]::before {
-    content: 'Roboto';
-    font-family: 'Roboto';
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="merriweather"]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="merriweather"]::before {
-    content: 'Merriweather';
-    font-family: 'Merriweather';
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="arial"]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="arial"]::before {
-    content: 'Arial';
-    font-family: 'Arial';
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="times"]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="times"]::before {
-    content: 'Times New Roman';
-    font-family: 'Times New Roman';
+.error-text {
+    color: red;
+    font-size: 12px;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    display: none;
 }

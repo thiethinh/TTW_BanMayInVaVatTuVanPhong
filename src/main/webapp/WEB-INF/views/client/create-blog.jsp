@@ -44,24 +44,27 @@
             <div class="form-group">
                 <label>Tiêu đề bài viết</label>
                 <input type="text" name="title" id="blog-title" placeholder="Nhập tiêu đề..." required>
+                <span class="error-text" id="err-title"></span>
             </div>
 
             <!-- Thumbnail Upload -->
             <div class="form-group">
                 <label>Ảnh Thumbnail</label>
 
-                <div class="upload-box">
+                <div class="upload-box" id="upload-box">
                     <label for="thumbnail-input" class="upload-label">Chọn ảnh...</label>
                     <input type="file" name="image" id="thumbnail-input" accept="image/*" hidden>
                 </div>
 
                 <img id="thumbnail-preview" class="thumb-preview" alt="Preview"/>
+                <span class="error-text" id="err-thumbnail"></span>
             </div>
 
             <!-- Short Description -->
             <div class="form-group">
                 <label>Mô tả ngắn</label>
                 <textarea name="description" id="blog-desc" placeholder="Nhập mô tả ..." required></textarea>
+                <span class="error-text" id="err-description"></span>
             </div>
 
             <!-- Tags -->
@@ -74,12 +77,13 @@
                     <option>Hướng Dẫn</option>
                     <option>Bảo Trì</option>
                 </select>
+                <span class="error-text" id="err-tags"></span>
             </div>
 
-            <!-- Rich Text Editor -->
             <div class="form-group">
                 <label>Nội dung bài viết</label>
                 <textarea name="content" class="ckeditor" id="blog-editor"></textarea>
+                <span class="error-text" id="err-content"></span>
             </div>
 
             <!-- Submit -->
@@ -102,10 +106,6 @@
 <!-- ===================== FOOTER ===================== -->
 <jsp:include page="../includes/footer.jsp"/>
 
-<!--Dùng QuillJS để tạo trinhg soạn thảo-->
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<!-- JS -->
 <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/create-blog.js"></script>
 </body>
