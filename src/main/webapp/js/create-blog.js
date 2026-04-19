@@ -102,23 +102,33 @@ function validateContent() {
 }
 
 title.addEventListener('blur', validateTitle);
-title.addEventListener('input', () => clearError('blog-title', 'err-title'));
+title.addEventListener('input', () => {
+    clearError('blog-title', 'err-title');
+    saveDraft();
+});
 
 thumnailInput.addEventListener('cancel', validateThumbnail);
 thumnailInput.addEventListener('change', validateThumbnail);
 thumnailInput.addEventListener('input', () => clearError('upload-box', 'err-thumbnail'));
 
 description.addEventListener('blur', validateDescription);
-description.addEventListener('input', () => clearError('blog-desc', 'err-description'));
+description.addEventListener('input', () => {
+    clearError('blog-desc', 'err-description');
+    saveDraft();
+});
 
 tags.addEventListener('blur', validateTags);
-tags.addEventListener('change', validateTags);
+tags.addEventListener('change', () => {
+    validateTags();
+    saveDraft();
+});
 
 CKEDITOR.on('instanceReady', function (evt) {
     evt.editor.on('change', function () {
         clearError(null, 'err-content');
         const editorUI = document.getElementById('cke_blog-editor');
         if (editorUI) editorUI.style.border = '';
+        saveDraft();
     });
 
     evt.editor.on('blur', function () {
@@ -137,6 +147,37 @@ if (blogForm) {
 
         if (!isTitleValid || !isThumbnailValid || !isDescriptionValid || !isTagsValid || !isContentValid) {
             e.preventDefault();
+        } else {
+            localStorage.removeItem('blog_draft');
         }
     });
 }
+
+// Auto save
+function saveDraft() {
+    if (CKEDITOR.instances['blog-editor']) {
+        const draftData = {
+            title: title.value,
+            description: description.value,
+            tags: tags.value,
+            content: CKEDITOR.instances['blog-editor'].getData(),
+        };
+        localStorage.setItem('blog_draft', JSON.stringify(draftData));
+    }
+}
+
+function loadDraft() {
+    const savedDraft = localStorage.getItem('blog_draft');
+    if (savedDraft) {
+        const draftData = JSON.parse(savedDraft);
+        title.value = draftData.title;
+        description.value = draftData.description;
+        tags.value = draftData.tags;
+
+        CKEDITOR.on('instanceReady', function (evt) {
+            evt.editor.setData(draftData.content);
+        });
+    }
+}
+
+loadDraft();
