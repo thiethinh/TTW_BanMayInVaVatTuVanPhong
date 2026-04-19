@@ -35,7 +35,7 @@
         </c:if>
         <c:if test="${not empty success}">
             <p style="color: green; text-align: center;">${success}</p>
-            <c:remove var="succMsg" scope="session"/>
+            <c:remove var="success" scope="session"/>
         </c:if>
 
         <form class="blog-form" action="add_blog" method="post" enctype="multipart/form-data" id="blog-form">

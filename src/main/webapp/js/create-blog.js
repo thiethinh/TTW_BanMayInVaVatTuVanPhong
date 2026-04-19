@@ -72,7 +72,7 @@ function validateThumbnail() {
 
 function validateDescription() {
     if (description.value.trim() === '') {
-        showError('blog-desc', 'err-description');
+        showError('blog-desc', 'err-description', 'Mô tả ngắn không được để trống');
         return false;
     }
     clearError('blog-desc', 'err-description');
@@ -91,7 +91,7 @@ function validateTags() {
 function validateContent() {
     const contentData = CKEDITOR.instances['blog-editor'].getData().trim();
     if (contentData === '') {
-        showError('blog-editor', 'err-content');
+        showError('blog-editor', 'err-content', 'Nội dung bài viết không được để trống');
 
         const editorUI = document.getElementById('cke_blog-editor');
         if (editorUI) editorUI.style.border = '2px solid red';
@@ -104,12 +104,14 @@ function validateContent() {
 title.addEventListener('blur', validateTitle);
 title.addEventListener('input', () => clearError('blog-title', 'err-title'));
 
-thumnailInput.addEventListener('blur', validateThumbnail);
+thumnailInput.addEventListener('cancel', validateThumbnail);
+thumnailInput.addEventListener('change', validateThumbnail);
 thumnailInput.addEventListener('input', () => clearError('upload-box', 'err-thumbnail'));
 
 description.addEventListener('blur', validateDescription);
 description.addEventListener('input', () => clearError('blog-desc', 'err-description'));
 
+tags.addEventListener('blur', validateTags);
 tags.addEventListener('change', validateTags);
 
 CKEDITOR.on('instanceReady', function (evt) {
@@ -117,6 +119,10 @@ CKEDITOR.on('instanceReady', function (evt) {
         clearError(null, 'err-content');
         const editorUI = document.getElementById('cke_blog-editor');
         if (editorUI) editorUI.style.border = '';
+    });
+
+    evt.editor.on('blur', function () {
+        validateContent();
     });
 });
 
