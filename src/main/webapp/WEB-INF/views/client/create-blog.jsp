@@ -10,10 +10,6 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- QuillJS Rich Text -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/create-blog.css">
 </head>
@@ -83,8 +79,7 @@
             <!-- Rich Text Editor -->
             <div class="form-group">
                 <label>Nội dung bài viết</label>
-                <div id="blog-editor"></div>
-                <input type="hidden" id="hidden-content" name="content">
+                <textarea name="content" class="ckeditor" id="blog-editor"></textarea>
             </div>
 
             <!-- Submit -->
@@ -111,6 +106,7 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <!-- JS -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/create-blog.js"></script>
 </body>
 </html>
