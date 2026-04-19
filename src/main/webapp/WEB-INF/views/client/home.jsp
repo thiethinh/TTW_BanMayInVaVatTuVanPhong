@@ -309,27 +309,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<%
-    String msg = (String) session.getAttribute("success");
-    if (msg != null) {
-%>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        Swal.fire({
-            title: 'Thành công!',
-            text: '<%= msg %>',
-            icon: 'success',
-            confirmButtonText: 'Tuyệt vời',
-            confirmButtonColor: '#3085d6',
-            timer: 3000
-        });
-    });
-</script>
-<%
-        session.removeAttribute("success");
-    }
-%>
-
 <jsp:include page="../includes/footer.jsp"/>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js" defer></script>

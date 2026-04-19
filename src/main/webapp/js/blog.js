@@ -11,6 +11,7 @@ export function initializeBlogNavigation() {
 
     // Lấy tất cả bài viết đang có
     const allPosts = Array.from(document.querySelectorAll('.post-card'));
+
     function displayPage(page) {
         allPosts.forEach(post => post.style.display = 'none');
 
@@ -74,4 +75,8 @@ export function initializeBlogNavigation() {
 
     displayPage(currentPage);
     setupPagination();
+}
+
+export function createBlogValidation() {
+
 }

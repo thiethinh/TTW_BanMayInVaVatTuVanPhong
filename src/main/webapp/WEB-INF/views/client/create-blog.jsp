@@ -10,10 +10,6 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- QuillJS Rich Text -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/create-blog.css">
 </head>
@@ -37,9 +33,9 @@
             <p style="color: red; text-align: center;">${failedMsg}</p>
             <c:remove var="failedMsg" scope="session"/>
         </c:if>
-        <c:if test="${not empty successMsg}">
-            <p style="color: green; text-align: center;">${succMsg}</p>
-            <c:remove var="succMsg" scope="session"/>
+        <c:if test="${not empty success}">
+            <p style="color: green; text-align: center;">${success}</p>
+            <c:remove var="success" scope="session"/>
         </c:if>
 
         <form class="blog-form" action="add_blog" method="post" enctype="multipart/form-data" id="blog-form">
@@ -48,24 +44,32 @@
             <div class="form-group">
                 <label>Tiêu đề bài viết</label>
                 <input type="text" name="title" id="blog-title" placeholder="Nhập tiêu đề..." required>
+                <span class="error-text" id="err-title"></span>
             </div>
 
             <!-- Thumbnail Upload -->
             <div class="form-group">
                 <label>Ảnh Thumbnail</label>
 
-                <div class="upload-box">
+                <div class="upload-box" id="upload-box">
                     <label for="thumbnail-input" class="upload-label">Chọn ảnh...</label>
                     <input type="file" name="image" id="thumbnail-input" accept="image/*" hidden>
                 </div>
 
-                <img id="thumbnail-preview" class="thumb-preview" alt="Preview"/>
+                <div class="preview-wrapper" id="preview-wrapper">
+                    <img id="thumbnail-preview" class="thumb-preview" alt="Preview"/>
+                    <button type="button" class="remove-thumb-btn" id="remove-thumb-btn" title="Xóa ảnh">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <span class="error-text" id="err-thumbnail"></span>
             </div>
 
             <!-- Short Description -->
             <div class="form-group">
                 <label>Mô tả ngắn</label>
                 <textarea name="description" id="blog-desc" placeholder="Nhập mô tả ..." required></textarea>
+                <span class="error-text" id="err-description"></span>
             </div>
 
             <!-- Tags -->
@@ -78,13 +82,13 @@
                     <option>Hướng Dẫn</option>
                     <option>Bảo Trì</option>
                 </select>
+                <span class="error-text" id="err-tags"></span>
             </div>
 
-            <!-- Rich Text Editor -->
             <div class="form-group">
                 <label>Nội dung bài viết</label>
-                <div id="blog-editor"></div>
-                <input type="hidden" id="hidden-content" name="content">
+                <textarea name="content" class="ckeditor" id="blog-editor"></textarea>
+                <span class="error-text" id="err-content"></span>
             </div>
 
             <!-- Submit -->
@@ -107,10 +111,7 @@
 <!-- ===================== FOOTER ===================== -->
 <jsp:include page="../includes/footer.jsp"/>
 
-<!--Dùng QuillJS để tạo trinhg soạn thảo-->
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<!-- JS -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/create-blog.js"></script>
 </body>
 </html>
