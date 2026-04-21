@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-contacts.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 
 </head>
 
@@ -60,7 +61,7 @@
 
                 <tbody>
                 <c:forEach items="${contacts}" var="c">
-                    <tr>
+                    <tr class="item-page">
                         <td>${c.id}</td>
                         <td>${c.userFullname}</td>
                         <td>${c.email}</td>
@@ -92,9 +93,16 @@
 
             </table>
         </section>
+        <div class ="pagination"></div>
 
     </main>
 </div>
+<script type="module">
+    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    document.addEventListener("DOMContentLoaded", () => {
+        initPagination();
+    });
+</script>
 </body>
 
 </html>

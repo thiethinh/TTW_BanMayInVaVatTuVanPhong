@@ -64,6 +64,46 @@
     background-color: #024ce1;
 }
 
+
+
+.btn-action {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.btn-lock {
+    background-color: #dc354554;
+    color: white;
+}
+
+.btn-unlock {
+    background-color: #28a745;
+    color: white;
+}
+
+.tag-status.active {
+    color: #28a745;
+    background: #d4edda;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.tag-status.blocked {
+    color: #dc3545;
+    background: #f8d7da;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
 /* ====== Table ========== */
 .block-table{
     background: #fff;

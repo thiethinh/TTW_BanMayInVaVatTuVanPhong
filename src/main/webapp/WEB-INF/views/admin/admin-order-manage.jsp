@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-product-edit.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-order-manage.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 </head>
 
 
@@ -60,7 +61,7 @@
                         </thead>
                         <tbody>
                         <c:forEach items="${orders}" var="o">
-                            <tr>
+                            <tr class="item-page">
                                 <td>${o.id}</td>
                                 <td>${o.shippingName}</td>
                                 <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
@@ -78,37 +79,44 @@
             </c:choose>
 
 
-            <div class="footer">
-                <nav>
-                    <ul class="nav-change-page">
-                        <%-- Nút Trang trước --%>
-                        <c:if test="${currentPage > 1}">
-                            <li>
-                                <a href="?status=${param.status}&page=${currentPage - 1}"><span>«</span> Trang trước</a>
-                            </li>
-                        </c:if>
+<%--            <div class="footer">--%>
+<%--                <nav>--%>
+<%--                    <ul class="nav-change-page">--%>
+<%--                        &lt;%&ndash; Nút Trang trước &ndash;%&gt;--%>
+<%--                        <c:if test="${currentPage > 1}">--%>
+<%--                            <li>--%>
+<%--                                <a href="?status=${param.status}&page=${currentPage - 1}"><span>«</span> Trang trước</a>--%>
+<%--                            </li>--%>
+<%--                        </c:if>--%>
 
-                        <%-- Hiển thị danh sách số trang --%>
-                        <c:forEach begin="1" end="${totalPages}" var="i">
-                            <li class="${currentPage == i ? 'active' : ''}">
-                                <a href="?status=${param.status}&page=${i}">${i}</a>
-                            </li>
-                        </c:forEach>
+<%--                        &lt;%&ndash; Hiển thị danh sách số trang &ndash;%&gt;--%>
+<%--                        <c:forEach begin="1" end="${totalPages}" var="i">--%>
+<%--                            <li class="${currentPage == i ? 'active' : ''}">--%>
+<%--                                <a href="?status=${param.status}&page=${i}">${i}</a>--%>
+<%--                            </li>--%>
+<%--                        </c:forEach>--%>
 
-                        <%-- Nút Trang tiếp theo --%>
-                        <c:if test="${currentPage < totalPages}">
-                            <li>
-                                <a href="?status=${param.status}&page=${currentPage + 1}">Trang tiếp theo <span>»</span></a>
-                            </li>
-                        </c:if>
-                    </ul>
-                </nav>
-            </div>
+<%--                        &lt;%&ndash; Nút Trang tiếp theo &ndash;%&gt;--%>
+<%--                        <c:if test="${currentPage < totalPages}">--%>
+<%--                            <li>--%>
+<%--                                <a href="?status=${param.status}&page=${currentPage + 1}">Trang tiếp theo <span>»</span></a>--%>
+<%--                            </li>--%>
+<%--                        </c:if>--%>
+<%--                    </ul>--%>
+<%--                </nav>--%>
+<%--            </div>--%>
 
         </section>
+        <div class ="pagination"></div>
 
     </main>
 </div>
+<script type="module">
+    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    document.addEventListener("DOMContentLoaded", () => {
+        initPagination();
+    });
+</script>
 
 </body>
 

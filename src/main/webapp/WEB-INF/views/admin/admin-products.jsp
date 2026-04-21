@@ -13,10 +13,10 @@
     <link rel="icon" href="${pageContext.request.contextPath}/images/logo.webp"/>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-products.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 </head>
 
 <body>
@@ -78,7 +78,7 @@
                 </thead>
                 <tbody>
                 <c:forEach items="${products}" var="p">
-                    <tr>
+                    <tr class="item-page">
                         <td>${p.id}</td>
 
                         <td>
@@ -114,55 +114,18 @@
                 </tbody>
 
             </table>
-            <c:if test="${totalPages > 1}">
-                <div class="pagination-container" style="display: flex; justify-content: center; margin-top: 20px; gap: 5px;">
-
-                    <c:if test="${currentPage > 1}">
-                        <a href="admin-product?page=${currentPage - 1}&keyword=${keyword}" class="btn-page">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </a>
-                    </c:if>
-
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="admin-product?page=${i}&keyword=${keyword}"
-                           class="btn-page ${currentPage == i ? 'active' : ''}">
-                                ${i}
-                        </a>
-                    </c:forEach>
-
-                    <c:if test="${currentPage < totalPages}">
-                        <a href="admin-product?page=${currentPage + 1}&keyword=${keyword}" class="btn-page">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                    </c:if>
-                </div>
-
-                <style>
-                    .btn-page {
-                        display: inline-block;
-                        padding: 8px 14px;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                        text-decoration: none;
-                        color: #333;
-                        background-color: white;
-                        transition: 0.2s;
-                    }
-                    .btn-page:hover {
-                        background-color: #f0f0f0;
-                    }
-                    .btn-page.active {
-                        background-color: #0d6efd;
-                        color: white;
-                        border-color: #0d6efd;
-                    }
-                </style>
-            </c:if>
-
         </section>
+        <div class ="pagination"></div>
 
     </main>
 </div>
+
+<script type="module">
+    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    document.addEventListener("DOMContentLoaded", () => {
+        initPagination();
+    });
+</script>
 
 </body>
 

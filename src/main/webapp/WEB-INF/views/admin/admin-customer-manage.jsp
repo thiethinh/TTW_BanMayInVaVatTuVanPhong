@@ -15,46 +15,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-customer-manage.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 
-    <style>
-        .btn-action {
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-        }
 
-        .btn-lock {
-            background-color: #dc354554;
-            color: white;
-        }
-
-        .btn-unlock {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .tag-status.active {
-            color: #28a745;
-            background: #d4edda;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .tag-status.blocked {
-            color: #dc3545;
-            background: #f8d7da;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
@@ -101,7 +64,7 @@
                     </thead>
                     <tbody>
                     <c:forEach var="u" items="${userList}">
-                        <tr>
+                        <tr class="item-page">
                             <td>${u.id}</td>
 
                             <td>${u.fullname}</td>
@@ -180,43 +143,17 @@
                     </tbody>
                 </table>
             </div>
-
-            <c:if test="${totalPages > 1}">
-                <div class="footer">
-                    <nav>
-                        <ul class="nav-change-page">
-                            <c:if test="${currentPage > 1}">
-                                <li>
-                                    <a href="admin-account?page=${currentPage - 1}&search-customer=${keyword}&select-sort=${statusFilter}">
-                                        <span>«</span> Trang trước
-                                    </a>
-                                </li>
-                            </c:if>
-
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="${currentPage == i ? 'active' : ''}">
-                                    <a href="admin-account?page=${i}&search-customer=${keyword}&select-sort=${statusFilter}">
-                                            ${i}
-                                    </a>
-                                </li>
-                            </c:forEach>
-
-                            <c:if test="${currentPage < totalPages}">
-                                <li>
-                                    <a href="admin-account?page=${currentPage + 1}&search-customer=${keyword}&select-sort=${statusFilter}">
-                                        Trang tiếp theo <span>»</span>
-                                    </a>
-                                </li>
-                            </c:if>
-                        </ul>
-                    </nav>
-                </div>
-            </c:if>
-
         </section>
+        <div class ="pagination"></div>
 
     </main>
 </div>
+<script type="module">
+    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    document.addEventListener("DOMContentLoaded", () => {
+        initPagination();
+    });
+</script>
 
 </body>
 </html>

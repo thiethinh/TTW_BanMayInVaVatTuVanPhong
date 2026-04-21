@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-blog.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 </head>
 
 <body>
@@ -81,7 +82,7 @@
 
                 <tbody>
                 <c:forEach items="${listBlog}" var="b">
-                    <tr>
+                    <tr class="item-page">
                         <td class="td-id">${b.id}</td>
 
                         <td>${b.authorName}</td>
@@ -124,8 +125,16 @@
                 </tbody>
             </table>
         </div>
+        <div class ="pagination"></div>
+
     </main>
 </div>
+<script type="module">
+    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    document.addEventListener("DOMContentLoaded", () => {
+        initPagination();
+    });
+</script>
 
 </body>
 
