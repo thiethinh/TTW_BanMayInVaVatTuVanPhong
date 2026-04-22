@@ -196,7 +196,7 @@
                     </div>
                 </div>
 
-                <button class="order-btn" type="submit">ĐẶT HÀNG</button>
+                <button class="order-btn" id=orderBtn type="submit">ĐẶT HÀNG</button>
             </section>
         </div>
     </form>

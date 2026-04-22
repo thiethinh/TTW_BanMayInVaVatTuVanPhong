@@ -75,7 +75,7 @@ public class CheckoutServlet extends HttpServlet {
         request.setAttribute("shippingFee", shippingFee);
         request.setAttribute("grandTotal", grandTotal);
 
-        request.getRequestDispatcher("/payment.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/client/payment.jsp").forward(request, response);
     }
 
     @Override
