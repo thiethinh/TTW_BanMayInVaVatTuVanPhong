@@ -44,6 +44,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const originText = orderBtn.textContent.trim();
 
         checkoutForm.addEventListener("submit", (e) => {
+            //Invalid Field
+            let isValid = true;
+            const requiredInputs = checkoutForm.querySelectorAll("[required]");
+
+            requiredInputs.forEach((input) => {
+                input.classList.remove("is-invalid"); // Xóa lỗi cũ
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add("is-invalid"); // Thêm class lỗi
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault(); // Ngăn submit
+                const firstError = checkoutForm.querySelector(".is-invalid");
+                if (firstError) firstError.focus();
+                return; // Dừng lại không chạy code xử lý loading bên dưới
+            }
+
             if (isSubmitting) {
                 e.preventDefault();
                 return;
@@ -56,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const allInputs = checkoutForm.querySelectorAll("input, textarea, select,button");
             allInputs.forEach((el) => {
                     if (el !== orderBtn) {
-                        el.classList().add("is-disable-temp");
+                        el.classList.add("is-disable-temp");
                     }
                 }
             )
