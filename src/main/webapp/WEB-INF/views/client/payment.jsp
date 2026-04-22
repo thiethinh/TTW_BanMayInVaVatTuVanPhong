@@ -31,7 +31,7 @@
         </div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm">
+    <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm" novalidate>
 
         <div class="block-paymentDetails-finalBill">
 
@@ -44,6 +44,7 @@
                         <option value="VN" ${addr.nation == 'VN' ? 'selected' : ''}>Việt Nam</option>
                         <option value="US" ${addr.nation == 'US' ? 'selected' : ''}>Hoa Kỳ</option>
                     </select>
+                    <div class="invalid-feedback">Vui lòng chọn quốc gia của bạn!</div>
                 </div>
 
                 <div class="block-firstname-lastname">
@@ -52,6 +53,7 @@
                         <input id="fullname" name="fullname" type="text"
                                value="${not empty addr ? addr.fname : sessionScope.acc.fname} ${not empty addr ? addr.lname : sessionScope.acc.lname}"
                                placeholder="Nguyễn Văn A" required>
+                        <div class="invalid-feedback">Vui lòng nhập họ tên!</div>
                     </div>
                 </div>
 
@@ -60,6 +62,7 @@
                     <input id="address" name="address" type="text"
                            value="${addr.detailAddress}"
                            placeholder="Số nhà, tên đường..." required>
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ giao hàng!</div>
                 </div>
 
                 <div class="block-addressCity-postCode">
@@ -68,6 +71,7 @@
                         <input id="addressCity" name="city" type="text"
                                value="${addr.city}"
                                placeholder="TP. Hồ Chí Minh" required>
+                        <div class="invalid-feedback">Vui lòng nhập tỉnh/thành phố!</div>
                     </div>
 
                     <div class="block-postCode">
@@ -84,12 +88,14 @@
                         <input id="phone" name="phone" type="tel"
                                value="${addr.phone}"
                                placeholder="0901234567" required>
+                        <div class="invalid-feedback">Vui lòng nhập số điện thoại!</div>
                     </div>
                     <div class="block-email">
                         <label for="email">Email <span>*</span></label>
                         <input id="email" name="email" type="email"
                                value="${sessionScope.acc.email}"
                                placeholder="email@example.com" required>
+                        <div class="invalid-feedback">Vui lòng nhập Email!</div>
                     </div>
                 </div>
 

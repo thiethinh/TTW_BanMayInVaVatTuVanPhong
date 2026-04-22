@@ -36,7 +36,7 @@
                         <h1 class="account-title">Chi Tiết Đơn Hàng</h1>
                     </div>
                     <div>
-                        <h2>Mã đơn: <span>${order.id}</span></h2>
+                        <h2>Mã đơn: <span>#${order.id}</span></h2>
                         <a href="${pageContext.request.contextPath}/invoice-print?orderId=${order.id}" target="_blank"
                            class="btn">
                             In hóa đơn
@@ -66,11 +66,11 @@
                                 <tbody>
                                 <tr>
                                     <td>Họ Tên:</td>
-                                    <td><span>${user.fullname}</span></td>
+                                    <td><span>${order.shippingName}</span></td>
                                 </tr>
                                 <tr>
                                     <td>SĐT:</td>
-                                    <td><span>${user.phoneNumber}</span></td>
+                                    <td><span>${order.shippingPhone}</span></td>
                                 </tr>
                                 <tr>
                                     <td>Email:</td>
