@@ -107,10 +107,19 @@ public class CheckoutServlet extends HttpServlet {
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
         order.setShippingAddress(fullAddress);
-        order.setNote((note == null ? "" : note.trim()) + " (PTTT: " + paymentMethod + ")");
+//        order.setNote((note == null ? "" : note.trim()) + " (PTTT: " + paymentMethod + ")");
+//
+//        OrderService orderService = new OrderService();
+//        boolean success = orderService.placeOrder(user, cart, order);
+
+        order.setNote(note ==null ? "": note.trim());
+
+        if (paymentMethod ==null || paymentMethod.isBlank()){
+            paymentMethod = "COD";
+        }
 
         OrderService orderService = new OrderService();
-        boolean success = orderService.placeOrder(user, cart, order);
+        boolean success= orderService.placeOrder(user,cart,order,paymentMethod);
 
         if (success) {
             session.removeAttribute("cart");
