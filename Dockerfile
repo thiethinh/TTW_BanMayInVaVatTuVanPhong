@@ -2,6 +2,7 @@ FROM gradle:9.2-jdk21 AS build
 USER root
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
+RUN cp src/main/webapp/META-INF/context-docker.xml src/main/webapp/META-INF/context.xml
 RUN chmod +x gradlew
 RUN ./gradlew war --no-daemon
 

@@ -39,7 +39,7 @@
                         <h2>Mã đơn: <span>#${order.id}</span></h2>
                         <a href="${pageContext.request.contextPath}/invoice-print?orderId=${order.id}" target="_blank"
                            class="btn">
-                            In hóa đơn
+                            🖨️ In hóa đơn
                         </a>
                     </div>
                 </section>
@@ -107,10 +107,8 @@
                                         </td>
                                         <td>${oi.product.productName}</td>
                                         <td style="text-align: center;">${oi.quantity}</td>
-                                        <td><fmt:formatNumber value="${oi.price}" pattern="#,###"/> VNĐ</td>
-                                        <td><fmt:formatNumber
-                                                value="${oi.price * oi.quantity}" pattern="#,###"/> VNĐ
-                                        </td>
+                                        <td><fmt:formatNumber value="${oi.price}" pattern="#,###"/> đ</td>
+                                        <td><fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#,###"/> đ</td>
                                     </tr>
                                 </c:forEach>
                                 </tbody>
@@ -127,13 +125,13 @@
                             <div class="summary-bill">
                                 <h4>Tóm tắt thanh toán: </h4>
                                 <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice - order.shippingFee}"
-                                                                      pattern="#,###"/> VNĐ</span></p>
+                                                                      pattern="#,###"/> đ</span></p>
                                 <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}"
-                                                                            pattern="#,###"/> VNĐ</span>
+                                                                            pattern="#,###"/> đ</span>
                                 </p>
                                 <p> Thuế(VAT): <span>Đã bao gồm</span></p>
                                 <h3>Tổng Cộng: <span style="color: red"><fmt:formatNumber value="${order.totalPrice}"
-                                                                                          pattern="#,###"/> VNĐ</span>
+                                                                                          pattern="#,###"/> đ</span>
                                 </h3>
                             </div>
 
@@ -142,8 +140,27 @@
                                 <p> Phương thức:
                                     <span>${not empty payment.paymentMethod ? payment.paymentMethod : 'Chưa cập nhật'}</span>
                                 </p>
+
+                                <p>Trạng thái:
+                                    <span>
+                                        <c:choose>
+                                            <c:when test="${not empty payment and payment.status}">
+                                                <span style="color:green">Đã thanh toán</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span style="color: red">Chưa thanh toán</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </p>
+
                                 <p> Ngày thanh toán:
-                                    <span>${not empty payment.paidAt ? payment.paidAt : 'Chưa thanh toán'} </span></p>
+                                    <span>${not empty payment.paidAt ? payment.paidAt : 'Chưa thanh toán'} </span>
+                                </p>
+
+                                <p>Mã giao dịch:
+                                    <span>${not empty payment.transacsionCode ? payment.transacsionCode : 'Chưa có'}</span>
+                                </p>
                             </div>
 
 

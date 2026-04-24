@@ -13,7 +13,6 @@
 
 <div class="print-btn">
     <button onclick="window.print()">🖨️ In hóa đơn</button>
-<%--    <button onclick="history.back()" style="margin-left:10px; background:#999;">← Quay lại</button>--%>
 </div>
 
 <div class="invoice-header">
@@ -67,10 +66,10 @@
             <td>${oi.product.productName}</td>
             <td class="text-center">${oi.quantity}</td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.price}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${oi.price}" pattern="#,###"/> đ
             </td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.total}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${oi.total}" pattern="#,###"/> đ
             </td>
         </tr>
     </c:forEach>
@@ -82,13 +81,13 @@
         <tr>
             <td>Tạm tính:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#,###"/> đ
             </td>
         </tr>
         <tr>
             <td>Phí vận chuyển:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.shippingFee}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${order.shippingFee}" pattern="#,###"/> đ
             </td>
         </tr>
         <tr>
@@ -98,7 +97,7 @@
         <tr class="total">
             <td>TỔNG CỘNG:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice}" pattern="#,###"/> VNĐ
+                <fmt:formatNumber value="${order.totalPrice}" pattern="#,###"/> đ
             </td>
         </tr>
     </table>
