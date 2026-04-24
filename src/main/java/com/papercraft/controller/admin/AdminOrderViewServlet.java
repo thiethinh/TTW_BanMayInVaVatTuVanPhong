@@ -20,6 +20,8 @@ public class AdminOrderViewServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String orderID = request.getParameter("orderId");
+        String verifyPayment= request.getParameter("verifyPayment");
+        String transactionCode= request.getParameter("transactionCode");
 
         String accept = request.getParameter("accept");
         String cancel = request.getParameter("cancel");
@@ -37,6 +39,31 @@ public class AdminOrderViewServlet extends HttpServlet {
         } else if (cancel != null) {
             updated = orderDAO.updateOrderStatus(id, cancel);
             isCancel = true;
+        }
+    // Xuwr lys VerifyPayment
+        boolean isVeryfyPayment= false;
+        boolean verifiedPayment = false;
+
+        if (verifyPayment != null ){
+            PaymentDAO paymentDAO = new PaymentDAO();
+            Payment currentPayment= paymentDAO.getPaymentByOrderId(id);
+            Order currentOrder= orderDAO.getOrderByID(id);
+
+            if (currentPayment != null && !Boolean.TRUE.equals(currentPayment.getStatus())){
+                String method= currentPayment.getPaymentMethod();
+
+                //Gia su cho COD verify khi owr trang thai shipping/complete
+                if ("COD".equalsIgnoreCase(method)){
+                    if (currentOrder != null && ("shipped".equalsIgnoreCase(currentOrder.getStatus())
+                    || "completed".equalsIgnoreCase(currentOrder.getStatus()))){
+                        verifiedPayment= paymentDAO.verifyPaymentSuccess(id,transactionCode);
+                        isVeryfyPayment= true;
+                    }
+                }else {
+                    verifiedPayment= paymentDAO.verifyPaymentSuccess(id,transactionCode);
+                    isVeryfyPayment= true;
+                }
+            }
         }
 
 
@@ -60,6 +87,8 @@ public class AdminOrderViewServlet extends HttpServlet {
         request.setAttribute("updated", updated);
         request.setAttribute("isAccept", isAccept);
         request.setAttribute("isCancel", isCancel);
+        request.setAttribute("isVerifyPayment",isVeryfyPayment);
+        request.setAttribute("verifiedPayment", verifiedPayment);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-order-view.jsp").forward(request, response);
 

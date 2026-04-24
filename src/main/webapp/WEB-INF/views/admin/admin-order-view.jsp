@@ -114,16 +114,6 @@
                 <!-- BILL -->
                 <div class="bill">
                     <div class="bill-details">
-                        <!-- <div>
-                            <label for="admin-status-order-viewDetails"> Trạng thái đơn: </label>
-                            <select name="admin-status-order-viewDetails" id="admin-status-order-viewDetails">
-                                <option value="all">Tất cả</option>
-                                <option value="pending">Chờ Xử Lý</option>
-                                <option value="shipped">Đã Gửi</option>
-                                <option value="completed">Hoàn Thành</option>
-                                <option value="canceled">Đã Hủy</option>
-                            </select>
-                        </div> -->
                         <div class="summary-bill">
                             <h4>Tóm tắt thanh toán: </h4>
                             <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice  - order.shippingFee}"
@@ -138,7 +128,7 @@
                         <button class="btn update-status" type="submit" name="btn-update-status"> Cập nhật trạng
                             thái
                         </button>
-                        <!-- <button class="btn contact" type="button" name="btn-contact"> Liên hệ khách hàng </button> -->
+
                         <div id="block-accept-cancel">
                             <button
                                     class="btn-accept"
@@ -176,8 +166,49 @@
                         <p> Phương thức:
                             <span>${not empty payment.paymentMethod ? payment.paymentMethod : 'Chưa cập nhật'}</span>
                         </p>
+
+                        <p>Trạng thái:
+                            <span>
+                                <c:choose>
+                                    <c:when test="${not empty payment and payment.status}">
+                                        <span style="color: green">Đã thanh toán</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span style="color: red">Chưa thanh toán</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+
+                        </p>
                         <p> Ngày thanh toán:
-                            <span>${not empty payment.paidAt ? payment.paidAt : 'Chưa thanh toán'} </span></p>
+                            <span>${not empty payment.paidAt ? payment.paidAt : 'Chưa thanh toán'} </span>
+                        </p>
+
+                        <p>Mã giao dịch:
+                            <span>${not empty payment.transactionCode ? payment.transactionCode : 'Chưa có'}</span>
+                        </p>
+
+                        <c:if test="${not empty payment and not payment.status}">
+                            <form action="${pageContext.request.contextPath}/admin-order-view" method="get"
+                                  style="margin-top: 12px;">
+                                <input type="hidden" name="orderId" value="${order.id}">
+                                <input type="hidden" name="verifyPayment" value="1">
+
+                                <c:if test="${payment.paymentMethod != 'COD'}">
+                                    <input type="text" name="transactionCode" placeholder="Nhập mã giao dịch( nếu có)">
+                                </c:if>
+
+                                <button type="submit" class="btn">
+                                    Xác nhận đã thanh toán
+                                </button>
+                            </form>
+                        </c:if>
+
+                        <c:if test="${isVerifyPayment}">
+                            <p style="margin-top: 10px; color: ${verifiedPayment ? 'green' : 'red'};">
+                                    ${verifiedPayment ? 'Xác nhận thanh toán thành công!' : 'Không thể xác nhận thanh toán.'}
+                            </p>
+                        </c:if>
                     </div>
                 </div>
 

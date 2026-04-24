@@ -159,7 +159,7 @@
                                 </p>
 
                                 <p>Mã giao dịch:
-                                    <span>${not empty payment.transacsionCode ? payment.transacsionCode : 'Chưa có'}</span>
+                                    <span>${not empty payment.transactionCode ? payment.transactionCode : 'Chưa có'}</span>
                                 </p>
                             </div>
 
