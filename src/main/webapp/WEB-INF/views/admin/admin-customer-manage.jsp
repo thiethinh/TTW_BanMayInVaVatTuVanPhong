@@ -75,7 +75,7 @@
 
                             <td>
                                 <fmt:setLocale value="vi_VN"/>
-                                <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="VNĐ"
+                                <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="đ"
                                                   maxFractionDigits="0"/>
                             </td>
 

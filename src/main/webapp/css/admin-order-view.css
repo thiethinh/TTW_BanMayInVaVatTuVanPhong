@@ -278,10 +278,21 @@
 }
 
 .order-detail .btn {
-    font-size: 16px;
-    margin: 5px 20px 10px;
+    font-size: 14px;
+    display: block;
+    margin: 5px 0 10px;
     padding: 8px 10px;
     border-radius: 8px;
+    width: 100%;
+    font-weight: 600;
+    background: rgb(240, 240, 240);
+    border: none;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+.order-detail .btn:hover{
+    background: green;
+    transform: translateY(-3px);
 }
 
 .order-detail .update-status {
@@ -291,13 +302,9 @@
     color: #fff;
     border: none;
     box-shadow: 0 0 4px rgba(36, 119, 191, 0.4);
-    transition: transform 0.3s ease;
+
 }
 
-.order-detail .update-status:hover {
-    background: #0a58ca;
-    transform: translateY(-3px);
-}
 
 .order-detail #block-accept-cancel {
     display: flex;
@@ -315,6 +322,7 @@
     background: rgb(240, 240, 240);
     border: none;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .order-detail .btn-accept:hover {
@@ -332,6 +340,7 @@
     background: #d9534f;
     border: none;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .order-detail .btn-cancel:hover {
@@ -366,4 +375,14 @@
 
 .action i {
     margin-right: 6px;
+}
+.input{
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    font-size: 15px;
+    width: 220px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
 }

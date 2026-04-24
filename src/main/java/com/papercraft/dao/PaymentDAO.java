@@ -49,11 +49,11 @@ public class PaymentDAO {
 
                 while (rs.next()) {
                     Integer id = rs.getInt("id");
-                    Integer order_id= rs.getInt("order_id");
+                    Integer order_id = rs.getInt("order_id");
                     String payment_method = rs.getString("payment_method");
                     BigDecimal payment_amount = rs.getBigDecimal("payment_amount");
                     Boolean status = rs.getBoolean("status");
-                    String transaction_code= rs.getString("transaction_code");
+                    String transaction_code = rs.getString("transaction_code");
                     Timestamp paid_at = rs.getTimestamp("paid_at");
 
                     Payment payment = new Payment();
@@ -82,9 +82,9 @@ public class PaymentDAO {
     //insertPayment
     public boolean insertPayment(Connection conn, Payment payment) throws SQLException {
         String sql = """
-            INSERT INTO payment (order_id, payment_method, payment_amount, status, transaction_code, paid_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """;
+                INSERT INTO payment (order_id, payment_method, payment_amount, status, transaction_code, paid_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
 
         try (
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -109,4 +109,34 @@ public class PaymentDAO {
             return ps.executeUpdate() > 0;
         }
     }
+
+    // verifyPaymentSuccess
+    public boolean verifyPaymentSuccess(int orderId, String transactionCode) {
+        String sql = """
+                UPDATE payment 
+                Set status = 1,
+                    paid_at= CURRENT_TIMESTAMP,
+                    transaction_code=?
+                Where order_id = ? and status=0
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (transactionCode != null && !transactionCode.isBlank()) {
+                ps.setString(1, transactionCode.trim());
+            } else {
+                ps.setNull(1, Types.VARCHAR);
+            }
+
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
 }

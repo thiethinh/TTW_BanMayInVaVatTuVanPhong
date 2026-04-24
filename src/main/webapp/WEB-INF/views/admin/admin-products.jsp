@@ -90,7 +90,7 @@
                         <td>${p.productName}</td>
 
                         <td>
-                            <fmt:formatNumber value="${p.price}" type="number"/> VNĐ
+                            <fmt:formatNumber value="${p.origin_price}" type="number"/> đ
                         </td>
 
                         <td>${p.stockQuantity}</td>

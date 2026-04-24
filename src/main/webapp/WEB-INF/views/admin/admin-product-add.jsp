@@ -57,7 +57,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="product-price">Giá (VNĐ)</label>
+                        <label for="product-price">Giá (đ)</label>
                         <input type="number" id="product-price" name="price" class="form-input" placeholder="Ví dụ: 4500000" required>
                     </div>
                 </div>

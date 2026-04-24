@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<fmt:setTimeZone value="Asia/Ho_Chi_Minh" />
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,8 +65,8 @@
                             <tr class="item-page">
                                 <td>${o.id}</td>
                                 <td>${o.shippingName}</td>
-                                <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> VNĐ</td>
+                                <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm" timeZone="Asia/Ho_Chi_Minh"/></td>
+                                <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
 
                                 <td><span class="status-badge ${o.status}">${o.status}</span></td>
                                 <td>
