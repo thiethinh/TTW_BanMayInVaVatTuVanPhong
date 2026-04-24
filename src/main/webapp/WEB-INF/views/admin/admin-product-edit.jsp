@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="product-price">Giá Gốc (VNĐ)</label>
+                        <label for="product-price">Giá Gốc (đ)</label>
                         <fmt:formatNumber value="${product.originPrice}" pattern="##0" var="formattedPrice" />
                         <input type="number" id="product-price" name="price" class="form-input"
                                value="${formattedPrice}" required>

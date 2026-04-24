@@ -251,7 +251,7 @@
                         <i class="fas fa-shipping-fast benefit-icon"></i>
                     </div>
                     <h3 class="benefit-title">Miễn Phí Vận Chuyển</h3>
-                    <p class="benefit-description">Giao hàng miễn phí cho đơn hàng trên 500.000 VNĐ</p>
+                    <p class="benefit-description">Giao hàng miễn phí cho đơn hàng trên 500.000 đ</p>
                 </div>
             </div>
         </div>
