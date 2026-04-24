@@ -2,11 +2,8 @@ package com.papercraft.service;
 
 import com.papercraft.dao.OrderDAO;
 import com.papercraft.dao.OrderItemDAO;
-import com.papercraft.model.Cart;
-import com.papercraft.model.Order;
-import com.papercraft.model.OrderItem;
-import com.papercraft.model.Product;
-import com.papercraft.model.User;
+import com.papercraft.dao.PaymentDAO;
+import com.papercraft.model.*;
 import com.papercraft.utils.DBConnect;
 
 import java.math.BigDecimal;
@@ -18,10 +15,14 @@ import java.util.List;
 public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final OrderItemDAO orderItemDAO = new OrderItemDAO();
+    private final PaymentDAO paymentDAO = new PaymentDAO();
 
-    public boolean placeOrder(User user, Cart cart, Order order) {
+    public boolean placeOrder(User user, Cart cart, Order order, String paymentMethod) {
         if (user == null || cart == null || cart.list() == null || cart.list().isEmpty() || order == null) {
             return false;
+        }
+        if(paymentMethod ==null || paymentMethod.isBlank()){
+            paymentMethod = "COD";
         }
 
         Connection conn = null;
@@ -70,12 +71,33 @@ public class OrderService {
                 return false;
             }
 
-            for (OrderItem item : orderItems) {
+//            for (OrderItem item : orderItems) {
+//                item.setOrderId(orderId);
+//            }
+//
+//            orderItemDAO.insertOrderItem(conn, orderItems);
+//
+//            conn.commit();
+//            return true;
+
+            for (OrderItem item: orderItems){
                 item.setOrderId(orderId);
             }
+            orderItemDAO.insertOrderItem(conn,orderItems);
 
-            orderItemDAO.insertOrderItem(conn, orderItems);
+            Payment payment= new Payment();
+            payment.setOrderId(orderId);
+            payment.setPaymentMethod(paymentMethod);
+            payment.setPaymentAmount(BigDecimal.valueOf(grandTotal));
+            payment.setStatus(false);
+            payment.setTransactionCode(null);
+            payment.setPaidAt(null);
 
+            boolean paymentInserted= paymentDAO.insertPayment(conn,payment);
+            if (!paymentInserted){
+                conn.rollback();
+                return false;
+            }
             conn.commit();
             return true;
 
