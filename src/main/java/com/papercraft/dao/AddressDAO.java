@@ -12,7 +12,7 @@ public class AddressDAO {
     public boolean insertAddress(Address address) {
         // ID auto increament
         String sql = "INSERT INTO address (user_id, fname, lname, nation, " +
-                "city, " + "detail_address, postcode, email, phone, is_default) " +
+                "city,detail_address, postcode, email, phone, is_default) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (

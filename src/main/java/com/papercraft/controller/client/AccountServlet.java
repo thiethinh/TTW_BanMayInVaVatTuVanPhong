@@ -20,12 +20,14 @@ public class AccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
-        AddressDAO addressDAO = new AddressDAO();
-
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
+
+        AddressDAO addressDAO = new AddressDAO();
+        Address address = addressDAO.findDefaultAddress(user.getId());
 
         String lnameAdrr = request.getParameter("lname");
         String fnameAdrr = request.getParameter("fname");
@@ -36,28 +38,46 @@ public class AccountServlet extends HttpServlet {
         String detailAddress = request.getParameter("address");
 
         if (lnameAdrr != null && fnameAdrr != null && phoneAdrr != null && nation != null && city != null && poseCode != null && detailAddress != null) {
-            Address address = new Address();
-            address.setFname(fnameAdrr);
-            address.setLname(lnameAdrr);
-            address.setPhone(phoneAdrr);
-            address.setDetailAddress(detailAddress);
-            address.setNation(nation);
-            address.setCity(city);
-            address.setPostcode(poseCode);
+            if(address != null) {
+                address.setFname(fnameAdrr);
+                address.setLname(lnameAdrr);
+                address.setPhone(phoneAdrr);
+                address.setDetailAddress(detailAddress);
+                address.setNation(nation);
+                address.setCity(city);
+                address.setPostcode(poseCode);
+                boolean isUpdateAddr = addressDAO.updateAddress(address, user.getId());
+                if (isUpdateAddr) {
+                    request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
+                    address = addressDAO.getAddresById(user.getId());
+                    request.setAttribute("address", address);
+                } else {
+                    request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
+                }
+            }else{
+                address = new Address();
+                address.setUserId(user.getId());
+                address.setFname(fnameAdrr);
+                address.setLname(lnameAdrr);
+                address.setPhone(phoneAdrr);
+                address.setDetailAddress(detailAddress);
+                address.setNation(nation);
+                address.setCity(city);
+                address.setPostcode(poseCode);
+                address.setEmail(user.getEmail());
+                address.setDefault(true);
+                boolean inserted =addressDAO.insertAddress(address);
 
-
-            boolean isUpdateAddr = addressDAO.updateAddress(address, user.getId());
-            if (isUpdateAddr) {
-                request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
-            } else {
-                request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
+                if (inserted) {
+                    request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
+                    address = addressDAO.getAddresById(address.getId());
+                    request.setAttribute("address", address);
+                } else {
+                    request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
+                }
             }
-
         }
-
-        Address address = addressDAO.getAddresById(user.getId());
         request.setAttribute("address", address);
-
         request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
     }
 
