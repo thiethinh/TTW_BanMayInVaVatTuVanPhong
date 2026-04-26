@@ -150,7 +150,27 @@
         <section id="contact-pending" class="content-table-card">
             <h2>Tin Nhắn Chưa Phản Hồi</h2>
 
+            <div style="margin: 20px 0;">
+                <label>Chọn tháng: </label>
+                <input type="month" id="contactMonthFilter">
+            </div>
 
+            <div class="block-table">
+                <table class="table-contact">
+                    <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>Họ tên</td>
+                        <td>Email</td>
+                        <td>Chủ đề</td>
+                        <td>Nội dung</td>
+                        <td>Phản hồi</td>
+                    </tr>
+                    </thead>
+                    <tbody id="contactTableBody">
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <%-- dasshboard khach hang --%>
@@ -179,7 +199,9 @@
                     <tbody id="accountTableBody">
                     </tbody>
                 </table>
-                <a href="${pageContext.request.contextPath}/admin-account">Xem chi tiết tất cả các tài khoản</a>
+                <div class="table-footer">
+                    <a href="${pageContext.request.contextPath}/admin-account">Xem chi tiết tất cả các tài khoản</a>
+                </div>
             </div>
         </section>
 

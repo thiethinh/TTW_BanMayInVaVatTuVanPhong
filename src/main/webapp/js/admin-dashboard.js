@@ -82,6 +82,74 @@ function formatCurrency(number) {
         currency: 'VND'
     }).format(number);
 }
+
+
+//contact
+function initContactFilter() {
+    const input = document.getElementById("contactMonthFilter");
+    if (!input) return;
+
+    input.addEventListener("change", function () {
+        const value = this.value;
+        if (!value) return;
+
+        const [year, month] = value.split("-");
+
+        fetch(`admin-contacts?action=get-by-month&month=${month}&year=${year}`)
+            .then(res => res.json())
+            .then(data => renderContactTable(data))
+            .catch(err => console.error(err));
+    });
+
+    // load tháng hiện tại
+    const today = new Date();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+
+    input.value = `${y}-${m}`;
+    input.dispatchEvent(new Event("change"));
+}
+
+function renderContactTable(list) {
+    const tbody = document.getElementById("contactTableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (!list || list.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center">Không có tin nhắn</td>
+            </tr>
+        `;
+        return;
+    }
+
+    list.forEach(c => {
+        const icon = c.rely
+            ? `<i class="fa-solid fa-square-check" style="color: green;"></i>`
+            : `<i class="fa-regular fa-square" style="color: red;"></i>`;
+
+        const row = `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.userFullname}</td>
+                <td>${c.email}</td>
+                <td>${c.contactTitle}</td>
+                <td class="content-cell">${c.content}</td>
+                <td class="status-col">
+                    <a href="admin-contacts?action=toggle&id=${c.id}">
+                        ${icon}
+                    </a>
+                </td>
+            </tr>
+        `;
+
+        tbody.innerHTML += row;
+    });
+}
+
 window.addEventListener("DOMContentLoaded", () => {
     initAccountFilter();
+    initContactFilter();
 });

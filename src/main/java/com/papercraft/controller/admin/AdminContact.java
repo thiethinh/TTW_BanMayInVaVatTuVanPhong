@@ -1,12 +1,15 @@
 package com.papercraft.controller.admin;
 
+import com.google.gson.Gson;
 import com.papercraft.dao.ContactDAO;
+import com.papercraft.dto.ContactDTO;
 import com.papercraft.model.Contact;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -16,6 +19,33 @@ public class AdminContact extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         ContactDAO contactDAO = new ContactDAO();
+        String action = request.getParameter("action");
+
+
+        if ("get-by-month".equals(action)) {
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                int month = Integer.parseInt(request.getParameter("month"));
+                int year = Integer.parseInt(request.getParameter("year"));
+
+                System.out.println(year);
+                List<ContactDTO> list = new ContactDAO().getContactsByMonth(month, year);
+
+                PrintWriter out = response.getWriter();
+                out.print(new Gson().toJson(list));
+                out.flush();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(500);
+                response.getWriter().print("{\"error\":\"server error\"}");
+            }
+            return;
+        }
+
 
         String keyword = request.getParameter("keyword");
         if (keyword == null) keyword = "";
@@ -32,7 +62,6 @@ public class AdminContact extends HttpServlet {
             }
         }
 
-        String action = request.getParameter("action");
         if ("toggle".equals(action)) {
             try {
                 int id = Integer.parseInt(request.getParameter("id"));

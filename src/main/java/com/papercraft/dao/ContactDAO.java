@@ -1,5 +1,6 @@
 package com.papercraft.dao;
 
+import com.papercraft.dto.ContactDTO;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Contact;
 
@@ -135,5 +136,44 @@ public class ContactDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    public List<ContactDTO> getContactsByMonth(int month, int year) {
+        List<ContactDTO> list = new ArrayList<>();
+
+        String sql = """
+        SELECT *
+        FROM contact
+        WHERE MONTH(created_at) = ?
+        AND YEAR(created_at) = ?
+        AND rely = 0
+        ORDER BY created_at DESC;
+    """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                ContactDTO c = new ContactDTO();
+                c.setId(rs.getInt("id"));
+                c.setUserFullname(rs.getString("user_fullname"));
+                c.setEmail(rs.getString("email"));
+                c.setContactTitle(rs.getString("contact_title"));
+                c.setContent(rs.getString("content"));
+                c.setRely(rs.getBoolean("rely"));
+                list.add(c);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }
