@@ -82,7 +82,7 @@
             <div class="filter-bar">
                 <div class="filter-item">
                     <label for="fromDate">Từ:</label>
-                   <input type="month" id="fromDate">
+                    <input type="month" id="fromDate">
                 </div>
 
                 <div class="filter-item">
@@ -157,6 +157,30 @@
         <section id="account" class="content-table-card">
             <h2>Thống Kê Tài Khoản</h2>
 
+            <div style="margin: 20px 0;">
+                <label for="monthFilterAccount">Các tài khoản tạo mới trong tháng: </label>
+                <input type="month" id="monthFilterAccount">
+            </div>
+
+            <div class="block-table">
+                <table class="table-customer">
+                    <thead>
+                    <tr>
+                        <td>Mã KH</td>
+                        <td>Tên KH</td>
+                        <td>SĐT</td>
+                        <td>Email</td>
+                        <td>Tổng chi tiêu</td>
+                        <td>Quyền</td>
+                        <td>Trạng thái</td>
+                        <td>Thao tác</td>
+                    </tr>
+                    </thead>
+                    <tbody id="accountTableBody">
+                    </tbody>
+                </table>
+                <a href="${pageContext.request.contextPath}/admin-account">Xem chi tiết tất cả các tài khoản</a>
+            </div>
         </section>
 
     </main>

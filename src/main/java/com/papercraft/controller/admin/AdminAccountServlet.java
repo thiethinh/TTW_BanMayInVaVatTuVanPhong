@@ -1,23 +1,43 @@
 package com.papercraft.controller.admin;
 
+import com.google.gson.Gson;
 import com.papercraft.dao.UserDAO;
 import com.papercraft.model.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet(name = "AdminCusServlet", value = "/admin-account")
-public class AdminCusServlet extends HttpServlet {
+@WebServlet(name = "AdminAccountServlet", value = "/admin-account")
+public class AdminAccountServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         UserDAO userDAO = new UserDAO();
         request.setCharacterEncoding("UTF-8");
 
-        //  XỬ LÝ KHÓA / MỞ KHÓA
+
         String action = request.getParameter("action");
+
+        if ("get-by-month".equals(action)) {
+            int month = Integer.parseInt(request.getParameter("month"));
+            int year = Integer.parseInt(request.getParameter("year"));
+
+            UserDAO dao = new UserDAO();
+            List<User> list = dao.getCustomersByMonth(month, year);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            PrintWriter out = response.getWriter();
+            out.print(new Gson().toJson(list));
+            out.flush();
+            return;
+        }
+
+        //  XỬ LÝ KHÓA / MỞ KHÓA
         String idParam = request.getParameter("id");
 
         if (idParam != null && action != null) {

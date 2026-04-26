@@ -3,32 +3,42 @@ let revenueChartMonth;
 const idRevenueChart = 'revenueChart';
 const idRevenueChartMonth = 'revenueChartMonth';
 
-
 function loadRevenue() {
-    const from = document.getElementById("fromDate").value;
-    const to = document.getElementById("toDate").value;
+    const fromInput = document.getElementById("fromDate");
+    const toInput = document.getElementById("toDate");
+
+    if (!fromInput || !toInput) return;
+
+    const from = fromInput.value;
+    const to = toInput.value;
+
+    if (!from || !to) return;
 
     fetch(`revenue?from=${from}&to=${to}`)
         .then(res => res.json())
-        .then(data => renderChart(data,idRevenueChart))
+        .then(data => renderChart(data, idRevenueChart))
         .catch(err => console.error(err));
 }
 
-
 function loadDailyRevenue() {
-    const month = document.getElementById("monthDetail").value;
+    const monthInput = document.getElementById("monthDetail");
+    if (!monthInput) return;
+
+    const month = monthInput.value;
+    if (!month) return;
 
     fetch(`revenue-by-month?month=${month}`)
         .then(res => res.json())
-        .then(data => renderChart(data,idRevenueChartMonth))
+        .then(data => renderChart(data, idRevenueChartMonth))
         .catch(err => console.error(err));
 }
 
 function renderChart(data, idChart) {
+    const ctx = document.getElementById(idChart);
+    if (!ctx) return;
+
     const labels = data.map(i => i.label);
     const values = data.map(i => i.total);
-
-    const ctx = document.getElementById(idChart);
 
     let chartInstance;
 
@@ -70,21 +80,22 @@ function renderChart(data, idChart) {
     }
 }
 
-// auto load lần đầu
-window.onload = () => {
-    const now = new Date();
-    const currentMonth = now.toISOString().slice(0, 7);
+window.addEventListener("DOMContentLoaded", () => {
+    const fromInput = document.getElementById("fromDate");
+    const toInput = document.getElementById("toDate");
+    const monthDetail = document.getElementById("monthDetail");
 
-    document.getElementById("fromDate").value = "2026-01";
-    document.getElementById("toDate").value = currentMonth;
+    if (fromInput && toInput && monthDetail) {
+        const now = new Date();
+        const currentMonth = now.toISOString().slice(0, 7);
+        fromInput.value = "2026-01";
+        toInput.value = "2026-05";
+        monthDetail.value = currentMonth;
 
-    document.getElementById("monthDetail").value = currentMonth;
+        loadRevenue();
+        loadDailyRevenue();
 
-
-    loadRevenue();
-    loadDailyRevenue()
-};
-
-// auto refresh mỗi 5 phút
-setInterval(loadRevenue, 300000);
-setInterval(loadDailyRevenue, 300000);
+        setInterval(loadRevenue, 300000);
+        setInterval(loadDailyRevenue, 300000);
+    }
+});

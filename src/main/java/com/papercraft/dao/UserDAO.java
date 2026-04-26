@@ -379,4 +379,45 @@ public class UserDAO {
         }
         return null;
     }
+
+    public List<User> getCustomersByMonth(int month, int year) {
+        List<User> list = new ArrayList<>();
+
+        String sql = """
+        SELECT u.id, u.fullname, u.phone_number,u.email, u.status, u.role, 
+               (SELECT COALESCE(SUM(o.total_price), 0) 
+                FROM orders o 
+                WHERE o.user_id = u.id) AS total_spending
+        FROM users u
+        WHERE MONTH(u.created_at) = ?
+        AND YEAR(u.created_at) = ?
+        ORDER BY u.created_at DESC
+    """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setFullname(rs.getString("fullname"));
+                u.setEmail(rs.getString("email"));
+                u.setPhoneNumber(rs.getString("phone_number"));
+                u.setRole(rs.getString("role"));
+                u.setStatus(rs.getBoolean("status"));
+                u.setTotalSpending(rs.getDouble("total_spending"));
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
