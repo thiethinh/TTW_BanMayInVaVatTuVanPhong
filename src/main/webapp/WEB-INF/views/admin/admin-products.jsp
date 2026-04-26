@@ -90,7 +90,7 @@
                         <td>${p.productName}</td>
 
                         <td>
-                            <fmt:formatNumber value="${p.origin_price}" type="number"/> đ
+                            <fmt:formatNumber value="${p.originPrice != null ? p.originPrice : 0}" type="number"/> đ
                         </td>
 
                         <td>${p.stockQuantity}</td>

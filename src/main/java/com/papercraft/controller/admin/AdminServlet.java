@@ -36,7 +36,7 @@ public class AdminServlet extends HttpServlet {
             return;
         }
         PaymentDAO paymentDAO = new PaymentDAO();
-        double totalRevenue = paymentDAO.getTotalRevenue();
+        double totalRevenue = paymentDAO.getTotalRevenueByMonthNow();
 
         OrderDAO orderDAO = new OrderDAO();
         Integer totalpendingOrder = orderDAO.totalPendingOrder();

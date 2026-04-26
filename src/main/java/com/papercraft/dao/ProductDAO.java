@@ -12,6 +12,50 @@ import java.util.TreeSet;
 public class ProductDAO {
     private static final String ROOT_PATH = "images/upload/";
 
+    public List<Product> getAllProduct() {
+        List<Product> list = new ArrayList<>();
+
+        String sql = """
+                SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, p.stock_quantity,p.origin_price, i.img_name
+                                    FROM product p
+                                    JOIN category c ON p.category_id = c.id
+                                    JOIN image i ON p.id = i.entity_id
+                                    WHERE i.is_thumbnail = 1 AND i.entity_type = 'Product';
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setId(rs.getInt("id"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    p.setBrand(rs.getString("brand"));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setStockQuantity(rs.getInt("stock_quantity"));
+
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
+                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                    } else {
+                        p.setThumbnail("images/logo.webp");
+                    }
+                    list.add(p);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     //getAllProduct
     public List<Product> getAllProduct(String type) {
         List<Product> list = new ArrayList<>();
@@ -276,18 +320,18 @@ public class ProductDAO {
         }
     }
 
-    public List<Product> filterProduct(String type, String search, int categoryId, String brand, String sort){
+    public List<Product> filterProduct(String type, String search, int categoryId, String brand, String sort) {
         List<Product> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
                 """
-                    SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,  p.origin_price,p.discount,p.price, i.img_name, AVG(r.rating) as avg_rating
-                    FROM product p
-                    JOIN category c ON p.category_id = c.id
-                    JOIN image i ON p.id = i.entity_id
-                    LEFT JOIN review r ON r.product_id = p.id
-                    WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
-                """
+                            SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,  p.origin_price,p.discount,p.price, i.img_name, AVG(r.rating) as avg_rating
+                            FROM product p
+                            JOIN category c ON p.category_id = c.id
+                            JOIN image i ON p.id = i.entity_id
+                            LEFT JOIN review r ON r.product_id = p.id
+                            WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
+                        """
         );
 
         List<Object> params = new ArrayList<>();
@@ -321,7 +365,7 @@ public class ProductDAO {
                 ps.setObject(i + 1, params.get(i));
             }
 
-            try(ResultSet rs = ps.executeQuery();){
+            try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
                     Product p = new Product();
 
@@ -521,9 +565,9 @@ public class ProductDAO {
                 WHERE p.product_name LIKE ? COLLATE utf8mb4_general_ci AND c.type = ?
                 LIMIT 5
                 """;
-        try(Connection conn = DBConnect.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
-            ps.setString(1, "%"+keyword+"%");
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
             ps.setString(2, type);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -531,9 +575,9 @@ public class ProductDAO {
                 }
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return names;

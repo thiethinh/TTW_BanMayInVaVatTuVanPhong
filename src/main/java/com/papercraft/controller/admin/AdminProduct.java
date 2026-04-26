@@ -43,7 +43,7 @@ public class AdminProduct extends HttpServlet {
         int totalPages = (int) Math.ceil((double) totalProducts / pageSize); //   tổng số trang
 
         // Lấy danh sách sản phẩm cho trang hiện tại
-        List<Product> products = productDAO.getProductsPagination(keyword, page, pageSize);
+        List<Product> products = productDAO.getAllProduct();
 
         //  Gửi dữ liệu sang JSP
         request.setAttribute("products", products);
