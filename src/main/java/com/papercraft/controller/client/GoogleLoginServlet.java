@@ -22,12 +22,13 @@ import java.util.Scanner;
 public class GoogleLoginServlet extends HttpServlet {
     private static final String CLIENT_ID = "1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com";
     private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URL = "http://localhost:8080/papercraft/google-login";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String code = request.getParameter("code");
+        String requestUrl = request.getRequestURL().toString();
+        String redirectUri = requestUrl.split("\\?")[0];
 
         if (code == null || code.isEmpty()) {
             session.setAttribute("msg", "Đăng nhập Google thất bại hoặc đã bị hủy.");
@@ -36,7 +37,7 @@ public class GoogleLoginServlet extends HttpServlet {
         }
 
         try {
-            String accessToken = getAccessToken(code);
+            String accessToken = getAccessToken(code, redirectUri);
             GoogleUser googleUser = getUserInfo(accessToken);
             String email = googleUser.getEmail();
 
@@ -79,7 +80,7 @@ public class GoogleLoginServlet extends HttpServlet {
         }
     }
 
-    private String getAccessToken(String code) throws IOException {
+    private String getAccessToken(String code, String redirectUri) throws IOException {
         URL url = new URL("https://oauth2.googleapis.com/token");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -88,7 +89,7 @@ public class GoogleLoginServlet extends HttpServlet {
 
         String params = "client_id=" + CLIENT_ID +
                 "&client_secret=" + CLIENT_SECRET +
-                "&redirect_uri=" + REDIRECT_URL +
+                "&redirect_uri=" + redirectUri +
                 "&grant_type=authorization_code" +
                 "&code=" + code;
 
