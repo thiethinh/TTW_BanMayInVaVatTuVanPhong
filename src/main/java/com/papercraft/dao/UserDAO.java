@@ -120,15 +120,28 @@ public class UserDAO {
     }
 
     public boolean updateProfile(User user) {
-        String sql = "UPDATE users SET fname = ?, lname = ?, phone_number = ?, gender = ? WHERE id = ?";
+        StringBuilder sql = new StringBuilder("UPDATE users SET fname = ?, lname = ?, phone_number = ?, gender = ?");
+
+        if (user.getPasswordHash() != null) {
+            sql.append(",password_hash = ? WHERE id = ?");
+        } else {
+            sql.append(" WHERE id = ?");
+        }
 
         try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);) {
+             PreparedStatement ps = conn.prepareStatement(String.valueOf(sql));) {
             ps.setString(1, user.getFname());
             ps.setString(2, user.getLname());
             ps.setString(3, user.getPhoneNumber());
             ps.setString(4, user.getGender());
-            ps.setInt(5, user.getId());
+
+            if (user.getPasswordHash() != null) {
+                ps.setString(5, user.getPasswordHash());
+                ps.setInt(6, user.getId());
+            } else {
+                ps.setInt(5, user.getId());
+            }
+
 
             int rowAffected = ps.executeUpdate();
             return rowAffected > 0;
@@ -384,15 +397,15 @@ public class UserDAO {
         List<User> list = new ArrayList<>();
 
         String sql = """
-        SELECT u.id, u.fullname, u.phone_number,u.email, u.status, u.role, 
-               (SELECT COALESCE(SUM(o.total_price), 0) 
-                FROM orders o 
-                WHERE o.user_id = u.id) AS total_spending
-        FROM users u
-        WHERE MONTH(u.created_at) = ?
-        AND YEAR(u.created_at) = ?
-        ORDER BY u.created_at DESC
-    """;
+                    SELECT u.id, u.fullname, u.phone_number,u.email, u.status, u.role, 
+                           (SELECT COALESCE(SUM(o.total_price), 0) 
+                            FROM orders o 
+                            WHERE o.user_id = u.id) AS total_spending
+                    FROM users u
+                    WHERE MONTH(u.created_at) = ?
+                    AND YEAR(u.created_at) = ?
+                    ORDER BY u.created_at DESC
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
