@@ -1,5 +1,6 @@
 package com.papercraft.controller.client;
 
+import com.google.gson.JsonObject;
 import com.papercraft.dao.ContactDAO;
 import com.papercraft.model.Contact;
 import com.papercraft.model.User;
@@ -25,46 +26,68 @@ public class ContactServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         // Lấy dữ liệu từ Form
-        String fullname = request.getParameter("fullname");
-        String email = request.getParameter("email");
-        String subject = request.getParameter("subject");
-        String message = request.getParameter("message");
+        String fullname = request.getParameter("fullname") !=null ? request.getParameter("fullname") : "";
+        String email = request.getParameter("email") != null ? request.getParameter("email") : "";
+        String subject = request.getParameter("subject") != null ? request.getParameter("subject"): "";
+        String message = request.getParameter("message") !=null ? request.getParameter("message") : "";
 
-        // Tạo đối tượng Contact
-        Contact contact = new Contact();
+        String errorFullname="";
+        String errorEmail="";
+        String errorSubject= "";
+        String errorMessage="";
+
+        if (fullname.isEmpty()){
+            errorFullname = "Vui lòng nhập họ và tên.";
+        }
+        if (email.isEmpty()){
+            errorEmail="Vui lòng nhập Email";
+        }else if(!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
+            errorEmail="Email phải có dạng: nguyenvana@gmail.com.";
+        }
+        if (subject.isEmpty()){
+            errorSubject="Vui lòng nhập chủ dề.";
+        }
+        if (message.isEmpty()){
+            errorMessage="Vui lòng nhập nội dung liên hệ.";
+        }
+
+        boolean hasError= !errorFullname.isEmpty()
+                || !errorEmail.isEmpty()
+                || !errorSubject.isEmpty()
+                || !errorMessage.isEmpty();
+        JsonObject json= new JsonObject();
+        if (hasError){
+            json.addProperty("success",false);
+            json.addProperty("message","Vui lòng kiểm tra lại thông tin đã nhập.");
+            json.addProperty("errorFullname", errorFullname);
+            json.addProperty("errorEmail", errorEmail);
+            json.addProperty("errorSubject",errorSubject);
+            json.addProperty("errorMessage", errorMessage);
+
+            response.getWriter().write(json.toString());
+            return;
+        }
+        Contact contact= new Contact();
         contact.setUserFullname(fullname);
         contact.setEmail(email);
         contact.setContactTitle(subject);
         contact.setContent(message);
 
-        // Kiểm tra đăng nhập (Lấy user từ session "acc")
-        HttpSession session = request.getSession();
+        HttpSession session= request.getSession();
         User user = (User) session.getAttribute("acc");
+        contact.setUserId(user != null ? user.getId() : null);
 
-        if (user != null) {
-            contact.setUserId(user.getId()); // Nếu đã login thì lưu ID
-        } else {
-            contact.setUserId(null); // User chưa login
-        }
+        ContactDAO dao= new ContactDAO();
+        boolean isuccess= dao.insertContact(contact);
 
-        //  Gọi DAO lưu vào DB
-        ContactDAO dao = new ContactDAO();
-        boolean isSuccess = dao.insertContact(contact);
+        json.addProperty("success", isuccess);
+        json.addProperty("message",isuccess?"Gửi liên hệ thành công! chúng tôi sẽ phản hồi sớm" : "Có lỗi xảy ra. Vui lòng thử lại!");
+        json.addProperty("errorFullname","");
+        json.addProperty("errorEmail", "");
+        json.addProperty("errorSubject","");
+        json.addProperty("errorMessage","");
 
-        // Thông báo kết quả
-        if (isSuccess) {
-            request.setAttribute("ms", "Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm.");
-        } else {
-            request.setAttribute("error", "Có lỗi xảy ra. Vui lòng thử lại!");
+        response.getWriter().write(json.toString());
 
-            // Giữ lại nội dung cũ để user không cần nhập lại
-            request.setAttribute("old_fullname", fullname);
-            request.setAttribute("old_email", email);
-            request.setAttribute("old_subject", subject);
-            request.setAttribute("old_message", message);
-        }
-
-        // chuyển hướng về contact.jsp
-        request.getRequestDispatcher("/WEB-INF/views/client/contact.jsp").forward(request, response);
     }
 }
