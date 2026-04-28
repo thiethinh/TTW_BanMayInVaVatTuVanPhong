@@ -67,8 +67,15 @@ public class GoogleLoginServlet extends HttpServlet {
             User loggedUser = userDAO.getUserByEmail(email);
             if (loggedUser != null) {
                 session.setAttribute("acc", loggedUser);
-                session.setAttribute("success", "Đăng nhập thành công");
-                response.sendRedirect("home");
+
+                if(loggedUser.getEmail().isEmpty() || loggedUser.getPhoneNumber().isEmpty() || loggedUser.getPasswordHash().isEmpty()) {
+                    session.setAttribute("error", "Vui lòng nhập thông tin còn thiếu để hoàn thiện tài khoản");
+                    session.setAttribute("missingInformation", true);
+                    response.sendRedirect("account");
+                } else {
+                    session.setAttribute("success", "Đăng nhập thành công");
+                    response.sendRedirect("home");
+                }
             } else {
                 session.setAttribute("msg", "Lỗi khi tải thông tin tài khoản");
                 response.sendRedirect("login");

@@ -39,11 +39,12 @@
                 </c:if>
 
                 <form action="account" method="post" class="account-form">
+                    <input type="hidden" name="missingInformation" value="${sessionScope.missingInformation}">
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="first-name">Họ</label>
-                            <input type="text" id="first-name" name="firstname" value="${sessionScope.acc.fname}"
-                                   required>
+                            <input type="text" id="first-name" name="firstname" value="${sessionScope.acc.fname}">
                         </div>
                         <div class="form-group">
                             <label for="last-name">Tên</label>
@@ -65,11 +66,30 @@
                     <div class="form-group">
                         <label for="gender-select">Giới tính</label>
                         <select id="gender-select" name="gender" required>
+                            <option ${sessionScope.acc.gender == '' ? 'selected' : ''}>Chọn giới tính</option>
                             <option value="male" ${sessionScope.acc.gender == 'male' ? 'selected' : ''}>Nam</option>
                             <option value="female" ${sessionScope.acc.gender == 'female' ? 'selected' : ''}>Nữ</option>
                             <option value="other" ${sessionScope.acc.gender == 'other' ? 'selected' : ''}>Khác</option>
                         </select>
                     </div>
+
+                    <c:if test="${sessionScope.missingInformation}">
+                        <div class="form-group">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                            <i class="bx bx-lock-alt"></i>
+                            <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm-password">Nhập Lại Mật khẩu</label>
+                            <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu"
+                                   required>
+                            <i class="bx bx-lock-alt"></i>
+                            <i class="fas fa-eye-slash toggle-password"
+                               onclick="togglePassword('confirm-password', this)"></i>
+                        </div>
+                    </c:if>
 
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>

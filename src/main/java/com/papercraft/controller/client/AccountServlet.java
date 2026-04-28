@@ -4,6 +4,7 @@ import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.UserDAO;
 import com.papercraft.model.Address;
 import com.papercraft.model.User;
+import com.papercraft.utils.MD5;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -38,7 +39,7 @@ public class AccountServlet extends HttpServlet {
         String detailAddress = request.getParameter("address");
 
         if (lnameAdrr != null && fnameAdrr != null && phoneAdrr != null && nation != null && city != null && poseCode != null && detailAddress != null) {
-            if(address != null) {
+            if (address != null) {
                 address.setFname(fnameAdrr);
                 address.setLname(lnameAdrr);
                 address.setPhone(phoneAdrr);
@@ -54,7 +55,7 @@ public class AccountServlet extends HttpServlet {
                 } else {
                     request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
-            }else{
+            } else {
                 address = new Address();
                 address.setUserId(user.getId());
                 address.setFname(fnameAdrr);
@@ -66,7 +67,7 @@ public class AccountServlet extends HttpServlet {
                 address.setPostcode(poseCode);
                 address.setEmail(user.getEmail());
                 address.setDefault(true);
-                boolean inserted =addressDAO.insertAddress(address);
+                boolean inserted = addressDAO.insertAddress(address);
 
                 if (inserted) {
                     request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
@@ -96,6 +97,11 @@ public class AccountServlet extends HttpServlet {
         String lname = request.getParameter("lastname");
         String phone = request.getParameter("phone");
         String gender = request.getParameter("gender");
+
+        String missingInformation = request.getParameter("missingInformation");
+        String password = request.getParameter("password");
+        String confirmPassword = request.getParameter("confirm-password");
+
         if (fname != null && lname != null && phone != null && gender != null) {
             User userToUpdate = new User();
             userToUpdate.setId(user.getId());
@@ -104,22 +110,45 @@ public class AccountServlet extends HttpServlet {
             userToUpdate.setPhoneNumber(phone);
             userToUpdate.setGender(gender);
 
-            UserDAO userDAO = new UserDAO();
-            boolean isUpdated = userDAO.updateProfile(userToUpdate);
+            boolean error = false;
+            if (missingInformation != null && missingInformation.equals("true")) {
+                if (!password.matches("^(?=.*[0-9])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}$")) {
+                    session.setAttribute("error", "Mật khẩu mới yếu! Cần ít nhất 8 kí tự, có số và kí tự đặc biệt");
+                    error = true;
+                } else if (!password.equals(confirmPassword)) {
+                    session.setAttribute("error", "Mật khẩu xác nhận không trùng khớp");
+                    error = true;
+                } else {
+                    userToUpdate.setPasswordHash(MD5.getMD5(password));
+                }
+            }
 
-            if (isUpdated) {
-                user.setFname(fname);
-                user.setLname(lname);
-                user.setPhoneNumber(phone);
-                user.setGender(gender);
-                session.setAttribute("acc", user);
+            if (!error) {
+                UserDAO userDAO = new UserDAO();
+                boolean isUpdated = userDAO.updateProfile(userToUpdate);
 
-                request.setAttribute("msg", "Cập nhật thông tin thành công!");
-            } else {
-                request.setAttribute("error", "Có lỗi xảy ra, vui lòng thử lại!");
+                if (isUpdated) {
+                    user.setFname(fname);
+                    user.setLname(lname);
+                    user.setPhoneNumber(phone);
+                    user.setGender(gender);
+                    session.setAttribute("acc", user);
+
+                    if (missingInformation != null && missingInformation.equals("true")) {
+                        session.setAttribute("success", "Cập nhật thông tin thành công!");
+                        session.removeAttribute("missingInformation");
+                        session.removeAttribute("error");
+                        session.removeAttribute("password");
+                        session.removeAttribute("confirm-password");
+                        response.sendRedirect("home");
+                        return;
+                    }
+                    request.setAttribute("msg", "Cập nhật thông tin thành công!");
+                } else {
+                    request.setAttribute("error", "Có lỗi xảy ra, vui lòng thử lại!");
+                }
             }
         }
-
         request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
     }
 }
