@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         import('./register.js')
             .then(module => {
                 module.initializeRegister();
-        })
+            })
     }
 
     if (document.querySelector('.blog-nav')) {
@@ -95,6 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('review-form')) {
         import('./review.js').then(module => {
             module.initializeReview();
+        });
+    }
+
+    if (document.getElementById('account-form')) {
+        import('./account.js').then(module => {
+            module.initializeAccount();
         });
     }
 });

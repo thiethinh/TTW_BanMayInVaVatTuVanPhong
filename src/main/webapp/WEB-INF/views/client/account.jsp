@@ -38,12 +38,13 @@
                     <p style="color: red; font-weight: bold">${error}</p>
                 </c:if>
 
-                <form action="account" method="post" class="account-form">
+                <form action="account" method="post" class="account-form" id="account-form">
+                    <input type="hidden" name="missingInformation" value="${sessionScope.missingInformation}">
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="first-name">Họ</label>
-                            <input type="text" id="first-name" name="firstname" value="${sessionScope.acc.fname}"
-                                   required>
+                            <input type="text" id="first-name" name="firstname" value="${sessionScope.acc.fname}">
                         </div>
                         <div class="form-group">
                             <label for="last-name">Tên</label>
@@ -60,20 +61,46 @@
                     <div class="form-group">
                         <label for="phone">Số điện thoại</label>
                         <input type="text" id="phone" name="phone" value="${sessionScope.acc.phoneNumber}" required>
+                        <span class="error-text" id="err-phone"
+                              style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="gender-select">Giới tính</label>
                         <select id="gender-select" name="gender" required>
+                            <option value="" disabled ${sessionScope.acc.gender == '' ? 'selected' : ''}>Chọn giới tính</option>
                             <option value="male" ${sessionScope.acc.gender == 'male' ? 'selected' : ''}>Nam</option>
                             <option value="female" ${sessionScope.acc.gender == 'female' ? 'selected' : ''}>Nữ</option>
                             <option value="other" ${sessionScope.acc.gender == 'other' ? 'selected' : ''}>Khác</option>
                         </select>
+                        <span class="error-text" id="err-gender"
+                              style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                </form>
+                    <c:if test="${sessionScope.missingInformation}">
+                        <div class="form-group">
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                            <i class="bx bx-lock-alt"></i>
+                            <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
+                            <span class="error-password" id="err-password"
+                                  style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="confirm-password">Nhập Lại Mật khẩu</label>
+                            <input type="password" id="confirm-password" name="confirm-password"
+                                   placeholder="Nhập lại mật khẩu"
+                                   required>
+                            <i class="bx bx-lock-alt"></i>
+                            <i class="fas fa-eye-slash toggle-password"
+                               onclick="togglePassword('confirm-password', this)"></i>
+                            <span class="err-text" id="err-confirm-pwd"
+                                  style="color: red; font-size: 12px; position: absolute; bottom: -18px; left: 0; display: none;"></span>
+                        </div>
+                    </c:if>
+
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
 
                 <hr class="divider">

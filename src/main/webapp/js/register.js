@@ -126,6 +126,7 @@ export function initializeRegister() {
     phone.addEventListener('input', () => clearError('reg-phone', 'err-phone'));
 
     gender.addEventListener('blur', validateGender);
+    gender.addEventListener('change', validateGender);
     gender.addEventListener('input', () => clearError('reg-gender', 'err-gender'));
 
     password.addEventListener('blur', validatePassword);
