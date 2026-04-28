@@ -37,7 +37,8 @@
         </section>
         <section class="information">
 
-            <form action="contact" method="post">
+            <form action="contact" method="post" id="contactForm">
+                <div id="formMessage"></div>
                 <h3 id="form-title">Hãy gửi lời nhắn cho chúng tôi!</h3>
 
                 <div class="name-email">
@@ -46,12 +47,14 @@
                         <input id="name" name="fullname" type="text"
                                value="${not empty sessionScope.acc ? sessionScope.acc.fullname : old_fullname}"
                                placeholder="Tên bạn là gì?" required>
+                        <small class="field-error" id="error-fullname"></small>
                     </div>
                     <div class="email-block">
                         <label for="email">Email <span>*</span></label>
                         <input id="email" name="email" type="email"
                                value="${not empty sessionScope.acc ? sessionScope.acc.email : old_email}"
                                placeholder="Hoten@gmail.com" required>
+                        <small class="field-error" id="error-email"></small>
                     </div>
                 </div>
 
@@ -60,12 +63,14 @@
                     <input id="subject" name="subject" type="text"
                            value="${old_subject}"
                            placeholder="Chủ đề của bạn là gì?" required>
+                    <small class="field-error" id="error-subject"></small>
                 </div>
 
                 <div class="message-block">
                     <label for="message"> Nội dung </label>
                     <textarea id="message" name="message"
                               placeholder="Hãy nhập lời nhắn của bạn..." required>${old_message}</textarea>
+                    <small class="field-error" id="error-message"></small>
                 </div>
 
                 <button type="submit"> Gửi</button>
@@ -122,7 +127,7 @@
 </body>
 
 <jsp:include page="../includes/footer.jsp"/>
-
+<script src="${pageContext.request.contextPath}/js/contact.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

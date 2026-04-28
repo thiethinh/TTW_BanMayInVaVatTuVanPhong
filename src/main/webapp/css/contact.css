@@ -208,6 +208,36 @@
     color: var(--primary-color);
 }
 
+.contact-page-wrapper .field-error {
+    display: block;
+    margin-top: 6px;
+    color: #d93025;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 16px;
+}
+
+.contact-page-wrapper .input-error {
+    border-color: #d93025 !important;
+    background-color: #fff5f5 !important;
+}
+
+.contact-page-wrapper .ajax-success {
+    padding: 15px;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 15px;
+    margin: 0 0 20px 0;
+}
+
+.contact-page-wrapper .ajax-error {
+    padding: 15px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 15px;
+    margin: 0 0 20px 0;
+}
+
 @media (max-width: 768px) {
     .contact-page-wrapper .information {
         flex-direction: column;
