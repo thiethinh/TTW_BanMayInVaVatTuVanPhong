@@ -111,7 +111,7 @@ public class UserDAO {
                 user.setRole(rs.getString("role"));
                 user.setPasswordHash(rs.getString("password_hash"));
 
-                if ("mod".equals(user.getRole())) {
+                if ("mod".equalsIgnoreCase(user.getRole())) {
                     List<String> permissions = getPermissions(user.getId());
                     user.setPermissions(permissions);
                 }
@@ -315,12 +315,14 @@ public class UserDAO {
                     u.setStatus(rs.getBoolean("status")); // 1: true, 0: false
                     u.setTotalSpending(rs.getDouble("total_spending"));
 
-
                     try {
                         u.setCreatedAt(rs.getTimestamp("created_at"));
                     } catch (Exception ignore) {
                     }
 
+                    if ("mod".equalsIgnoreCase(u.getRole())) {
+                        u.setPermissions(getPermissions(u.getId()));
+                    }
                     list.add(u);
                 }
             }
@@ -445,9 +447,8 @@ public class UserDAO {
         String sql = "SELECT permission FROM user_permissions WHERE user_id = ?";
 
         try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     permissions.add(rs.getString("permission"));

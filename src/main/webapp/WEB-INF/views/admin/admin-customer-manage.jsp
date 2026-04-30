@@ -125,7 +125,7 @@
                                                     <label><input type="checkbox" name="permissions" value="contact-manage" ${fn:contains(u.permissions, 'contact-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý liên hệ</label>
                                                     <label><input type="checkbox" name="permissions" value="setting-manage" ${fn:contains(u.permissions, 'setting-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý cài đặt</label>
 
-                                                    <button type="submit" class="btn-save-perms"><i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi</button>
+                                                    <button type="submit" class="btn-save-perms">Lưu Thay Đổi</button>
                                                 </div>
                                             </div>
                                         </form>

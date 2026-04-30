@@ -37,7 +37,7 @@ public class AdminAccountServlet extends HttpServlet {
             return;
         }
 
-        //  XỬ LÝ KHÓA / MỞ KHÓA
+        //  XỬ LÝ KHÓA / MỞ KHÓA / PHÂN QUYỀN
         String idParam = request.getParameter("id");
 
         if (idParam != null && action != null) {
@@ -52,16 +52,23 @@ public class AdminAccountServlet extends HttpServlet {
                     if ("admin".equals(newRole) || "user".equals(newRole) || "mod".equals(newRole)) {
                         userDAO.updateUserRole(uid, newRole);
 
-                        if ("user".equals(newRole)) {
+                        if ("user".equals(newRole) || "admin".equals(newRole)) {
                             userDAO.updateModPermissions(uid, null);
                         }
                     }
+                } else if ("set-permission".equals(action)) {
+                    String[] permissions = request.getParameterValues("permissions");
+                    userDAO.updateModPermissions(uid, permissions);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            response.sendRedirect("admin-account");
+            String pageStr = request.getParameter("page") != null ? request.getParameter("page") : "1";
+            String searchStr = request.getParameter("search-customer") != null ? request.getParameter("search-customer") : "";
+            String sortStr = request.getParameter("select-sort") != null ? request.getParameter("select-sort") : "all";
+
+            response.sendRedirect("admin-account?page=" + pageStr + "&search-customer=" + searchStr + "&select-sort=" + sortStr);
             return;
         }
 
