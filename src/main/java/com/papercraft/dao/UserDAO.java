@@ -111,6 +111,11 @@ public class UserDAO {
                 user.setRole(rs.getString("role"));
                 user.setPasswordHash(rs.getString("password_hash"));
 
+                if ("mod".equalsIgnoreCase(user.getRole())) {
+                    List<String> permissions = getPermissions(user.getId());
+                    user.setPermissions(permissions);
+                }
+
                 return user;
             }
         } catch (Exception e) {
@@ -216,9 +221,14 @@ public class UserDAO {
     }
 
     //  Đếm số lượng user
-    public int countCustomers(String keyword, String statusFilter) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE role != 'admin' ");
+    public int countCustomers(String keyword, String statusFilter, String roleFilter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE 1=1 ");
         List<Object> params = new ArrayList<>();
+
+        if (roleFilter != null && !"all".equalsIgnoreCase(roleFilter)) {
+            sql.append("AND role = ?");
+            params.add(roleFilter);
+        }
 
         // Tìm kiếm
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -253,7 +263,7 @@ public class UserDAO {
     }
 
     //  Lấy danh sách user phân trang
-    public List<User> getCustomersPagination(String keyword, String statusFilter, int page, int pageSize) {
+    public List<User> getCustomersPagination(String keyword, String statusFilter, String roleFilter, int page, int pageSize) {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
                     SELECT u.*, 
@@ -264,6 +274,12 @@ public class UserDAO {
                     WHERE 1=1 
                 """);
         List<Object> params = new ArrayList<>();
+
+        //ROLE
+        if (roleFilter != null && !"all".equals(roleFilter)) {
+            sql.append("AND role = ? ");
+            params.add(roleFilter);
+        }
 
         //SEARCH
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -310,12 +326,14 @@ public class UserDAO {
                     u.setStatus(rs.getBoolean("status")); // 1: true, 0: false
                     u.setTotalSpending(rs.getDouble("total_spending"));
 
-
                     try {
                         u.setCreatedAt(rs.getTimestamp("created_at"));
                     } catch (Exception ignore) {
                     }
 
+                    if ("mod".equalsIgnoreCase(u.getRole())) {
+                        u.setPermissions(getPermissions(u.getId()));
+                    }
                     list.add(u);
                 }
             }
@@ -432,5 +450,60 @@ public class UserDAO {
         }
 
         return list;
+    }
+
+    // Permissions
+    public List<String> getPermissions(int userId) {
+        List<String> permissions = new ArrayList<>();
+        String sql = "SELECT permission FROM user_permissions WHERE user_id = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    permissions.add(rs.getString("permission"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return permissions;
+    }
+
+    public boolean updateModPermissions(int userId, String[] permissions) {
+        String deleteSql = "DELETE FROM user_permissions WHERE user_id = ?";
+        String insertSql = "INSERT INTO user_permissions (user_id, permission) VALUES (?, ?)";
+
+        try (Connection conn = DBConnect.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+                    psDelete.setInt(1, userId);
+                    psDelete.executeUpdate();
+                }
+
+                if (permissions != null) {
+                    try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
+                        for (String p : permissions) {
+                            psInsert.setInt(1, userId);
+                            psInsert.setString(2, p);
+                            psInsert.addBatch();
+                        }
+                        psInsert.executeBatch();
+                    }
+                }
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -1,8 +1,9 @@
 package com.papercraft.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.ArrayList;
 
 public class User implements Serializable {
     public int id;
@@ -17,6 +18,7 @@ public class User implements Serializable {
     public Timestamp createdAt;
     public String fullname;
     private double totalSpending;
+    private List<String> permissions = new ArrayList<>();
 
     public User() {
     }
@@ -131,4 +133,8 @@ public class User implements Serializable {
     public void setTotalSpending(double totalSpending) {
         this.totalSpending = totalSpending;
     }
+
+    public List<String> getPermissions() { return permissions; }
+
+    public void setPermissions(List<String> permissions) { this.permissions = permissions; }
 }
