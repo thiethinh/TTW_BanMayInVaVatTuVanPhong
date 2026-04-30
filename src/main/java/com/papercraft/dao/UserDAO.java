@@ -111,6 +111,11 @@ public class UserDAO {
                 user.setRole(rs.getString("role"));
                 user.setPasswordHash(rs.getString("password_hash"));
 
+                if ("mod".equals(user.getRole())) {
+                    List<String> permissions = getPermissions(user.getId());
+                    user.setPermissions(permissions);
+                }
+
                 return user;
             }
         } catch (Exception e) {
@@ -432,5 +437,61 @@ public class UserDAO {
         }
 
         return list;
+    }
+
+    // Permissions
+    public List<String> getPermissions(int userId) {
+        List<String> permissions = new ArrayList<>();
+        String sql = "SELECT permission FROM user_permissions WHERE user_id = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    permissions.add(rs.getString("permission"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return permissions;
+    }
+
+    public boolean updateModPermissions(int userId, String[] permissions) {
+        String deleteSql = "DELETE FROM user_permissions WHERE user_id = ?";
+        String insertSql = "INSERT INTO user_permissions (user_id, permission) VALUES (?, ?)";
+
+        try (Connection conn = DBConnect.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+                    psDelete.setInt(1, userId);
+                    psDelete.executeUpdate();
+                }
+
+                if (permissions != null) {
+                    try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
+                        for (String p : permissions) {
+                            psInsert.setInt(1, userId);
+                            psInsert.setString(2, p);
+                            psInsert.addBatch();
+                        }
+                        psInsert.executeBatch();
+                    }
+                }
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

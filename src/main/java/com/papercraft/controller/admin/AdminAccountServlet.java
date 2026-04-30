@@ -6,6 +6,7 @@ import com.papercraft.model.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -17,7 +18,6 @@ public class AdminAccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         UserDAO userDAO = new UserDAO();
         request.setCharacterEncoding("UTF-8");
-
 
         String action = request.getParameter("action");
 
@@ -49,14 +49,18 @@ public class AdminAccountServlet extends HttpServlet {
                     userDAO.updateUserStatus(uid, true);
                 } else if ("set-role".equals(action)) {
                     String newRole = request.getParameter("role");
-                    if ("admin".equals(newRole) || "user".equals(newRole)) {
+                    if ("admin".equals(newRole) || "user".equals(newRole) || "mod".equals(newRole)) {
                         userDAO.updateUserRole(uid, newRole);
+
+                        if ("user".equals(newRole)) {
+                            userDAO.updateModPermissions(uid, null);
+                        }
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // Redirect lại trang quản lý
+
             response.sendRedirect("admin-account");
             return;
         }
@@ -75,7 +79,9 @@ public class AdminAccountServlet extends HttpServlet {
         try {
             String p = request.getParameter("page");
             if (p != null) page = Integer.parseInt(p);
-        } catch (Exception e) { page = 1; }
+        } catch (Exception e) {
+            page = 1;
+        }
 
         //  Gọi DAO
         int totalUsers = userDAO.countCustomers(keyword, statusFilter);

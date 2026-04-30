@@ -65,7 +65,6 @@
 }
 
 
-
 .btn-action {
     border: none;
     padding: 5px 10px;
@@ -105,12 +104,13 @@
 }
 
 /* ====== Table ========== */
-.block-table{
+.block-table {
     background: #fff;
     padding: 20px 25px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .customer-view table {
     width: 100%;
     border-collapse: separate;
@@ -123,33 +123,36 @@
 }
 
 
-
 .customer-view table thead td {
     padding: 14px 18px;
     font-weight: 600;
     color: #333;
     text-align: center;
 }
+
 /* ---BODY------- */
 /* .customer-view table tbody {
     padding-left: 5px;
 
 } */
-.customer-view table tbody tr{
+.customer-view table tbody tr {
     background: #fff;
     border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     transition: 0.2s ease;
 }
-.customer-view table tbody tr:hover{
+
+.customer-view table tbody tr:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
-.block-action{
+
+.block-action {
     padding: 5px;
     text-align: left;
 }
-.customer-view table tbody td{
+
+.customer-view table tbody td {
     padding: 14px 18px;
     color: #444;
     vertical-align: middle;
@@ -158,13 +161,13 @@
 }
 
 
-
-.block-action a{
+.block-action a {
     margin-right: 6px;
     text-decoration: none;
     color: #165FF2;
 }
-.block-action a:hover{
+
+.block-action a:hover {
     text-decoration: underline;
 }
 
@@ -184,7 +187,7 @@
 .customer-view .tag-status.active {
     background-color: #e6f7f0;
     color: #2e7d32;
-    
+
 }
 
 .customer-view .tag-status.blocked {
@@ -192,20 +195,22 @@
     color: #842029;
 }
 
-.customer-view .table-customer  button{
+.customer-view .table-customer button {
     padding: 2px 8px;
     cursor: pointer;
 }
-.customer-view .table-customer  button:hover{
+
+.customer-view .table-customer button:hover {
     background: #cfcfcf;
 }
-.customer-view  .fa-unlock{
+
+.customer-view .fa-unlock {
     color: #d8b120fa;
 }
-.customer-view  .fa-lock{
+
+.customer-view .fa-lock {
     color: #cc6600;
 }
-
 
 
 /* ========= Footer ========= */
@@ -239,4 +244,85 @@
 .customer-view .footer li a {
     text-decoration: none;
     color: #0a58ca;
+}
+
+/* Dropdown Checkbox */
+.multiselect-container {
+    position: relative;
+    width: 150px;
+    text-align: center;
+}
+
+.select-box {
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    display: flex;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    font-size: 13px;
+    user-select: none;
+}
+
+.select-box:hover {
+    border-color: #888;
+}
+
+.checkbox-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0 0 6px 6px;
+    z-index: 100;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 2px;
+}
+
+.checkbox-list.show {
+    display: block;
+}
+
+.checkbox-list label {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    margin: 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.checkbox-list label:hover {
+    background: #f8f9fa;
+}
+
+.checkbox-list input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.btn-save-perms {
+    width: 100%;
+    padding: 8px;
+    background: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+}
+
+.btn-save-perms:hover {
+    background: #218838;
 }
