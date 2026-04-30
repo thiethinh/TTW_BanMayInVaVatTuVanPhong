@@ -41,6 +41,13 @@
                        value="${keyword}"
                        placeholder="Tìm tài khoản theo tên, số điện thoại hoặc email">
 
+                <select name="role-filter" id="role-filter">
+                    <option value="all" ${roleFilter == 'all' ? 'selected' : ''}>Tất cả loại tài khoản</option>
+                    <option value="user" ${roleFilter == 'user' ? 'selected' : ''}>Khách hàng</option>
+                    <option value="mod" ${roleFilter == 'mod' ? 'selected' : ''}>Mod</option>
+                    <option value="admin" ${roleFilter == 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+
                 <select name="select-sort" id="select-sort">
                     <option value="all" ${statusFilter == 'all' ? 'selected' : ''}>Tất cả trạng thái</option>
                     <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Hoạt động</option>
@@ -67,133 +74,135 @@
                     </thead>
                     <tbody>
                     <c:forEach var="u" items="${userList}">
-                    <ch class="item-page">
-                        <td>${u.id}</td>
+                        <tr class="item-page">
+                            <td>${u.id}</td>
 
-                        <td>${u.fullname}</td>
+                            <td>${u.fullname}</td>
 
-                        <td>${u.phoneNumber}</td>
+                            <td>${u.phoneNumber}</td>
 
-                        <td>${u.email}</td>
+                            <td>${u.email}</td>
 
-                        <td>
-                            <fmt:setLocale value="vi_VN"/>
-                            <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="đ"
-                                              maxFractionDigits="0"/>
-                        </td>
+                            <td>
+                                <fmt:setLocale value="vi_VN"/>
+                                <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="đ"
+                                                  maxFractionDigits="0"/>
+                            </td>
 
-                        <td>
-                            <form action="admin-account" method="get" style="margin: 0;">
-                                <input type="hidden" name="action" value="set-role">
-                                <input type="hidden" name="id" value="${u.id}">
+                            <td>
+                                <form action="admin-account" method="get" style="margin: 0;">
+                                    <input type="hidden" name="action" value="set-role">
+                                    <input type="hidden" name="id" value="${u.id}">
 
-                                <input type="hidden" name="page" value="${currentPage}">
-                                <input type="hidden" name="search-customer" value="${keyword}">
-                                <input type="hidden" name="select-sort" value="${statusFilter}">
+                                    <input type="hidden" name="page" value="${currentPage}">
+                                    <input type="hidden" name="search-customer" value="${keyword}">
+                                    <input type="hidden" name="select-sort" value="${statusFilter}">
+                                    <input type="hidden" name="role-filter" value="${roleFilter}">
 
-                                <select name="role" onchange="this.form.submit()"
-                                        style=" border-radius: 4px; cursor: pointer; border: none;
+                                    <select name="role" onchange="this.form.submit()"
+                                            style=" border-radius: 4px; cursor: pointer; border: none;
                        ${u.role == 'admin' ? 'color: red' : ''}">
-                                    <option value="user" ${u.role == 'user' ? 'selected' : ''}>Khách hàng</option>
-                                    <option value="mod" ${u.role == 'mod' ? 'selected' : ''}>Mod</option>
-                                    <option value="admin" ${u.role == 'admin' ? 'selected' : ''}>Admin</option>
-                                </select>
-                            </form>
-                        </td>
+                                        <option value="user" ${u.role == 'user' ? 'selected' : ''}>Khách hàng</option>
+                                        <option value="mod" ${u.role == 'mod' ? 'selected' : ''}>Mod</option>
+                                        <option value="admin" ${u.role == 'admin' ? 'selected' : ''}>Admin</option>
+                                    </select>
+                                </form>
+                            </td>
 
-                        <td style="text-align: center">
-                            <c:choose>
-                                <c:when test="${u.role == 'mod'}">
-                                    <form action="admin-account" method="get" class="perm-form"
-                                          style="margin: 0; display: flex; gap: 5px; align-items: center;">
-                                        <input type="hidden" name="action" value="set-permission">
-                                        <input type="hidden" name="id" value="${u.id}">
-                                        <input type="hidden" name="page" value="${currentPage}">
-                                        <input type="hidden" name="search-customer" value="${keyword}">
-                                        <input type="hidden" name="select-sort" value="${statusFilter}">
+                            <td style="text-align: center">
+                                <c:choose>
+                                    <c:when test="${u.role == 'mod'}">
+                                        <form action="admin-account" method="get" class="perm-form"
+                                              style="margin: 0; display: flex; gap: 5px; align-items: center;">
+                                            <input type="hidden" name="action" value="set-permission">
+                                            <input type="hidden" name="id" value="${u.id}">
+                                            <input type="hidden" name="page" value="${currentPage}">
+                                            <input type="hidden" name="search-customer" value="${keyword}">
+                                            <input type="hidden" name="select-sort" value="${statusFilter}">
+                                            <input type="hidden" name="role-filter" value="${roleFilter}">
 
-                                        <select name="permissions" class="select-permissions" multiple="multiple"
-                                                style="width: 180px;">
-                                            <option value="dashboard" ${fn:contains(u.permissions, 'dashboard') ? 'selected' : ''}>
-                                                Quản lý Thống kê
-                                            </option>
-                                            <option value="product-manage" ${fn:contains(u.permissions, 'product-manage') ? 'selected' : ''}>
-                                                Quản lý Sản phẩm
-                                            </option>
-                                            <option value="review-manage" ${fn:contains(u.permissions, 'review-manage') ? 'selected' : ''}>
-                                                Quản lý Đánh giá
-                                            </option>
-                                            <option value="order-manage" ${fn:contains(u.permissions, 'order-manage') ? 'selected' : ''}>
-                                                Quản lý Đơn hàng
-                                            </option>
-                                            <option value="account-manage" ${fn:contains(u.permissions, 'account-manage') ? 'selected' : ''}>
-                                                Quản lý Tài khoản
-                                            </option>
-                                            <option value="blog-manage" ${fn:contains(u.permissions, 'blog-manage') ? 'selected' : ''}>
-                                                Quản lý Blog
-                                            </option>
-                                            <option value="contact-manage" ${fn:contains(u.permissions, 'contact-manage') ? 'selected' : ''}>
-                                                Quản lý Liên hệ
-                                            </option>
-                                            <option value="setting-manage" ${fn:contains(u.permissions, 'setting-manage') ? 'selected' : ''}>
-                                                Quản lý Cài đặt
-                                            </option>
-                                        </select>
+                                            <select name="permissions" class="select-permissions" multiple="multiple"
+                                                    style="width: 180px;">
+                                                <option value="dashboard" ${fn:contains(u.permissions, 'dashboard') ? 'selected' : ''}>
+                                                    Quản lý Thống kê
+                                                </option>
+                                                <option value="product-manage" ${fn:contains(u.permissions, 'product-manage') ? 'selected' : ''}>
+                                                    Quản lý Sản phẩm
+                                                </option>
+                                                <option value="review-manage" ${fn:contains(u.permissions, 'review-manage') ? 'selected' : ''}>
+                                                    Quản lý Đánh giá
+                                                </option>
+                                                <option value="order-manage" ${fn:contains(u.permissions, 'order-manage') ? 'selected' : ''}>
+                                                    Quản lý Đơn hàng
+                                                </option>
+                                                <option value="account-manage" ${fn:contains(u.permissions, 'account-manage') ? 'selected' : ''}>
+                                                    Quản lý Tài khoản
+                                                </option>
+                                                <option value="blog-manage" ${fn:contains(u.permissions, 'blog-manage') ? 'selected' : ''}>
+                                                    Quản lý Blog
+                                                </option>
+                                                <option value="contact-manage" ${fn:contains(u.permissions, 'contact-manage') ? 'selected' : ''}>
+                                                    Quản lý Liên hệ
+                                                </option>
+                                                <option value="setting-manage" ${fn:contains(u.permissions, 'setting-manage') ? 'selected' : ''}>
+                                                    Quản lý Cài đặt
+                                                </option>
+                                            </select>
 
-                                        <button type="submit"
-                                                style="background: #28a745; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
-                                            <i class="fa-solid fa-floppy-disk"></i>
-                                        </button>
-                                    </form>
-                                </c:when>
-                                <c:otherwise>
-                                    <span style="color: #aaa; font-style: italic; font-size: 13px;">Không áp dụng</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
+                                            <button type="submit"
+                                                    style="background: #28a745; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                                <i class="fa-solid fa-floppy-disk"></i>
+                                            </button>
+                                        </form>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span style="color: #aaa; font-style: italic; font-size: 13px;">Không áp dụng</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
 
-                        <td>
-                            <c:choose>
-                                <c:when test="${u.status == true}">
-                                    <span class="tag-status active" style="text-align: center">Hoạt động</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="tag-status blocked" style="text-align: center">Bị khóa</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${u.status == true}">
+                                        <span class="tag-status active" style="text-align: center">Hoạt động</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="tag-status blocked" style="text-align: center">Bị khóa</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
 
-                        <td class="block-action" style="white-space: nowrap;">
-                            <a href="admin-customer-details?id=${u.id}" id="link-view">Xem</a>
-                            <a href="admin-customer-update?id=${u.id}">Sửa</a>
+                            <td class="block-action" style="white-space: nowrap;">
+                                <a href="admin-customer-details?id=${u.id}" id="link-view">Xem</a>
+                                <a href="admin-customer-update?id=${u.id}">Sửa</a>
 
-                            <c:choose>
-                                <c:when test="${u.status == true}">
-                                    <a href="admin-account?action=lock&id=${u.id}"
-                                       class="btn-action btn-lock"
-                                       onclick="return confirm('Khóa tài khoản này?');">
-                                        <i class="fa-solid fa-lock"></i> Khóa
-                                    </a>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="admin-account?action=unlock&id=${u.id}"
-                                       class="btn-action btn-unlock"
-                                       onclick="return confirm('Mở khóa tài khoản này?');">
-                                        <i class="fa-solid fa-unlock"></i> Mở
-                                    </a>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
+                                <c:choose>
+                                    <c:when test="${u.status == true}">
+                                        <a href="admin-account?action=lock&id=${u.id}"
+                                           class="btn-action btn-lock"
+                                           onclick="return confirm('Khóa tài khoản này?');">
+                                            <i class="fa-solid fa-lock"></i> Khóa
+                                        </a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="admin-account?action=unlock&id=${u.id}"
+                                           class="btn-action btn-unlock"
+                                           onclick="return confirm('Mở khóa tài khoản này?');">
+                                            <i class="fa-solid fa-unlock"></i> Mở
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
                         </tr>
-                        </c:forEach>
+                    </c:forEach>
 
-                        <c:if test="${empty userList}">
+                    <c:if test="${empty userList}">
                         <tr>
                             <td colspan="7" style="text-align: center; padding: 20px;">
                                 Không tìm thấy khách hàng nào.
                             </td>
                         </tr>
-                        </c:if>
+                    </c:if>
                     </tbody>
                 </table>
             </div>

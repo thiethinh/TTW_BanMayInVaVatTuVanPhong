@@ -67,8 +67,9 @@ public class AdminAccountServlet extends HttpServlet {
             String pageStr = request.getParameter("page") != null ? request.getParameter("page") : "1";
             String searchStr = request.getParameter("search-customer") != null ? request.getParameter("search-customer") : "";
             String sortStr = request.getParameter("select-sort") != null ? request.getParameter("select-sort") : "all";
+            String roleStr = request.getParameter("role-filter") != null ? request.getParameter("role-filter") : "all";
 
-            response.sendRedirect("admin-account?page=" + pageStr + "&search-customer=" + searchStr + "&select-sort=" + sortStr);
+            response.sendRedirect("admin-account?page=" + pageStr + "&search-customer=" + searchStr + "&select-sort=" + sortStr + "&role-filter=" + roleStr);
             return;
         }
 
@@ -79,6 +80,10 @@ public class AdminAccountServlet extends HttpServlet {
         // Lấy bộ lọc trạng thái
         String statusFilter = request.getParameter("select-sort");
         if (statusFilter == null) statusFilter = "all";
+
+        // Lấy bộ lọc role
+        String roleFilter = request.getParameter("role-filter");
+        if (roleFilter == null) roleFilter = "all";
 
         //  Phân trang
         int page = 1;
@@ -91,15 +96,16 @@ public class AdminAccountServlet extends HttpServlet {
         }
 
         //  Gọi DAO
-        int totalUsers = userDAO.countCustomers(keyword, statusFilter);
+        int totalUsers = userDAO.countCustomers(keyword, statusFilter, roleFilter);
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
-        List<User> userList = userDAO.getCustomersPagination(keyword, statusFilter, page, pageSize);
+        List<User> userList = userDAO.getCustomersPagination(keyword, statusFilter, roleFilter, page, pageSize);
 
         request.setAttribute("userList", userList);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
         request.setAttribute("statusFilter", statusFilter);
+        request.setAttribute("roleFilter", roleFilter);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-customer-manage.jsp").forward(request, response);
     }

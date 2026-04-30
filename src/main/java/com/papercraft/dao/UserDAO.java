@@ -221,9 +221,14 @@ public class UserDAO {
     }
 
     //  Đếm số lượng user
-    public int countCustomers(String keyword, String statusFilter) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE role != 'admin' ");
+    public int countCustomers(String keyword, String statusFilter, String roleFilter) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE 1=1 ");
         List<Object> params = new ArrayList<>();
+
+        if (roleFilter != null && !"all".equalsIgnoreCase(roleFilter)) {
+            sql.append("AND role = ?");
+            params.add(roleFilter);
+        }
 
         // Tìm kiếm
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -258,7 +263,7 @@ public class UserDAO {
     }
 
     //  Lấy danh sách user phân trang
-    public List<User> getCustomersPagination(String keyword, String statusFilter, int page, int pageSize) {
+    public List<User> getCustomersPagination(String keyword, String statusFilter, String roleFilter, int page, int pageSize) {
         List<User> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
                     SELECT u.*, 
@@ -269,6 +274,12 @@ public class UserDAO {
                     WHERE 1=1 
                 """);
         List<Object> params = new ArrayList<>();
+
+        //ROLE
+        if (roleFilter != null && !"all".equals(roleFilter)) {
+            sql.append("AND role = ? ");
+            params.add(roleFilter);
+        }
 
         //SEARCH
         if (keyword != null && !keyword.trim().isEmpty()) {

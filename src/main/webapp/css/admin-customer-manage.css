@@ -31,7 +31,8 @@
     box-shadow: 0 0 4px rgba(36, 119, 191, 0.4);
 }
 
-.customer-view form #select-sort {
+.customer-view form #select-sort,
+.customer-view form #role-filter {
     flex: 1 20%;
     padding: 6px 10px;
     border-radius: 8px;
@@ -39,11 +40,13 @@
     cursor: pointer;
 }
 
-.customer-view form #select-sort:hover {
+.customer-view form #select-sort:hover,
+.customer-view form #role-filter:hover {
     background-color: #cccccc30;
 }
 
-.customer-view form #select-sort:focus {
+.customer-view form #select-sort:focus,
+.customer-view form #role-filter:focus {
     outline: none;
     border-color: #2477BF;
     box-shadow: 0 0 4px rgba(36, 119, 191, 0.4);
