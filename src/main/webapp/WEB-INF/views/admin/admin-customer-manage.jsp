@@ -18,7 +18,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-customer-manage.css">
 
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
 
@@ -65,119 +67,133 @@
                     </thead>
                     <tbody>
                     <c:forEach var="u" items="${userList}">
-                        <tr class="item-page">
-                            <td>${u.id}</td>
+                    <ch class="item-page">
+                        <td>${u.id}</td>
 
-                            <td>${u.fullname}</td>
+                        <td>${u.fullname}</td>
 
-                            <td>${u.phoneNumber}</td>
+                        <td>${u.phoneNumber}</td>
 
-                            <td>${u.email}</td>
+                        <td>${u.email}</td>
 
-                            <td>
-                                <fmt:setLocale value="vi_VN"/>
-                                <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="đ"
-                                                  maxFractionDigits="0"/>
-                            </td>
+                        <td>
+                            <fmt:setLocale value="vi_VN"/>
+                            <fmt:formatNumber value="${u.totalSpending}" type="currency" currencySymbol="đ"
+                                              maxFractionDigits="0"/>
+                        </td>
 
-                            <td>
-                                <form action="admin-account" method="get" style="margin: 0;">
-                                    <input type="hidden" name="action" value="set-role">
-                                    <input type="hidden" name="id" value="${u.id}">
+                        <td>
+                            <form action="admin-account" method="get" style="margin: 0;">
+                                <input type="hidden" name="action" value="set-role">
+                                <input type="hidden" name="id" value="${u.id}">
 
-                                    <input type="hidden" name="page" value="${currentPage}">
-                                    <input type="hidden" name="search-customer" value="${keyword}">
-                                    <input type="hidden" name="select-sort" value="${statusFilter}">
+                                <input type="hidden" name="page" value="${currentPage}">
+                                <input type="hidden" name="search-customer" value="${keyword}">
+                                <input type="hidden" name="select-sort" value="${statusFilter}">
 
-                                    <select name="role" onchange="this.form.submit()"
-                                            style=" border-radius: 4px; cursor: pointer; border: none;
+                                <select name="role" onchange="this.form.submit()"
+                                        style=" border-radius: 4px; cursor: pointer; border: none;
                        ${u.role == 'admin' ? 'color: red' : ''}">
-                                        <option value="user" ${u.role == 'user' ? 'selected' : ''}>Khách hàng</option>
-                                        <option value="mod" ${u.role == 'mod' ? 'selected' : ''}>Mod</option>
-                                        <option value="admin" ${u.role == 'admin' ? 'selected' : ''}>Admin</option>
-                                    </select>
-                                </form>
-                            </td>
+                                    <option value="user" ${u.role == 'user' ? 'selected' : ''}>Khách hàng</option>
+                                    <option value="mod" ${u.role == 'mod' ? 'selected' : ''}>Mod</option>
+                                    <option value="admin" ${u.role == 'admin' ? 'selected' : ''}>Admin</option>
+                                </select>
+                            </form>
+                        </td>
 
-                            <td style="text-align: center">
-                                <c:choose>
-                                    <c:when test="${u.role == 'mod'}">
-                                        <form action="admin-account" method="get" style="margin: 0;">
-                                            <input type="hidden" name="action" value="set-permission">
-                                            <input type="hidden" name="id" value="${u.id}">
-                                            <input type="hidden" name="page" value="${currentPage}">
-                                            <input type="hidden" name="search-customer" value="${keyword}">
-                                            <input type="hidden" name="select-sort" value="${statusFilter}">
+                        <td style="text-align: center">
+                            <c:choose>
+                                <c:when test="${u.role == 'mod'}">
+                                    <form action="admin-account" method="get" class="perm-form"
+                                          style="margin: 0; display: flex; gap: 5px; align-items: center;">
+                                        <input type="hidden" name="action" value="set-permission">
+                                        <input type="hidden" name="id" value="${u.id}">
+                                        <input type="hidden" name="page" value="${currentPage}">
+                                        <input type="hidden" name="search-customer" value="${keyword}">
+                                        <input type="hidden" name="select-sort" value="${statusFilter}">
 
-                                            <div class="multiselect-container">
-                                                <div class="select-box" onclick="toggleDropdown(this)">
-                                                    <span class="selected-text">Chọn quyền...</span>
-                                                    <i class="fa-solid fa-chevron-down"></i>
-                                                </div>
+                                        <select name="permissions" class="select-permissions" multiple="multiple"
+                                                style="width: 180px;">
+                                            <option value="dashboard" ${fn:contains(u.permissions, 'dashboard') ? 'selected' : ''}>
+                                                Quản lý Thống kê
+                                            </option>
+                                            <option value="product-manage" ${fn:contains(u.permissions, 'product-manage') ? 'selected' : ''}>
+                                                Quản lý Sản phẩm
+                                            </option>
+                                            <option value="review-manage" ${fn:contains(u.permissions, 'review-manage') ? 'selected' : ''}>
+                                                Quản lý Đánh giá
+                                            </option>
+                                            <option value="order-manage" ${fn:contains(u.permissions, 'order-manage') ? 'selected' : ''}>
+                                                Quản lý Đơn hàng
+                                            </option>
+                                            <option value="account-manage" ${fn:contains(u.permissions, 'account-manage') ? 'selected' : ''}>
+                                                Quản lý Tài khoản
+                                            </option>
+                                            <option value="blog-manage" ${fn:contains(u.permissions, 'blog-manage') ? 'selected' : ''}>
+                                                Quản lý Blog
+                                            </option>
+                                            <option value="contact-manage" ${fn:contains(u.permissions, 'contact-manage') ? 'selected' : ''}>
+                                                Quản lý Liên hệ
+                                            </option>
+                                            <option value="setting-manage" ${fn:contains(u.permissions, 'setting-manage') ? 'selected' : ''}>
+                                                Quản lý Cài đặt
+                                            </option>
+                                        </select>
 
-                                                <div class="checkbox-list">
-                                                    <label><input type="checkbox" name="permissions" value="dashboard" ${fn:contains(u.permissions, 'dashboard') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý thống kê</label>
-                                                    <label><input type="checkbox" name="permissions" value="product-manage" ${fn:contains(u.permissions, 'product-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý sản phẩm</label>
-                                                    <label><input type="checkbox" name="permissions" value="review-manage" ${fn:contains(u.permissions, 'review-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý đánh giá</label>
-                                                    <label><input type="checkbox" name="permissions" value="order-manage" ${fn:contains(u.permissions, 'order-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý đơn hàng</label>
-                                                    <label><input type="checkbox" name="permissions" value="account-manage" ${fn:contains(u.permissions, 'account-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý tài khoản</label>
-                                                    <label><input type="checkbox" name="permissions" value="blog-manage" ${fn:contains(u.permissions, 'blog-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý blog</label>
-                                                    <label><input type="checkbox" name="permissions" value="contact-manage" ${fn:contains(u.permissions, 'contact-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý liên hệ</label>
-                                                    <label><input type="checkbox" name="permissions" value="setting-manage" ${fn:contains(u.permissions, 'setting-manage') ? 'checked' : ''} onchange="updateSelectText(this)"> Quản lý cài đặt</label>
+                                        <button type="submit"
+                                                style="background: #28a745; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">
+                                            <i class="fa-solid fa-floppy-disk"></i>
+                                        </button>
+                                    </form>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="color: #aaa; font-style: italic; font-size: 13px;">Không áp dụng</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
 
-                                                    <button type="submit" class="btn-save-perms">Lưu Thay Đổi</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span style="color: #aaa; font-style: italic; font-size: 13px; text-align: center">Không áp dụng</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${u.status == true}">
+                                    <span class="tag-status active" style="text-align: center">Hoạt động</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="tag-status blocked" style="text-align: center">Bị khóa</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
 
-                            <td>
-                                <c:choose>
-                                    <c:when test="${u.status == true}">
-                                        <span class="tag-status active" style="text-align: center">Hoạt động</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="tag-status blocked" style="text-align: center">Bị khóa</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
+                        <td class="block-action" style="white-space: nowrap;">
+                            <a href="admin-customer-details?id=${u.id}" id="link-view">Xem</a>
+                            <a href="admin-customer-update?id=${u.id}">Sửa</a>
 
-                            <td class="block-action" style="white-space: nowrap;">
-                                <a href="admin-customer-details?id=${u.id}" id="link-view">Xem</a>
-                                <a href="admin-customer-update?id=${u.id}">Sửa</a>
-
-                                <c:choose>
-                                    <c:when test="${u.status == true}">
-                                        <a href="admin-account?action=lock&id=${u.id}"
-                                           class="btn-action btn-lock"
-                                           onclick="return confirm('Khóa tài khoản này?');">
-                                            <i class="fa-solid fa-lock"></i> Khóa
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a href="admin-account?action=unlock&id=${u.id}"
-                                           class="btn-action btn-unlock"
-                                           onclick="return confirm('Mở khóa tài khoản này?');">
-                                            <i class="fa-solid fa-unlock"></i> Mở
-                                        </a>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
+                            <c:choose>
+                                <c:when test="${u.status == true}">
+                                    <a href="admin-account?action=lock&id=${u.id}"
+                                       class="btn-action btn-lock"
+                                       onclick="return confirm('Khóa tài khoản này?');">
+                                        <i class="fa-solid fa-lock"></i> Khóa
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="admin-account?action=unlock&id=${u.id}"
+                                       class="btn-action btn-unlock"
+                                       onclick="return confirm('Mở khóa tài khoản này?');">
+                                        <i class="fa-solid fa-unlock"></i> Mở
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
                         </tr>
-                    </c:forEach>
+                        </c:forEach>
 
-                    <c:if test="${empty userList}">
+                        <c:if test="${empty userList}">
                         <tr>
                             <td colspan="7" style="text-align: center; padding: 20px;">
                                 Không tìm thấy khách hàng nào.
                             </td>
                         </tr>
-                    </c:if>
+                        </c:if>
                     </tbody>
                 </table>
             </div>
@@ -196,47 +212,33 @@
 </script>
 
 <script>
-    function toggleDropdown(element) {
-        document.querySelectorAll('.checkbox-list').forEach(list => {
-            if(list !== element.nextElementSibling) {
-                list.classList.remove('show');
-            }
+    $(document).ready(function () {
+        var $select = $('.select-permissions').select2({
+            placeholder: "Chọn quyền...",
+            closeOnSelect: false,
+            allowClear: true,
+            minimumResultsForSearch: Infinity,
         });
-        element.nextElementSibling.classList.toggle('show');
-        updateSelectText(element.nextElementSibling.querySelector('input'));
-    }
 
-    function updateSelectText(checkboxElem) {
-        if (!checkboxElem) return;
-        const container = checkboxElem.closest('.multiselect-container');
-        const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
-        const textSpan = container.querySelector('.selected-text');
+        function updateDisplay($el) {
+            var count = $el.val() ? $el.val().length : 0;
+            var $rendered = $el.next().find('.select2-selection__rendered');
 
-        if (checkboxes.length === 0) {
-            textSpan.textContent = "Chưa chọn quyền";
-            textSpan.style.color = "#999";
-        } else if (checkboxes.length === 1) {
-            textSpan.textContent = checkboxes[0].parentElement.textContent.trim();
-            textSpan.style.color = "#333";
-        } else {
-            textSpan.textContent = "Đã chọn " + checkboxes.length + " quyền";
-            textSpan.style.color = "#333";
-            textSpan.style.fontWeight = "bold";
+            $rendered.contents().filter(function () {
+                return !$(this).hasClass('select2-search');
+            }).remove();
+
+            if (count > 0) {
+                $rendered.prepend('<span style="color: #333;">Đã chọn ' + count + ' quyền</span>');
+            }
         }
-    }
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.multiselect-container')) {
-            document.querySelectorAll('.checkbox-list').forEach(list => {
-                list.classList.remove('show');
-            });
-        }
-    });
+        $('.select-permissions').each(function () {
+            updateDisplay($(this));
+        });
 
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll('.multiselect-container').forEach(container => {
-            const firstCheckbox = container.querySelector('input[type="checkbox"]');
-            if(firstCheckbox) updateSelectText(firstCheckbox);
+        $('.select-permissions').on('change', function () {
+            updateDisplay($(this));
         });
     });
 </script>

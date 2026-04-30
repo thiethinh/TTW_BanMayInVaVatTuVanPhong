@@ -109,6 +109,7 @@
     user-select: text;
     padding: 30px 40px;
     background-color: var(--third-color);
+    overflow: hidden;
 }
 
 .admin-header {
@@ -348,6 +349,8 @@
 
 .block-table {
     background: #f1f2f4;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-radius: 16px;
     padding: 10px;
 }
@@ -355,7 +358,7 @@
 .table-customer {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 12px; /* khoảng cách giữa các row */
+    border-spacing: 0 12px;
 }
 
 .table-customer thead td {
@@ -367,7 +370,7 @@
 .table-customer tbody tr {
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .table-customer tbody td {
@@ -469,7 +472,7 @@
 .table-contact tbody tr {
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .table-contact tbody tr:hover {
