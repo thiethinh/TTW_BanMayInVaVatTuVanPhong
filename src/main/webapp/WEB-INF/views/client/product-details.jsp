@@ -116,7 +116,14 @@
                 </c:choose>
             </div>
 
-            <div class="stock-status" style="padding-left: 20px; margin-bottom: 5px">
+            <div class="stock-status" >
+                <span style="color: #888;font-size: 15px">
+                    <i class="fa-solid fa-fire" style="color: #e74c3c;"></i>
+                    Đã bán: <strong>${p.soldQuantity}</strong>
+                </span>
+
+                <span style="color: #ddd;">|</span>
+
                 <c:choose>
                     <c:when test="${p.stockQuantity >10}">
                         <span style="color: #27ae60; font-size: 15px;">

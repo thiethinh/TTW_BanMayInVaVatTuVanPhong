@@ -19,7 +19,7 @@ public class Product implements Serializable {
     private int stockQuantity;
     private Timestamp createdAt;
 
-
+    private int soldQuantity;
     private Integer quantity;
     private String type;
     private String thumbnail;
@@ -47,6 +47,7 @@ public class Product implements Serializable {
         this.thumbnail = thumbnail;
         this.imageList = imageList;
         this.avgRating = avgRating;
+        this.soldQuantity= soldQuantity;
     }
 
     public int getId() {
@@ -103,6 +104,14 @@ public class Product implements Serializable {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public int getSoldQuantity() {
+        return soldQuantity;
+    }
+
+    public void setSoldQuantity(int soldQuantity) {
+        this.soldQuantity = soldQuantity;
     }
 
     public double getPrice() {

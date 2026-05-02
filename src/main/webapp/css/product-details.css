@@ -533,6 +533,13 @@
     margin-top: 15px;
     transition: background-color 0.3s ease;
 }
+.stock-status{
+    padding-left: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
 
 .product-details-main .your-review button:hover {
     background: var(--fourth-color);
