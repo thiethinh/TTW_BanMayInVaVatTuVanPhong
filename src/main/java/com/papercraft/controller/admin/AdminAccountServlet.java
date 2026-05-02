@@ -6,6 +6,7 @@ import com.papercraft.model.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -17,7 +18,6 @@ public class AdminAccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         UserDAO userDAO = new UserDAO();
         request.setCharacterEncoding("UTF-8");
-
 
         String action = request.getParameter("action");
 
@@ -37,7 +37,7 @@ public class AdminAccountServlet extends HttpServlet {
             return;
         }
 
-        //  XỬ LÝ KHÓA / MỞ KHÓA
+        //  XỬ LÝ KHÓA / MỞ KHÓA / PHÂN QUYỀN
         String idParam = request.getParameter("id");
 
         if (idParam != null && action != null) {
@@ -49,15 +49,27 @@ public class AdminAccountServlet extends HttpServlet {
                     userDAO.updateUserStatus(uid, true);
                 } else if ("set-role".equals(action)) {
                     String newRole = request.getParameter("role");
-                    if ("admin".equals(newRole) || "user".equals(newRole)) {
+                    if ("admin".equals(newRole) || "user".equals(newRole) || "mod".equals(newRole)) {
                         userDAO.updateUserRole(uid, newRole);
+
+                        if ("user".equals(newRole) || "admin".equals(newRole)) {
+                            userDAO.updateModPermissions(uid, null);
+                        }
                     }
+                } else if ("set-permission".equals(action)) {
+                    String[] permissions = request.getParameterValues("permissions");
+                    userDAO.updateModPermissions(uid, permissions);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // Redirect lại trang quản lý
-            response.sendRedirect("admin-account");
+
+            String pageStr = request.getParameter("page") != null ? request.getParameter("page") : "1";
+            String searchStr = request.getParameter("search-customer") != null ? request.getParameter("search-customer") : "";
+            String sortStr = request.getParameter("select-sort") != null ? request.getParameter("select-sort") : "all";
+            String roleStr = request.getParameter("role-filter") != null ? request.getParameter("role-filter") : "all";
+
+            response.sendRedirect("admin-account?page=" + pageStr + "&search-customer=" + searchStr + "&select-sort=" + sortStr + "&role-filter=" + roleStr);
             return;
         }
 
@@ -69,24 +81,31 @@ public class AdminAccountServlet extends HttpServlet {
         String statusFilter = request.getParameter("select-sort");
         if (statusFilter == null) statusFilter = "all";
 
+        // Lấy bộ lọc role
+        String roleFilter = request.getParameter("role-filter");
+        if (roleFilter == null) roleFilter = "all";
+
         //  Phân trang
         int page = 1;
         int pageSize = 10;
         try {
             String p = request.getParameter("page");
             if (p != null) page = Integer.parseInt(p);
-        } catch (Exception e) { page = 1; }
+        } catch (Exception e) {
+            page = 1;
+        }
 
         //  Gọi DAO
-        int totalUsers = userDAO.countCustomers(keyword, statusFilter);
+        int totalUsers = userDAO.countCustomers(keyword, statusFilter, roleFilter);
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
-        List<User> userList = userDAO.getCustomersPagination(keyword, statusFilter, page, pageSize);
+        List<User> userList = userDAO.getCustomersPagination(keyword, statusFilter, roleFilter, page, pageSize);
 
         request.setAttribute("userList", userList);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
         request.setAttribute("statusFilter", statusFilter);
+        request.setAttribute("roleFilter", roleFilter);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-customer-manage.jsp").forward(request, response);
     }

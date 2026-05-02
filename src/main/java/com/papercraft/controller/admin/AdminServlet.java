@@ -21,8 +21,7 @@ public class AdminServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
 
-        if (user == null || !user.getRole().equals("admin")) {
-
+        if (user == null || !user.getRole().equals("admin") && !user.getRole().equals("mod")) {
             session.setAttribute("acc", user);
             response.sendRedirect(request.getContextPath() + "/home");
             return;

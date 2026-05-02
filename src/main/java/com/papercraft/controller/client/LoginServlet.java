@@ -39,6 +39,10 @@ public class LoginServlet extends HttpServlet {
         User user = userDAO.login(email, passwordHash);
 
         if (user != null) {
+            if ("mod".equalsIgnoreCase(user.getRole())) {
+                user.setPermissions(userDAO.getPermissions(user.getId()));
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("acc", user);
             session.setAttribute("success", "Bạn đã đăng nhập thành công!");
@@ -73,7 +77,7 @@ public class LoginServlet extends HttpServlet {
                 }
                 response.sendRedirect(finalRedirect);
             } else {
-                if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+                if ("admin".equalsIgnoreCase(user.getRole()) || "mod".equalsIgnoreCase(user.getRole())) {
                     response.sendRedirect(contextPath + "/admin");
                 } else {
                     response.sendRedirect(contextPath + "/home");
