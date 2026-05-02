@@ -116,6 +116,29 @@
                 </c:choose>
             </div>
 
+            <div class="stock-status" style="padding-left: 20px; margin-bottom: 5px">
+                <c:choose>
+                    <c:when test="${p.stockQuantity >10}">
+                        <span style="color: #27ae60; font-size: 15px;">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Còn lại: <strong>${p.stockQuantity}</strong> sản phẩm
+                        </span>
+                    </c:when>
+                    <c:when test="${p.stockQuantity} >0">
+                        <span style="color: #e67e22; font-size: 15px">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            Sắp hết: chỉ còn <strong>${p.stockQuantity}</strong> sản phẩm
+                        </span>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="color: #e74c3c; font-size: 15px">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            <strong>Hết hàng</strong>
+                        </span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
 
             <form id="addToCartForm" action="cart" method="post">
                 <input type="hidden" name="id" value="${p.id}">

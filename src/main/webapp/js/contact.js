@@ -23,14 +23,12 @@ document.addEventListener("DOMContentLoaded",()=>{
             formMessage.innerHTML="";
         }
     }
-    function showFieldError(field,message){
-        const errorE1= errorMap[field];
-        const inputE1= form.querySelector('[name="${field}"]');
+    function showFieldError(field, message) {
+        const errorEl = errorMap[field];
+        const inputEl = form.querySelector(`[name="${field}"]`);
 
-        if (errorE1)
-            errorE1.textContent= message || "";
-        if (inputE1)
-            inputE1.classList.add("input-error");
+        if (errorEl) errorEl.textContent = message || "";
+        if (inputEl && message) inputEl.classList.add("input-error");
     }
 
     form.addEventListener("submit", async (e) =>{
@@ -59,19 +57,15 @@ document.addEventListener("DOMContentLoaded",()=>{
                 }
                 form.reset();
             }else {
-                if (formMessage){
-                    formMessage.innerHTML = `
-                        <div class="ajax-error">
-                            <i class="fa-solid fa-triangle-exclamation"></i> ${data.message}
-                        </div>
-                    `;
+                showFieldError("fullname", data.errorFullname);
+                showFieldError("email",data.errorEmail);
+                showFieldError("subject",data.errorSubject);
+                showFieldError("message",data.errorMessage);
                 }
-                if (data.fieldErrors){
-                    Object.entries(data.fieldErrors).forEach(([field,message]) => {
-                        showFieldError(field,mesage);
-                    });
-                }
-            }
+            showFieldError("fullname", data.errorFullname);
+            showFieldError("email", data.errorEmail);
+            showFieldError("subject", data.errorSubject);
+            showFieldError("message", data.errorMessage);
         }catch (error){
             if (formMessage){
                 formMessage.innerHTML = `
