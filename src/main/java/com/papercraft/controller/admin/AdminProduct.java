@@ -19,7 +19,8 @@ public class AdminProduct extends HttpServlet {
         String idDeleted = request.getParameter("delete");
         if (idDeleted != null) {
             boolean isDeleted = productDAO.deleteProductById(Integer.parseInt(idDeleted));
-            request.setAttribute("isDeleted", isDeleted);
+            response.sendRedirect(request.getContextPath()+ "/admin-product?msg=" + (isDeleted? "delete_success" : "delete_fail"));
+            return;
         }
 
         // Tìm kiếm & Phân trang

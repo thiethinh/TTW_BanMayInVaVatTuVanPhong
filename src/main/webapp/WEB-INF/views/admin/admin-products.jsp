@@ -34,6 +34,30 @@
             </a>
         </header>
 
+        <c:if test="${param.msg == 'delete-success'}">
+            <script>
+                Swal.fire({
+                    icon:'success',
+                    title:'Đã xóa!',
+                    toast: true,
+                    position:'top-end',
+                    showConfirmButton:false,
+                    timer:2000
+                });
+            </script>
+        </c:if>
+        <c:if test="${param.msg == 'delete-fail'}">
+            <script>
+                Swal.fire({
+                    icon:'error',
+                    title:'Xóa thất bại!',
+                    text: 'Có lỗi xảy ra, vui lòng thử lại.',
+                    confirmButtonColor: '#165FF2'
+                });
+            </script>
+        </c:if>
+
+
         <section class="content-table-card">
             <div class="action-bar" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
 
@@ -106,8 +130,13 @@
                             <a href="${pageContext.request.contextPath}/admin-product-edit?id=${p.id}"
                                class="btn-action edit">Sửa</a>
 
-                            <a href="${pageContext.request.contextPath}/admin-product?delete=${p.id}"
-                               class="btn-action delete">Xóa</a>
+
+                            <button type="button"
+                                    class="btn-action delete"
+                                    onclick="confirmDelete(${p.id},'$p.productName')">
+                                Xóa
+
+                            </button>
                         </td>
                     </tr>
                 </c:forEach>
@@ -115,17 +144,40 @@
 
             </table>
         </section>
-        <div class ="pagination"></div>
+        <div class="pagination"></div>
 
     </main>
 </div>
 
 <script type="module">
-    import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
+    import {initPagination} from '${pageContext.request.contextPath}/js/pagination-admin.js';
+
     document.addEventListener("DOMContentLoaded", () => {
         initPagination();
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(id,name){
+        Swal.fire({
+            title:"Xác nhận xóa?",
+            html: `Bạn có chắc muốn xóa sản phẩm <br><strong>"${name}"</strong>?<br><small style="color:#e74c3c">Hành động này không thể hoàn tác!</small>`,
+            icon:'warning',
+            showCancelButton:true,
+            confirmButtonColor:'#e74c3c',
+            cancelButtonColor:'#718096',
+            confirmButtonText:'<i class="fa-solid fa-trash"></i> Xóa',
+            cancelButtonText:'Hủy',
+            reverseButtons:true
+        }).then((result) =>{
+            if (result.isConfirmed){
+                window.location.href='${pageContext.request.contextPath}/admin-product?delete=${id}';
+            }
+        });
+    }
+</script>
+
 
 </body>
 

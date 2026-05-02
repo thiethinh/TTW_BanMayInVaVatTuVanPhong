@@ -248,12 +248,19 @@ public class ProductDAO {
     public Product getProductById(int id) {
         Product p = null;
         String sql = """
-                SELECT p.*, i.img_name, c.type
+                SELECT p.*, i.img_name, c.type,
+                       COALESCE((
+                           SELECT SUM(oi.quantity)
+                           FROM order_item oi
+                           JOIN orders o ON o.id = oi.order_id
+                           WHERE oi.product_id = p.id
+                           AND o.status = 'completed'
+                       ), 0) AS sold_quantity
                 FROM product p
                 JOIN category c ON p.category_id = c.id
                 LEFT JOIN image i ON p.id = i.entity_id
-                AND i.is_thumbnail = 1
-                AND i.entity_type = 'Product'
+                    AND i.is_thumbnail = 1
+                    AND i.entity_type = 'Product'
                 WHERE p.id = ?
                 """;
         try (Connection conn = DBConnect.getConnection();
@@ -270,6 +277,7 @@ public class ProductDAO {
                     p.setOriginPrice(rs.getDouble("origin_price"));
                     p.setDiscount(rs.getDouble("discount"));
                     p.setStockQuantity(rs.getInt("stock_quantity"));
+                    p.setSoldQuantity(rs.getInt("sold_quantity"));
                     p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setProductDescription(rs.getString("product_description"));
                     p.setProductDetail(rs.getString("product_detail"));
