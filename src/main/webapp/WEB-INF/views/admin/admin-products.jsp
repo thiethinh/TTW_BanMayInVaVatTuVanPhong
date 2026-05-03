@@ -37,20 +37,20 @@
         <c:if test="${param.msg == 'delete-success'}">
             <script>
                 Swal.fire({
-                    icon:'success',
-                    title:'Đã xóa!',
+                    icon: 'success',
+                    title: 'Đã xóa!',
                     toast: true,
-                    position:'top-end',
-                    showConfirmButton:false,
-                    timer:2000
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             </script>
         </c:if>
         <c:if test="${param.msg == 'delete-fail'}">
             <script>
                 Swal.fire({
-                    icon:'error',
-                    title:'Xóa thất bại!',
+                    icon: 'error',
+                    title: 'Xóa thất bại!',
                     text: 'Có lỗi xảy ra, vui lòng thử lại.',
                     confirmButtonColor: '#165FF2'
                 });
@@ -78,7 +78,57 @@
                         </a>
                     </c:if>
                 </form>
+            </div>
 
+            <div class="search-type">
+                <form action="admin-product" method="get" id="form-type-product">
+                    <%-- Tìm theo loại sản phẩm trước--%>
+                    <input type="hidden" name="type" id="type-input"
+                           value="${param.type != null ? param.type : ''}">
+
+                    <div class="custom-dropdown" id="type-dropdown">
+                        <div class="select-trigger">
+            <span class="selected-value" id="type-label">
+                ${empty param.type ? 'Tất cả loại sản phẩm' :
+                        (param.type == 'Printer' ? 'Máy in' : 'Văn phòng phẩm')}
+            </span>
+                            <span class="arrow">▼</span>
+                        </div>
+
+                        <div class="option-value">
+                            <div class="option-item" data-value="">Tất cả loại sản phẩm</div>
+                            <div class="option-item" data-value="Printer">Máy in</div>
+                            <div class="option-item" data-value="Stationery">Văn phòng phẩm</div>
+                        </div>
+                    </div>
+
+
+                    <!-- CATEGORY: chỉ hiện khi có categories -->
+                    <c:if test="${not empty categories}">
+                        <input type="hidden" name="category" id="category-input"
+                               value="${param.category != null ? param.category : ''}">
+
+                        <div class="custom-dropdown" id="category-dropdown">
+                            <div class="select-trigger">
+                <span class="selected-value" id="category-label">
+                        ${empty param.category ? 'Tất cả loại' : param.category}
+                </span>
+                                <span class="arrow">▼</span>
+                            </div>
+
+                            <div class="option-value">
+                                <div class="option-item" data-value="">Tất cả loại</div>
+
+                                <c:forEach items="${categories}" var="c">
+                                    <div class="option-item" data-value="${c.id}">
+                                            ${c.categoryName}
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </c:if>
+
+                </form>
 
             </div>
 
@@ -114,7 +164,7 @@
                         <td>${p.productName}</td>
 
                         <td>
-                            <fmt:formatNumber value="${p.originPrice != null ? p.originPrice : 0}" type="number"/> đ
+                            <fmt:formatNumber value="${p.price != null ? p.price : 0}" type="number"/> đ
                         </td>
 
                         <td>${p.stockQuantity}</td>
@@ -149,6 +199,68 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        function initDropdown() {
+            const dropdowns = document.querySelectorAll(".custom-dropdown")
+            dropdowns.forEach(dropdown => {
+                const trigger = dropdown.querySelector(".select-trigger")
+                const selectedValue = dropdown.querySelector(".selected-value")
+                const menu = dropdown.querySelector(".option-value")
+                const options = dropdown.querySelectorAll(".option-item")
+                const arrow = dropdown.querySelector(".arrow")
+
+                trigger.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll(".option-value.open").forEach(openedMenu => {
+                        if (openedMenu !== menu) {
+                            openedMenu.classList.remove("open")
+                        }
+                    })
+
+                    document.querySelectorAll(".arrow.open").forEach(openedArrow => {
+                        if (openedArrow !== arrow) openedArrow.classList.remove("open")
+                    })
+
+                    const isOpen = menu.classList.toggle("open")
+                    arrow.classList.toggle("open", isOpen)
+                });
+
+                options.forEach(option => {
+                    option.addEventListener("click", () => {
+                        //cap nhat text da chon
+                        selectedValue.textContent = option.innerText
+
+                        //them class de hightlight
+                        options.forEach(option => option.classList.remove("selected"))
+                        option.classList.add("selected")
+
+                        //sau khi chon xong thi dong menu lai
+                        menu.classList.remove("open")
+                        arrow.classList.remove("open")
+
+                    })
+                })
+
+                menu.addEventListener("mouseleave", () => {
+                    menu.classList.remove("open")
+                    arrow.classList.remove("open")
+                })
+
+                document.addEventListener("click", (e) => {
+                    if (!menu.contains(e.target)) {
+                        menu.classList.remove("open")
+                        arrow.classList.remove("open")
+                    }
+                })
+            })
+        }
+        initDropdown();
+    });
+
+</script>
+
 <script type="module">
     import {initPagination} from '${pageContext.request.contextPath}/js/pagination-admin.js';
 
@@ -159,23 +271,51 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(id,name){
+    function confirmDelete(id, name) {
         Swal.fire({
-            title:"Xác nhận xóa?",
+            title: "Xác nhận xóa?",
             html: `Bạn có chắc muốn xóa sản phẩm <br><strong>"${name}"</strong>?<br><small style="color:#e74c3c">Hành động này không thể hoàn tác!</small>`,
-            icon:'warning',
-            showCancelButton:true,
-            confirmButtonColor:'#e74c3c',
-            cancelButtonColor:'#718096',
-            confirmButtonText:'<i class="fa-solid fa-trash"></i> Xóa',
-            cancelButtonText:'Hủy',
-            reverseButtons:true
-        }).then((result) =>{
-            if (result.isConfirmed){
-                window.location.href='${pageContext.request.contextPath}/admin-product?delete=${id}';
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#718096',
+            confirmButtonText: '<i class="fa-solid fa-trash"></i> Xóa',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '${pageContext.request.contextPath}/admin-product?delete=${id}';
             }
         });
     }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // TYPE dropdown
+        document.querySelectorAll("#type-dropdown .option-item").forEach(item => {
+            item.addEventListener("click", function () {
+                document.getElementById("type-input").value = this.dataset.value;
+
+                // reset category khi đổi type
+                const categoryInput = document.getElementById("category-input");
+                if (categoryInput) categoryInput.value = "";
+
+                document.querySelector("#form-type-product").submit();
+            });
+        });
+
+        // CATEGORY dropdown
+        document.querySelectorAll("#category-dropdown .option-item").forEach(item => {
+            item.addEventListener("click", function () {
+                document.getElementById("category-input").value = this.dataset.value;
+
+                document.querySelector("#form-type-product").submit();
+            });
+        });
+
+    });
 </script>
 
 

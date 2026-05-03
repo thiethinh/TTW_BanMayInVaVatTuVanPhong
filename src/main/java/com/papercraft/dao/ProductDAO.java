@@ -514,11 +514,9 @@ public class ProductDAO {
     }
 
     // Lấy danh sách sản phẩm có Phân trang & Tìm kiếm
-    public List<Product> getProductsPagination(String keyword, int page, int pageSize) {
+    public List<Product> searchByName(String keyword) {
         List<Product> list = new ArrayList<>();
 
-        // Tính vị trí bắt đầu( số sp_trang cần bỏ qua để đến trang cần tìm)
-        int offset = (page - 1) * pageSize; // (page -1): tính từ trang 0
 
         String sql = """
                     SELECT p.id, p.product_name, p.price, p.stock_quantity, c.type, i.img_name
@@ -528,19 +526,16 @@ public class ProductDAO {
                            ON i.entity_id = p.id 
                           AND i.entity_type = 'Product'
                           AND i.is_thumbnail = 1
-                    WHERE p.product_name LIKE ?
-                    ORDER BY p.id DESC
-                    LIMIT ? OFFSET ?
+                    WHERE LOWER(p.product_name) LIKE ?
+                    ORDER BY p.id ASC
                 """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim() + "%";
+            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim().toLowerCase() + "%";
 
             ps.setString(1, search);
-            ps.setInt(2, pageSize); // số dòng lấy
-            ps.setInt(3, offset);   // số dòng bỏ qua
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

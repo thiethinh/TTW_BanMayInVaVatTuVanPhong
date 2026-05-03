@@ -1,12 +1,15 @@
 package com.papercraft.controller.admin;
 
+import com.papercraft.dao.CategoryDAO;
 import com.papercraft.dao.ProductDAO;
+import com.papercraft.model.Category;
 import com.papercraft.model.Product;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "AdminProduct", value = "/admin-product")
@@ -14,6 +17,7 @@ public class AdminProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ProductDAO productDAO = new ProductDAO();
+        List<Product> products;
 
 
         String idDeleted = request.getParameter("delete");
@@ -25,38 +29,30 @@ public class AdminProduct extends HttpServlet {
 
         // Tìm kiếm & Phân trang
         String keyword = request.getParameter("keyword");
-        if (keyword == null) keyword = "";
-
-        int page = 1;
-        int pageSize = 10;
-
-        try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null) {
-                page = Integer.parseInt(pageParam);
-            }
-        } catch (NumberFormatException e) {
-            page = 1;
+        if (keyword != null){
+            keyword = keyword.trim();
+            products = productDAO.searchByName(keyword);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("products", products);
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-products.jsp").forward(request, response);
+            return;
         }
 
-        //   lấy dữ liệu
-        int totalProducts = productDAO.countProducts(keyword); //   tổng số
-        int totalPages = (int) Math.ceil((double) totalProducts / pageSize); //   tổng số trang
+        String type = request.getParameter("type");
+        if(type!=null && !type.equals("")){
+            type = type.trim();
+            CategoryDAO  categoryDAO = new CategoryDAO();
+            List<Category> categories = categoryDAO.getAllCategories(type);
+            products = productDAO.getAllProduct(type);
+            request.setAttribute("categories", categories);
+            request.setAttribute("products", products);
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-products.jsp").forward(request, response);
+            return;
+        }
 
-        // Lấy danh sách sản phẩm cho trang hiện tại
-        List<Product> products = productDAO.getAllProduct();
-
+        products = productDAO.getAllProduct();
         //  Gửi dữ liệu sang JSP
         request.setAttribute("products", products);
-        request.setAttribute("keyword", keyword);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-products.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Code xử lý yêu cầu POST
     }
 }
