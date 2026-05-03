@@ -111,7 +111,7 @@
                         <div class="custom-dropdown" id="category-dropdown">
                             <div class="select-trigger">
                 <span class="selected-value" id="category-label">
-                        ${empty param.category ? 'Tất cả loại' : param.category}
+                        ${empty category ? 'Tất cả loại' : category}
                 </span>
                                 <span class="arrow">▼</span>
                             </div>

@@ -39,13 +39,30 @@ public class AdminProduct extends HttpServlet {
         }
 
         String type = request.getParameter("type");
-        if(type!=null && !type.equals("")){
+        String categoryId = request.getParameter("category");
+        if(type!=null&&categoryId==null){
             type = type.trim();
             CategoryDAO  categoryDAO = new CategoryDAO();
             List<Category> categories = categoryDAO.getAllCategories(type);
             products = productDAO.getAllProduct(type);
             request.setAttribute("categories", categories);
             request.setAttribute("products", products);
+            request.setAttribute("type", type);
+            request.setAttribute("category", categoryId);
+
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-products.jsp").forward(request, response);
+            return;
+        }else if(type!=null &&categoryId!=null){
+            type = type.trim();
+            categoryId = categoryId.trim();
+            CategoryDAO  categoryDAO = new CategoryDAO();
+            List<Category> categories = categoryDAO.getAllCategories(type);
+            products = productDAO.getProductByTypeAndCategory(type,categoryId);
+            request.setAttribute("categories", categories);
+            request.setAttribute("products", products);
+            request.setAttribute("type", type);
+            request.setAttribute("category", categoryId);
+
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-products.jsp").forward(request, response);
             return;
         }

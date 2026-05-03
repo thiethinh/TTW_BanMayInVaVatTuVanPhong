@@ -102,6 +102,53 @@ public class ProductDAO {
         }
     }
 
+    public List<Product> getProductByTypeAndCategory(String type, String categoryId) {
+        List<Product> products = new ArrayList<>();
+
+        String sql = """
+                SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name
+                                    FROM product p
+                                    JOIN category c ON p.category_id = c.id
+                                    JOIN image i ON p.id = i.entity_id
+                                    WHERE c.type = ? AND c.id =? AND i.is_thumbnail = 1 AND i.entity_type = 'Product';
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, type);
+            int id = Integer.parseInt(categoryId);
+            ps.setInt(2, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setId(rs.getInt("id"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
+                    p.setBrand(rs.getString("brand"));
+                    p.setPrice(rs.getDouble("price"));
+
+                    String imgName = rs.getString("img_name");
+                    if (imgName != null && !imgName.trim().isEmpty()) {
+                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                    } else {
+                        p.setThumbnail("images/logo.webp");
+                    }
+                    products.add(p);
+                }
+            } catch (SQLException e) {
+                System.err.println("Lỗi tại getAllProduct với type = " + type);
+                e.printStackTrace();
+            }
+            return products;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // getAllImageOfProduct
     public List<String> getAllImageOfProduct(int id) {
         List<String> images = new ArrayList<>();
