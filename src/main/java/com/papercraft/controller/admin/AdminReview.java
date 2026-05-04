@@ -7,11 +7,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,26 +61,51 @@ public class AdminReview extends HttpServlet {
 
         String content = request.getParameter("content");
         if("search-content".equals(action)&& content != null) {
+            List<Review> reviews = reviewDAO.findReviewByContent(content);
+
+            request.setAttribute("reviews", reviews);
+            request.setAttribute("contentKeyword", content);
+
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
             return;
 
         }
 
         String userName = request.getParameter("user-name");
         if("search-user-name".equals(action) && userName != null) {
+            List<Review> reviews = reviewDAO.findReviewByUserName(userName);
+            request.setAttribute("reviews", reviews);
+            request.setAttribute("userKeyword", userName);
+
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
             return;
             
         }
 
         String rating = request.getParameter("rating");
         if("search-rating".equals(action) && rating != null) {
-            return;
+            List<Review> reviews = new ArrayList<>();
+            try {
+                int ratingNumb = Integer.parseInt(id);
+                if(ratingNumb>=1 && ratingNumb<=5){
+                    reviews = reviewDAO.findReviewByRating(ratingNumb);
+                }else{
+                    reviews =  reviewDAO.getReviews(keyword);
+                }
+                request.setAttribute("reviews", reviews);
+                request.setAttribute("rating", rating);
+                request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
+                return;
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                response.sendRedirect("admin-review?search=false");
+                return;
+            }
 
         }
 
-
         List<Review> reviews = reviewDAO.getReviews(keyword);
         request.setAttribute("reviews", reviews);
-        request.setAttribute("currentKeyword", keyword);
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
     }
 

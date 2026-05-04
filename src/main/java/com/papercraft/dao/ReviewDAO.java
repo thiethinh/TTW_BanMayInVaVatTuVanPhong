@@ -188,4 +188,124 @@ public class ReviewDAO {
 
         return reviews;
     }
+
+    public List<Review> findReviewByContent(String content) {
+        List<Review> reviews = new ArrayList<>();
+        String sql = """
+                SELECT r.*, u.fullname, p.product_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                JOIN product p ON r.product_id = p.id
+                WHERE LOWER(r.comment) LIKE ?;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1,"%"+ content.trim().toLowerCase()+"%");
+
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Review review = new Review();
+                review.setId(rs.getInt("id"));
+                review.setUserId(rs.getInt("user_id"));
+                review.setProductId(rs.getInt("product_id"));
+                review.setRating(rs.getInt("rating"));
+                review.setComment(rs.getString("comment"));
+                review.setCreatedAt(rs.getTimestamp("created_at"));
+                review.setAuthorName(rs.getString("fullname"));
+                review.setProductName(rs.getString("product_name"));
+                reviews.add(review);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    public List<Review> findReviewByUserName(String userName) {
+        List<Review> reviews = new ArrayList<>();
+        String sql = """
+                SELECT r.*, u.fullname, p.product_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                JOIN product p ON r.product_id = p.id
+                WHERE LOWER(u.fullname) LIKE ?;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1,"%"+ userName.trim().toLowerCase()+"%");
+
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Review review = new Review();
+                review.setId(rs.getInt("id"));
+                review.setUserId(rs.getInt("user_id"));
+                review.setProductId(rs.getInt("product_id"));
+                review.setRating(rs.getInt("rating"));
+                review.setComment(rs.getString("comment"));
+                review.setCreatedAt(rs.getTimestamp("created_at"));
+                review.setAuthorName(rs.getString("fullname"));
+                review.setProductName(rs.getString("product_name"));
+                reviews.add(review);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    public List<Review> findReviewByRating(int ratingNumb) {
+        List<Review> reviews = new ArrayList<>();
+        String sql = """
+                SELECT r.*, u.fullname, p.product_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                JOIN product p ON r.product_id = p.id
+                WHERE r.rating = ?;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ratingNumb);
+
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Review review = new Review();
+                review.setId(rs.getInt("id"));
+                review.setUserId(rs.getInt("user_id"));
+                review.setProductId(rs.getInt("product_id"));
+                review.setRating(rs.getInt("rating"));
+                review.setComment(rs.getString("comment"));
+                review.setCreatedAt(rs.getTimestamp("created_at"));
+                review.setAuthorName(rs.getString("fullname"));
+                review.setProductName(rs.getString("product_name"));
+                reviews.add(review);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+
+
 }
