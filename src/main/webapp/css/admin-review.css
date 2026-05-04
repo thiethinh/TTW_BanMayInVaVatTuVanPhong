@@ -131,6 +131,6 @@
     text-decoration: underline;
 }
 
-.product-review .actions .delete {
+.product-review .actions .btn-delete {
     color: #dc3545;
 }

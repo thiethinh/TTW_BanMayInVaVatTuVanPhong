@@ -13,6 +13,39 @@ import java.util.List;
 
 public class ContactDAO {
 
+    public List<Contact> getAllContact(){
+        List<Contact> contacts = new ArrayList<>();
+        String sql = """
+            SELECT c.id, c.user_fullname, u.email ,c.contact_title, c.content, c.rely
+            FROM contact c
+            LEFT JOIN users u ON u.id = c.user_id
+            ORDER BY c.created_at DESC;
+            """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Contact contact = new Contact();
+                    contact.setId(rs.getInt("id"));
+                    contact.setUserFullname(rs.getString("user_fullname"));
+                    contact.setEmail(rs.getString("email")); // Lấy từ bảng contact
+                    contact.setContactTitle(rs.getString("contact_title"));
+                    contact.setContent(rs.getString("content"));
+                    contact.setRely(rs.getBoolean("rely"));
+
+                    contacts.add(contact);
+                }
+
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return contacts;
+    }
+
     public boolean insertContact(Contact c) {
 
         String sql = "INSERT INTO contact (user_id, user_fullname, email, contact_title, content, rely, created_at) VALUES (?, ?, ?, ?, ?, 0, NOW())";
@@ -34,6 +67,21 @@ public class ContactDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+    public boolean deleteContactById(int id){
+        String sql = "DELETE FROM contact WHERE id = ?";
+        try(Connection conn =DBConnect.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        }catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -76,7 +124,7 @@ public class ContactDAO {
                     AND (c.user_fullname LIKE ?
                     OR u.email LIKE ?
                     OR c.contact_title LIKE ?
-                    OR c.content LIKE ?)
+                    OR LOWER(c.content) LIKE ?)
                     """);
         }
 
@@ -93,7 +141,7 @@ public class ContactDAO {
 
             if (keyword != null && !keyword.trim().isEmpty()) {
                 for (int i = 1; i <= 4; i++) {
-                    ps.setString(index++, "%" + keyword.trim() + "%");
+                    ps.setString(index++, "%" + keyword.toLowerCase().trim() + "%");
                 }
             }
 

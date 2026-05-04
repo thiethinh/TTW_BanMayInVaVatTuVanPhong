@@ -79,6 +79,21 @@ public class AdminContact extends HttpServlet {
             }
         }
 
+        if ("delete".equals(action)) {
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                boolean deleted = contactDAO.deleteContactById(id);
+
+                response.sendRedirect("admin-contacts?deleted=" + deleted);
+                return;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect("admin-contacts?deleted=false");
+                return;
+            }
+        }
+
         List<Contact> contacts = contactDAO.getContact(keyword, replied);
 
         request.setAttribute("contacts", contacts);

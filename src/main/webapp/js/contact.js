@@ -1,81 +1,93 @@
-document.addEventListener("DOMContentLoaded",()=>{
-    const form= document.getElementById("contactForm");
-    const formMessage= document.getElementById("formMessage")
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("contactForm");
+    const formMessage = document.getElementById("formMessage");
 
     if (!form) return;
 
-    const errorMap= {
+    const errorMap = {
         fullname: document.getElementById("error-fullname"),
         email: document.getElementById("error-email"),
         subject: document.getElementById("error-subject"),
         message: document.getElementById("error-message")
     };
 
-    function clearError(){
-        Object.values(errorMap).forEach((el) =>{
-            if (el)
-                el.textContent="";
+    // clear UI
+    function clearUI() {
+        Object.values(errorMap).forEach(el => {
+            if (el) el.textContent = "";
         });
-        form.querySelectorAll("input,textarea").forEach((el) => {
+
+        form.querySelectorAll("input, textarea").forEach(el => {
             el.classList.remove("input-error");
         });
-        if (formMessage){
-            formMessage.innerHTML="";
+
+        if (formMessage) formMessage.innerHTML = "";
+    }
+
+    // render JSON lên form
+    function renderResponse(data) {
+        clearUI();
+
+        if (formMessage) {
+            formMessage.innerHTML = `
+                <div class="${data.success ? 'ajax-success' : 'ajax-error'}">
+                    ${data.message}
+                </div>
+            `;
+        }
+
+        if (!data.success) {
+            if (data.errorFullname) {
+                errorMap.fullname.textContent = data.errorFullname;
+            }
+            if (data.errorEmail) {
+                errorMap.email.textContent = data.errorEmail;
+            }
+            if (data.errorSubject) {
+                errorMap.subject.textContent = data.errorSubject;
+            }
+            if (data.errorMessage) {
+                errorMap.message.textContent = data.errorMessage;
+            }
+        }
+
+        if (data.success) {
+            form.reset();
         }
     }
-    function showFieldError(field, message) {
-        const errorEl = errorMap[field];
-        const inputEl = form.querySelector(`[name="${field}"]`);
 
-        if (errorEl) errorEl.textContent = message || "";
-        if (inputEl && message) inputEl.classList.add("input-error");
-    }
 
-    form.addEventListener("submit", async (e) =>{
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        clearError();
 
-        const formData= new FormData(form);
+        clearUI();
 
-        try{
-            const res= await fetch(form.action,{
+        // giống form thường đẩy lên, nếu dùng form data riêng sẽ xung đột và null tất cả các param đẩy lên
+        const formData = new URLSearchParams(new FormData(form));
+
+        try {
+            const res = await fetch(url, {
                 method: "POST",
-                body: formData,
-                headers:{
-                    "X-requested-with": "XMLHttpRequest"
-                }
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData
             });
-            const data= await res.json();
 
-            if (data.success){
-                if (formMessage){
-                    formMessage.innerHTML = `
-                        <div class="ajax-success">
-                            <i class="fa-solid fa-check-circle"></i> ${data.message}
-                        </div>
-                    `;
-                }
-                form.reset();
-            }else {
-                showFieldError("fullname", data.errorFullname);
-                showFieldError("email",data.errorEmail);
-                showFieldError("subject",data.errorSubject);
-                showFieldError("message",data.errorMessage);
-                }
-            showFieldError("fullname", data.errorFullname);
-            showFieldError("email", data.errorEmail);
-            showFieldError("subject", data.errorSubject);
-            showFieldError("message", data.errorMessage);
-        }catch (error){
-            if (formMessage){
+            const data = await res.json();
+
+            renderResponse(data);
+
+        } catch (err) {
+            console.error("Fetch error:", err);
+
+            if (formMessage) {
                 formMessage.innerHTML = `
                     <div class="ajax-error">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Không thể gửi liên hệ lúc này. Vui lòng thử lại.
+                        Không thể kết nối server
                     </div>
                 `;
             }
         }
-    })
-
-
-})
+    });
+});

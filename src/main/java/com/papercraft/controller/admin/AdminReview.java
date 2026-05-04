@@ -23,27 +23,19 @@ public class AdminReview extends HttpServlet {
         if (keyword == null) keyword = "";
 
         String action = request.getParameter("action");
-        String idParam = request.getParameter("id");
+        String id = request.getParameter("id");
 
-        if ("delete".equals(action) && idParam != null) {
+        if ("delete".equals(action) && id != null) {
             try {
-                int idReview = Integer.parseInt(idParam);
+                int idReview = Integer.parseInt(id);
                 boolean isDeleted = reviewDAO.deleteReviewByID(idReview);
 
-                if (isDeleted) {
-                    request.setAttribute("success", "Xóa thành công");
-                } else {
-                    request.setAttribute("error", "Lỗi: Xóa thất bại");
-                }
-
-                String redirectUrl = "admin-review";
-                if (!keyword.isEmpty()) {
-                    redirectUrl += "?keyword=" + URLEncoder.encode(keyword, "UTF-8");
-                }
-                response.sendRedirect(redirectUrl);
+                response.sendRedirect("admin-review?deleted=" + isDeleted+"&id="+idReview);
                 return;
             } catch (NumberFormatException e) {
                 e.printStackTrace();
+                response.sendRedirect("admin-review?deleted=false");
+                return;
             }
         }
 

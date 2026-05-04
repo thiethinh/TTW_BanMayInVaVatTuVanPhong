@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
 <!DOCTYPE html>
@@ -103,16 +104,27 @@
                     </div>
 
 
-                    <!-- CATEGORY: chỉ hiện khi có categories -->
+                    <!--chỉ hiện khi có categories -->
                     <c:if test="${not empty categories}">
                         <input type="hidden" name="category" id="category-input"
                                value="${param.category != null ? param.category : ''}">
 
                         <div class="custom-dropdown" id="category-dropdown">
                             <div class="select-trigger">
-                <span class="selected-value" id="category-label">
-                        ${empty category ? 'Tất cả loại' : category}
-                </span>
+                                <span class="selected-value" id="category-label">
+                                    <c:choose>
+                                        <c:when test="${empty param.category}">
+                                            Tất cả loại
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach items="${categories}" var="c">
+                                                <c:if test="${c.id == param.category}">
+                                                    ${c.categoryName}
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
                                 <span class="arrow">▼</span>
                             </div>
 

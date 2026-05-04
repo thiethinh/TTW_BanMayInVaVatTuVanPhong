@@ -57,6 +57,11 @@
     margin-top: 20px;
 }
 
+#formMessage{
+    margin-top: 10px;
+}
+
+
 .contact-page-wrapper .title p {
     font-size: 20px;
     color: gray;
