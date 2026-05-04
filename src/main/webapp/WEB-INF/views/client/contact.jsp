@@ -128,6 +128,9 @@
 
 <jsp:include page="../includes/footer.jsp"/>
 <script src="${pageContext.request.contextPath}/js/contact.js"></script>
+<script>
+    const url = "${pageContext.request.contextPath}/contact";
+</script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

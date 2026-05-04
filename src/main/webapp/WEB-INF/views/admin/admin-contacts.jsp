@@ -135,8 +135,6 @@
                 e.preventDefault();
                 const id = this.dataset.id;
 
-                console.log("ID:", id); // debug
-
                 confirmDelete(id);
             });
         });

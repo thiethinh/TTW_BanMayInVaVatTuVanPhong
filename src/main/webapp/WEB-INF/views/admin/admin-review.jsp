@@ -58,8 +58,7 @@
                         <td>${r.comment}</td>
                         <td>${r.createdAt}</td>
                         <td class="actions">
-                            <a href="admin-review?action=delete&id=${r.id}&keyword=${currentKeyword}" class="delete"
-                               onclick="return confirm('Bạn có chắc chắn muốn xóa review này không ?')">Xóa</a>
+                            <a href="#" class="btn-delete" data-id="${r.id}">Xóa</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -77,6 +76,63 @@
     </main>
 
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const baseUrl = "${pageContext.request.contextPath}";
+    window.confirmDelete = function (id) {
+        Swal.fire({
+            title: "Xác nhận xóa?",
+            html: `Bạn có chắc muốn xóa ID <b>${id}</b>?<br>
+                   <small style="color:#e74c3c">Hành động này không thể hoàn tác!</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#718096',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href =
+                    baseUrl + "/admin-review?action=delete&id=" + id;
+            }
+        });
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".btn-delete").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const id = this.dataset.id;
+
+                confirmDelete(id);
+            });
+        });
+    });
+</script>
+
+<script>
+    const deleted = "${param.deleted}";
+
+    if (deleted === "true") {
+        Swal.fire({
+            icon: "success",
+            title: "Thành công!",
+            text: "Xóa thành công!",
+        });
+    }
+
+    if (deleted === "false") {
+        Swal.fire({
+            icon: "error",
+            title: "Thất bại!",
+            text: "Xóa không thành công!",
+        });
+    }
+</script>
+
 <script type="module">
     import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
     document.addEventListener("DOMContentLoaded", () => {

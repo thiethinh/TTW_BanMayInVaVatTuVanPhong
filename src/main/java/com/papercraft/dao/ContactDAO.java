@@ -124,7 +124,7 @@ public class ContactDAO {
                     AND (c.user_fullname LIKE ?
                     OR u.email LIKE ?
                     OR c.contact_title LIKE ?
-                    OR c.content LIKE ?)
+                    OR LOWER(c.content) LIKE ?)
                     """);
         }
 
@@ -141,7 +141,7 @@ public class ContactDAO {
 
             if (keyword != null && !keyword.trim().isEmpty()) {
                 for (int i = 1; i <= 4; i++) {
-                    ps.setString(index++, "%" + keyword.trim() + "%");
+                    ps.setString(index++, "%" + keyword.toLowerCase().trim() + "%");
                 }
             }
 
