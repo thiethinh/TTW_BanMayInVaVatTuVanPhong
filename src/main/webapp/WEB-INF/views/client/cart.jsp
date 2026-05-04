@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN"/>
@@ -54,7 +53,7 @@
                 <div class="product-list">
 
                     <c:forEach items="${items}" var="item">
-                        <div class="product-detail">
+                        <div class="product-detail" id="row-${item.id}>
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
                                 <img src="${item.thumbnail}"/>
                             </a>
@@ -98,15 +97,15 @@
                                     Còn lại trong kho: <strong>${item.stockQuantity}</strong>
                                 </span>
 
-                                    <button id="bt-remove" onclick="removeItem(${item.id})">
-                                        <i class="fa fa-trash-can"></i> Xoá
-                                    </button>
+                                <button id="bt-remove" onclick="removeItem(${item.id})">
+                                    <i class="fa fa-trash-can"></i> Xoá
+                                </button>
 
                             </div>
 
                             <div class="item-cost">
                                 <span class="label">Giá:</span>
-                                <span class="price">
+                                <span class="price" id="item-total-${item.id}>
                                     <fmt:formatNumber value="${item.price * item.quantity}" type="number"
                                                       groupingUsed="true"/> ₫
                                 </span>
@@ -121,33 +120,37 @@
                     <h3>Tóm tắt đơn hàng</h3>
 
                     <p>Tạm tính:
-                        <span>
-                            <fmt:formatNumber value="${subTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                        <span id="bill-subTotal">
+                            <fmt:formatNumber value="${subTotal}" type="number" groupingUsed="true"
+                                              maxFractionDigits="0"/> ₫
                         </span>
                     </p>
 
                     <p>Phí vận chuyển:
-                        <span>
+                        <span id="bill-shippingFee">
                             <c:choose>
                                 <c:when test="${shippingFee == 0}">
                                     <strong style="color: #165FF2;">Miễn phí</strong>
                                 </c:when>
                                 <c:otherwise>
-                                    <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                                    <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true"
+                                                      maxFractionDigits="0"/> ₫
                                 </c:otherwise>
                             </c:choose>
                         </span>
                     </p>
 
                     <p>VAT (5%):
-                        <span>
+                        <span id="bill-vat">
                             <fmt:formatNumber value="${vat}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
                         </span>
                     </p>
 
                     <h2>Tổng cộng:
                         <p style="color: var(--danger-color);">
-                            <strong><fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/>
+                            <strong id="bill-grandTotal">
+                                <fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true"
+                                                  maxFractionDigits="0"/>
                                 ₫</strong>
                         </p>
                     </h2>
