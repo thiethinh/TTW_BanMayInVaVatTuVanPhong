@@ -1,4 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,108 +20,96 @@
 </head>
 
 <body>
+<div class="admin-container">
+    <jsp:include page="../includes/admin-sidebar.jsp"/>
 
-<jsp:include page="../includes/admin-sidebar.jsp"/>
+    <main class="admin-main-content">
+        <header class="admin-customer-details-header">
+            <a href="${pageContext.request.contextPath}/admin-account"><i class="fa-solid fa-arrow-left"></i> Quay
+                lại</a>
+            <h1>Chi tiết khách hàng: ${acc.fullname}</h1>
+            <a href="admin-account-update?id=${acc.id}"><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa</a>
+        </header>
 
-<main class="admin-main-content">
-
-    <header class="admin-customer-details-header">
-        <a href="${pageContext.request.contextPath}/admin-account"><i class="fa-solid fa-arrow-left"></i>
-            Quay lại</a>
-        <h1>Chi tiết khách hàng</h1>
-
-    </header>
-
-    <section class="customer-details-view">
-        <h3>Thông tin cá nhân</h3>
-        <div class="info-section">
-            <div class="info-left">
-                <p><strong>Mã khách hàng:</strong> KH001</p>
-                <p><strong>Email:</strong> nguyenvana@gmail.com</p>
-                <p><strong>Ngày đăng ký:</strong> 1/5/2025</p>
+        <section class="customer-details-view">
+            <div class="info-section">
+                <div class="info-left">
+                    <h3>Thông tin cơ bản</h3>
+                    <p><strong>Mã khách hàng:</strong> #${acc.id}</p>
+                    <p><strong>Họ và tên:</strong> ${acc.fullname}</p>
+                    <p><strong>Giới tính:</strong> ${acc.gender == 'male' ? 'Nam' : 'Nữ'}</p>
+                    <p><strong>Email:</strong> ${acc.email}</p>
+                    <p><strong>Số điện thoại:</strong> ${acc.phoneNumber}</p>
+                </div>
+                <div class="info-right">
+                    <h3>Trạng thái tài khoản</h3>
+                    <p><strong>Loại tài khoản:</strong>
+                        <span style="text-transform: uppercase; font-weight: bold; color: ${acc.role == 'admin' ? 'red' : 'blue'}">
+                            ${acc.role}
+                        </span>
+                    </p>
+                    <p><strong>Trạng thái:</strong>
+                        <c:choose>
+                            <c:when test="${acc.status}">
+                                <span class="status-active">Đang hoạt động</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="status-blocked">Bị khóa</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <p><strong>Ngày tham gia:</strong>
+                        <fmt:formatDate value="${acc.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                    </p>
+                </div>
             </div>
-            <div class="info-right">
-                <p><strong>Họ và tên:</strong> Nguyễn Văn A</p>
-                <p><strong>Số điện thoại:</strong> 0905123456</p>
-                <p><strong>Trạng thái:</strong> <span class="status-active">Đang hoạt động</span></p>
+
+            <div class="order-history">
+                <h3>Lịch sử mua hàng</h3>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Mã Đơn Hàng</th>
+                        <th>Người Nhận</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <c:choose>
+                        <c:when test="${empty orderList}">
+                            <tr>
+                                <td colspan="6" style="text-align: center">Chưa có lịch sử mua hàng</td>
+                            </tr>
+                        </c:when>
+
+                        <c:otherwise>
+                            <c:forEach items="${orderList}" var="o">
+                                <tr>
+                                    <td>${o.id}</td>
+                                    <td>${o.shippingName}</td>
+                                    <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm"
+                                                        timeZone="Asia/Ho_Chi_Minh"/></td>
+                                    <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
+                                    <td><span class="status ${o.status}">${o.status}</span></td>
+                                    <td>
+                                        <a href="${pageContext.request.contextPath}/order-view?orderId=${o.id}"
+                                           class="btn-action view">Xem</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                    </tbody>
+
+                </table>
             </div>
-        </div>
-
-        <h3>Lịch sử mua hàng</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Mã đơn hàng</th>
-                <th>Ngày mua</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>HD1023</td>
-                <td>01/11/2025</td>
-                <td>4.500.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-            <tr>
-                <td>HD0987</td>
-                <td>23/10/2025</td>
-                <td>2.250.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-            <tr>
-                <td>HD0875</td>
-                <td>15/10/2025</td>
-                <td>3.100.000VNĐ</td>
-                <td><span class="status status-cancel">Đã hủy</span></td>
-            </tr>
-
-            <tr>
-                <td>HD1201</td>
-                <td>10/09/2025</td>
-                <td>12.500.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-            <tr>
-                <td>HD1202</td>
-                <td>02/09/2025</td>
-                <td>9.850.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-            <tr>
-                <td>HD1203</td>
-                <td>22/08/2025</td>
-                <td>7.300.000VNĐ</td>
-                <td><span class="status status-cancel">Đã Hủy</span></td>
-            </tr>
-            <tr>
-                <td>HD1204</td>
-                <td>05/08/2025</td>
-                <td>5.500.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-
-            <tr>
-                <td>HD1075</td>
-                <td>20/6/10/2025</td>
-                <td>3.100.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-
-            <tr>
-                <td>HD0903</td>
-                <td>15/10/2024</td>
-                <td>7.300.000VNĐ</td>
-                <td><span class="status status-success">Hoàn tất</span></td>
-            </tr>
-            </tbody>
-        </table>
-
-    </section>
-
-</main>
-
+        </section>
+    </main>
+</div>
 </body>
-
 </html>
