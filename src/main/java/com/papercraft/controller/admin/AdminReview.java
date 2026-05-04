@@ -10,7 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @WebServlet(name = "AdminReview", value = "/admin-review")
 public class AdminReview extends HttpServlet {
@@ -23,8 +26,9 @@ public class AdminReview extends HttpServlet {
         if (keyword == null) keyword = "";
 
         String action = request.getParameter("action");
-        String id = request.getParameter("id");
 
+
+        String id = request.getParameter("id");
         if ("delete".equals(action) && id != null) {
             try {
                 int idReview = Integer.parseInt(id);
@@ -38,6 +42,39 @@ public class AdminReview extends HttpServlet {
                 return;
             }
         }
+
+        String date = request.getParameter("date");
+        if("search-time".equals(action)&& date!=null&&!date.isEmpty()){
+            LocalDate dateSearch = LocalDate.parse(date);
+            LocalDateTime start = dateSearch.atStartOfDay();
+            LocalDateTime end = dateSearch.plusDays(1).atStartOfDay();
+            List<Review> reviews = reviewDAO.findReviewByDate(start,end);
+
+            request.setAttribute("reviews", reviews);
+            request.setAttribute("dateSearch", date);
+
+            request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
+            return;
+        }
+
+        String content = request.getParameter("content");
+        if("search-content".equals(action)&& content != null) {
+            return;
+
+        }
+
+        String userName = request.getParameter("user-name");
+        if("search-user-name".equals(action) && userName != null) {
+            return;
+            
+        }
+
+        String rating = request.getParameter("rating");
+        if("search-rating".equals(action) && rating != null) {
+            return;
+
+        }
+
 
         List<Review> reviews = reviewDAO.getReviews(keyword);
         request.setAttribute("reviews", reviews);

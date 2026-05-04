@@ -3,10 +3,9 @@ package com.papercraft.dao;
 import com.papercraft.model.Review;
 import com.papercraft.utils.DBConnect;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,5 +146,46 @@ public class ReviewDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Review> findReviewByDate(LocalDateTime start, LocalDateTime end) {
+        List<Review> reviews = new ArrayList<>();
+
+        String sql = """
+                SELECT r.*, u.fullname, p.product_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                JOIN product p ON r.product_id = p.id
+                WHERE r.created_at >= ? AND r.created_at < ?;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setTimestamp(1, Timestamp.valueOf(start));
+            ps.setTimestamp(2, Timestamp.valueOf(end));
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Review review = new Review();
+                review.setId(rs.getInt("id"));
+                review.setUserId(rs.getInt("user_id"));
+                review.setProductId(rs.getInt("product_id"));
+                review.setRating(rs.getInt("rating"));
+                review.setComment(rs.getString("comment"));
+                review.setCreatedAt(rs.getTimestamp("created_at"));
+                review.setAuthorName(rs.getString("fullname"));
+                review.setProductName(rs.getString("product_name"));
+                reviews.add(review);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
     }
 }

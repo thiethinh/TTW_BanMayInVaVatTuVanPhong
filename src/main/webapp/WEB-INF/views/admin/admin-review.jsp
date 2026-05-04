@@ -26,11 +26,46 @@
         <div class="admin-header">
             <h1>Quản Lý Đánh Giá</h1>
 
-            <form action="admin-review" method="get" class="user-review-searchbox">
-                <input type="text" name="keyword" value="${currentKeyword}" placeholder="Nhập nội dung dùng để tìm..."
-                       class="search-control">
-                <button type="submit" id="bt-search">Tìm kiếm</button>
+            <!-- tìm theo ngày đăng review -->
+            <form action="admin-review" method="get" class="date-search-form">
+                <input type="hidden" name="action" value="search-time">
+                <input type="date" name="date" value="${dateSearch}" class="date-input">
+                <button type="submit" id="bt-search">
+                    🔍 Tìm kiếm
+                </button>
             </form>
+
+            <div class="auto-search-box">
+
+                <!-- tìm theo 1 phần nội dung -->
+                <div class="user-review-searchbox">
+                    <input type="text" name="content-keyword" id="search-content"
+                           value="${contentKeyword}"
+                           placeholder="Tìm theo nội dung..."
+                           class="search-control">
+                </div>
+
+                <!-- tìm tên -->
+                <div class="user-review-searchbox">
+                    <input type="text" name="user-keyword" id="search-user-name"
+                           value="${userKeyword}"
+                           placeholder="Tìm theo tên người dùng..."
+                           class="search-control">
+                </div>
+
+                <!-- tìm theo số sao -->
+                <div class="user-review-searchbox">
+                    <select name="rating" class="search-control" id="rating-select">
+                        <option value="">Tất cả số sao</option>
+                        <option value="1" ${rating == 1 ? "selected" : ""}>1 sao</option>
+                        <option value="2" ${rating == 2 ? "selected" : ""}>2 sao</option>
+                        <option value="3" ${rating == 3 ? "selected" : ""}>3 sao</option>
+                        <option value="4" ${rating == 4 ? "selected" : ""}>4 sao</option>
+                        <option value="5" ${rating == 5 ? "selected" : ""}>5 sao</option>
+                    </select>
+                </div>
+
+            </div>
         </div>
 
         <section class="product-review">
@@ -132,6 +167,7 @@
         });
     }
 </script>
+<script src="${pageContext.request.contextPath}/js/admin-review.js"></script>
 
 <script type="module">
     import { initPagination } from '${pageContext.request.contextPath}/js/pagination-admin.js';
