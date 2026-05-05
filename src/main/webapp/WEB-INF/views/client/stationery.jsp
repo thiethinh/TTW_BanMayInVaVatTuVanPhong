@@ -164,6 +164,16 @@
                             </c:if>
                         </div>
 
+                        <div class="general-sell-info">
+                            <div class="rating">
+                                ⭐ <span><fmt:formatNumber value="${s.avgRating}" maxFractionDigits="1"/></span>
+                            </div>
+
+                            <div class="sold">
+                                Đã bán: <span>${s.soldQuantity}</span>
+                            </div>
+                        </div>
+
                         <div class="action">
                             <button class="add-cart relative-btn" type="button" onclick="addToCart(${s.id})"><span><i
                                     class='bx bx-cart'></i></span>

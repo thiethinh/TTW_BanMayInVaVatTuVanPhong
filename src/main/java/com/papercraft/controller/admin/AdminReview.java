@@ -86,7 +86,7 @@ public class AdminReview extends HttpServlet {
         if("search-rating".equals(action) && rating != null) {
             List<Review> reviews = new ArrayList<>();
             try {
-                int ratingNumb = Integer.parseInt(id);
+                int ratingNumb = Integer.parseInt(rating);
                 if(ratingNumb>=1 && ratingNumb<=5){
                     reviews = reviewDAO.findReviewByRating(ratingNumb);
                 }else{

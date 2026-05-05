@@ -379,14 +379,46 @@ public class ProductDAO {
         List<Product> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                """
-                            SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,  p.origin_price,p.discount,p.price, i.img_name, AVG(r.rating) as avg_rating
-                            FROM product p
-                            JOIN category c ON p.category_id = c.id
-                            JOIN image i ON p.id = i.entity_id
-                            LEFT JOIN review r ON r.product_id = p.id
-                            WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
-                        """
+            """
+                 SELECT 
+                     p.id, 
+                     p.product_name, 
+                     p.category_id, 
+                     p.description_thumbnail, 
+                     p.brand,  
+                     p.origin_price,
+                     p.discount,
+                     p.price, 
+                     i.img_name,
+         
+                     COALESCE(r.avg_rating, 5) AS avg_rating,
+                     COALESCE(s.sold_quantity, 1) AS sold_quantity
+         
+                 FROM product p
+         
+                 JOIN category c ON p.category_id = c.id
+         
+                 LEFT JOIN image i 
+                     ON p.id = i.entity_id
+                     AND i.is_thumbnail = 1
+                     AND i.entity_type = 'Product'
+         
+                 LEFT JOIN (
+                     SELECT product_id, AVG(rating) AS avg_rating
+                     FROM review
+                     GROUP BY product_id
+                 ) r ON r.product_id = p.id
+         
+                 LEFT JOIN (
+                     SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+                     FROM order_item oi
+                     JOIN orders o ON o.id = oi.order_id
+                     WHERE o.status = 'completed'
+                     GROUP BY oi.product_id
+                 ) s ON s.product_id = p.id
+         
+                 WHERE c.type = ?
+             """
         );
 
         List<Object> params = new ArrayList<>();
@@ -405,12 +437,12 @@ public class ProductDAO {
             params.add(brand);
         }
 
-        sql.append(" GROUP BY p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.origin_price,p.discount,p.price, i.img_name");
+//        sql.append(" GROUP BY p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.origin_price,p.discount,p.price, i.img_name");
 
         switch (sort) {
             case "priceAsc" -> sql.append(" ORDER BY p.price ASC");
             case "priceDesc" -> sql.append(" ORDER BY p.price DESC");
-            default -> sql.append(" ORDER BY avg_rating IS NULL, avg_rating DESC");
+            default -> sql.append(" ORDER BY avg_rating DESC");
         }
 
         try (Connection conn = DBConnect.getConnection();
@@ -434,6 +466,9 @@ public class ProductDAO {
                     p.setPrice(rs.getDouble("price"));
                     p.setAvgRating(rs.getBigDecimal("avg_rating"));
                     p.setDiscount(rs.getDouble("discount"));
+
+                    p.setAvgRating(rs.getBigDecimal("avg_rating"));
+                    p.setSoldQuantity(rs.getInt("sold_quantity"));
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
