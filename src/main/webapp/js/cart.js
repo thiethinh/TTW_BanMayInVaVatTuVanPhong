@@ -154,5 +154,84 @@ function updateBillUI(data) {
     updateCartBadge(data.cartCount)
 }
 
+// cart search
+let cartItems= [];
+
+function collectCartItems(){
+    cartItems=[];
+    let allRows= document.querySelectorAll('.product-detail[id^="row-"]');
+    for (let i=0;i<allRows.length;i++){
+        let row = allRows[i];
+        let id = row.id.replace('row-', '');
+        let name = row.querySelector('h2').textContent.trim();
+        cartItems.push({
+            id: id,
+            name: name,
+            el: row
+        });
+    }
+}
+
+function searchInCart(keyWord){
+    let clearBtn= document.getElementById('cart-search-clear');
+    let noResult= document.getElementById('cart-no-result');
+    let autocomplete= document.getElementById('cart-autocomplete');
+    //Ânr/ hiện x trên search
+    if (keyWord.trim() ===''){
+        clearBtn.style.display='none';
+    }else {
+        clearBtn.style.display='block';
+    }
+    //neu ô searh trống => hiển thị all product
+    if (keyWord.trim() ===''){
+        for (let i=0;i<cartItems.length;i++){
+            cartItems[i].el.style.display='';
+        }
+        noResult.style.display= 'none';
+        autocomplete.innerHTML='';
+        return;
+    }
+    //Tachs keyWord
+    let words= keyWord.trim().toLowerCase().split(' ');
+    let filteredWords=[];
+
+    for(let i=0;i<words.length;i++){
+        if (words[i] !== ''){
+            filteredWords.push(words[i]);
+        }
+    }
+    let matchCount= 0;
+    for (let i=0;i<cartItems.length;i++){
+        let item= cartItems[i];
+        let itemName= item.name.toLowerCase();
+        let isMatch= true;
+
+        for (let j=0; j<filteredWords.length;j++){
+            if (itemName.includes(filteredWords[j]) ===false){
+                isMatch= false;
+                break;
+            }
+        }
+        //hiện row sản phẩm
+        if (isMatch){
+            item.el.style.display='';
+            matchCount++;
+        }else {
+            item.el.style.display='none';
+        }
+    }
+    //Hiện thông báo not found
+    if (isMatch ===0){
+        noResult.style.display='block';
+    }else {
+        noResult.style.display='none';
+    }
+    //Hiện goợi ý autocomplete
+    renderAutocomplete(keyWord,filteredWords);
+}
+function renderAutocomplete(keyword,filteredWords){
+    //TODO
+}
+
 
 document.addEventListener("DOMContentLoaded", updateCartCount);
