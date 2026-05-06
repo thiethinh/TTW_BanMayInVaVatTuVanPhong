@@ -49,7 +49,7 @@
         <div class="container">
             <h1>GIỎ HÀNG CỦA BẠN</h1>
                 <%-- box search--%>
-            <div class="cart-search-wapper">
+            <div class="cart-search-wrapper">
                 <div class="cart-search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="cart-search-input"

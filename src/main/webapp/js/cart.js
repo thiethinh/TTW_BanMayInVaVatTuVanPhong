@@ -155,12 +155,12 @@ function updateBillUI(data) {
 }
 
 // cart search
-let cartItems= [];
+let cartItems = [];
 
-function collectCartItems(){
-    cartItems=[];
-    let allRows= document.querySelectorAll('.product-detail[id^="row-"]');
-    for (let i=0;i<allRows.length;i++){
+function collectCartItems() {
+    cartItems = [];
+    let allRows = document.querySelectorAll('.product-detail[id^="row-"]');
+    for (let i = 0; i < allRows.length; i++) {
         let row = allRows[i];
         let id = row.id.replace('row-', '');
         let name = row.querySelector('h2').textContent.trim();
@@ -172,66 +172,142 @@ function collectCartItems(){
     }
 }
 
-function searchInCart(keyWord){
-    let clearBtn= document.getElementById('cart-search-clear');
-    let noResult= document.getElementById('cart-no-result');
-    let autocomplete= document.getElementById('cart-autocomplete');
+function searchInCart(keyWord) {
+    let clearBtn = document.getElementById('cart-search-clear');
+    let noResult = document.getElementById('cart-no-result');
+    let autocomplete = document.getElementById('cart-autocomplete');
     //Ânr/ hiện x trên search
-    if (keyWord.trim() ===''){
-        clearBtn.style.display='none';
-    }else {
-        clearBtn.style.display='block';
+    if (keyWord.trim() === '') {
+        clearBtn.style.display = 'none';
+    } else {
+        clearBtn.style.display = 'block';
     }
     //neu ô searh trống => hiển thị all product
-    if (keyWord.trim() ===''){
-        for (let i=0;i<cartItems.length;i++){
-            cartItems[i].el.style.display='';
+    if (keyWord.trim() === '') {
+        for (let i = 0; i < cartItems.length; i++) {
+            cartItems[i].el.style.display = '';
         }
-        noResult.style.display= 'none';
-        autocomplete.innerHTML='';
+        noResult.style.display = 'none';
+        autocomplete.innerHTML = '';
         return;
     }
     //Tachs keyWord
-    let words= keyWord.trim().toLowerCase().split(' ');
-    let filteredWords=[];
+    let words = keyWord.trim().toLowerCase().split(' ');
+    let filteredWords = [];
 
-    for(let i=0;i<words.length;i++){
-        if (words[i] !== ''){
+    for (let i = 0; i < words.length; i++) {
+        if (words[i] !== '') {
             filteredWords.push(words[i]);
         }
     }
-    let matchCount= 0;
-    for (let i=0;i<cartItems.length;i++){
-        let item= cartItems[i];
-        let itemName= item.name.toLowerCase();
-        let isMatch= true;
+    let matchCount = 0;
+    for (let i = 0; i < cartItems.length; i++) {
+        let item = cartItems[i];
+        let itemName = item.name.toLowerCase();
+        let isMatch = true;
 
-        for (let j=0; j<filteredWords.length;j++){
-            if (itemName.includes(filteredWords[j]) ===false){
-                isMatch= false;
+        for (let j = 0; j < filteredWords.length; j++) {
+            if (itemName.includes(filteredWords[j]) === false) {
+                isMatch = false;
                 break;
             }
         }
         //hiện row sản phẩm
-        if (isMatch){
-            item.el.style.display='';
+        if (isMatch) {
+            item.el.style.display = '';
             matchCount++;
-        }else {
-            item.el.style.display='none';
+        } else {
+            item.el.style.display = 'none';
         }
     }
     //Hiện thông báo not found
-    if (isMatch ===0){
-        noResult.style.display='block';
-    }else {
-        noResult.style.display='none';
+    if (matchCount === 0) {
+        noResult.style.display = 'block';
+    } else {
+        noResult.style.display = 'none';
     }
     //Hiện goợi ý autocomplete
-    renderAutocomplete(keyWord,filteredWords);
-}
-function renderAutocomplete(keyword,filteredWords){
-    //TODO
+    renderAutocomplete(keyWord, filteredWords);
 }
 
+function renderAutocomplete(keyword, filteredWords) {
+    let ul = document.getElementById('cart-autocomplete');
+    ul.innerHTML = ''; //xoas gợi ý cũ
 
-document.addEventListener("DOMContentLoaded", updateCartCount);
+    //lấy tối đa 5 sp để hiện thị gợi ý
+    let suggestions = [];
+    for (let i = 0; i < cartItems.length; i++) {
+        let item = cartItems[i];
+        let itemName = item.name.toLowerCase();
+        let isMatch = true;
+
+        for (let j = 0; j < filteredWords.length; j++) {
+            if (!itemName.includes(filteredWords[j])) {
+                isMatch = false;
+                break;
+            }
+        }
+        if (isMatch) {
+            suggestions.push(item);
+        }
+        if (suggestions.length === 5) break;
+    }
+    //taoj ther li cho tungwf goiwj ys
+    for (let i = 0; i < suggestions.length; i++) {
+        let item = suggestions[i];
+        let li = document.createElement('li');
+        li.innerHTML = '<i class="fa-solid fa-bag-shopping" style="color:#165FF2"></i> '
+            + highlightKeyword(item.name, filteredWords);
+        li.addEventListener('click', function () {
+            document.getElementById('cart-search-input').value = item.name;
+            ul.innerHTML = '';
+            for (let i = 0; i < cartItems.length; i++) {
+                if (cartItems[i].id === item.id) {
+                    cartItems[i].el.style.display = '';    //hiện sp được chọn
+                } else {
+                    cartItems[i].el.style.display = 'none'; //ẩn các sp khác
+                }
+            }
+            document.getElementById('cart-no-result').style.display = 'none';
+        });
+        ul.appendChild(li);
+    }
+
+}
+
+function highlightKeyword(name, words) {
+    let result = name;
+    for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        //tạo regexp để tìm từ(không phân biệt chữ hoa thường)
+        let regex = new RegExp(word, 'gi');
+        result = result.replace(regex, function (matched) {
+            return '<mark>' + matched + '</mark>';
+        });
+    }
+    return result;
+}
+
+//xoas kí tự trong ô tìm kiếm khi bấm x
+function clearCartSearch() {
+    let input = document.getElementById('cart-search-input');
+    input.value = '';
+    input.focus();
+    searchInCart('');
+}
+
+//dóng dropdown khi bấm ra vùng bên ngoài
+document.addEventListener('click', function (e) {
+    let wrapper = document.querySelector('.cart-search-wrapper');
+    let ul = document.getElementById('cart-autocomplete');
+
+    if (ul && wrapper && !wrapper.contains(e.target)) {
+        ul.innerHTML = '';
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", function (){
+    updateCartCount();
+    collectCartItems();
+});
