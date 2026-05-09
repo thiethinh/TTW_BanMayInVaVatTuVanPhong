@@ -4,21 +4,21 @@
         align-items: center;
         font-size: 14px;
         margin-bottom: 30px;
-        background: #cfcfcf;
+        background: transparent;
         padding: 0 10px;
     }
 
     .admin-customer-update-header h1 {
         margin: 10px;
-        text-decoration: underline;
+        text-decoration: none;
     }
 
     .admin-customer-update-header a {
         font-size: 16px;
         text-decoration: none;
         font-weight: 600;
-        color: #165FF2;
-        background-color: #ddd;
+        color: var(--primary-color);
+        background-color: white;
         border-radius: 8px;
         padding: 10px 20px;
         transition: transform 0.3s ease;
@@ -27,7 +27,6 @@
     .admin-customer-update-header a:hover {
         background-color: #165FF2;
         color: #fff;
-        transform: translateX(-5px);
     }
 
     .customer-update-view {
@@ -41,7 +40,7 @@
 
     .customer-update-view h3 {
         margin-top: 0;
-        border-left: 5px solid #007bff;
+        border-left: 5px solid var(--primary-color);
         padding-left: 10px;
         color: #333;
         font-size: 18px;
