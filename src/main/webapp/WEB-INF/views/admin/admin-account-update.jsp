@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,9 +33,20 @@
             <a href="admin-account-details?id=${acc.id}"><i class="fa-solid fa-info-circle"></i> Chi tiết</a>
         </header>
 
+        <c:if test="${not empty sessionScope.msg}">
+            <p style="color: green; font-weight: bold; text-align: center">${sessionScope.msg}</p>
+            <c:remove var="msg" scope="session"/>
+        </c:if>
+        <c:if test="${not empty sessionScope.error}">
+            <p style="color: red; font-weight: bold; text-align: center">${sessionScope.error}</p>
+            <c:remove var="error" scope="session"/>
+        </c:if>
+
         <section class="customer-update-view">
             <h3>Thông tin cá nhân</h3>
-            <form id="editForm">
+            <form action="${pageContext.request.contextPath}/admin-account-update" method="post" id="editForm">
+                <input type="hidden" name="id" value="${acc.id}">
+
                 <div>
                     <label>Mã khách hàng</label>
                     <input type="text" value="${acc.id}" disabled>
@@ -47,34 +60,45 @@
 
                 <div>
                     <label>Họ</label>
-                    <input type="text" value="${acc.fname}">
+                    <input type="text" name="fname" value="${acc.fname}">
                 </div>
+
                 <div>
                     <label>Tên</label>
-                    <input type="text" value="${acc.lname}">
+                    <input type="text" name="lname" value="${acc.lname}">
+                </div>
+
+                <div>
+                    <label>Giới tính</label>
+                    <select name="gender">
+                        <option value="" disabled ${acc.gender == '' ? 'selected' : ''}></option>
+                        <option value="male" ${acc.gender == 'male' ? 'selected' : ''}>Nam</option>
+                        <option value="female" ${acc.gender == 'female' ? 'selected' : ''}>Nữ</option>
+                        <option value="other" ${acc.gender == 'other' ? 'selected' : ''}>Khác</option>
+                    </select>
                 </div>
 
                 <div>
                     <label>Số điện thoại</label>
-                    <input type="text" value="${acc.phoneNumber}">
+                    <input type="text" name="phoneNumber" value="${acc.phoneNumber}">
                 </div>
 
                 <div>
                     <label>Trạng thái tài khoản</label>
-                    <select>
-                        <option ${acc.status == true ? selected : ''}selected>Đang hoạt động</option>
-                        <option ${acc.status == false ? selected : ''}>Bị khóa</option>
+                    <select name="status">
+                        <option value="true" ${acc.status == true ? 'selected' : ''} style="color: green">Hoạt động</option>
+                        <option value="false" ${acc.status == false ? 'selected' : ''} style="color: red">Bị khóa</option>
                     </select>
                 </div>
 
                 <div class="block-full-width">
                     <label>Địa chỉ</label>
-                    <textarea>${address.detailAddress}</textarea>
+                    <textarea name="detailAddress">${address.detailAddress}</textarea>
                 </div>
 
                 <div>
                     <label>Tỉnh/Thành</label>
-                    <select>
+                    <select name="city">
                         <option value=""></option>
                         <option value="hcm" ${address.city == 'hcm' ? 'selected' : ''}>TP. Hồ Chí Minh</option>
                         <option value="hn" ${address.city == 'hn' ? 'selected' : ''}>Hà Nội</option>
@@ -84,7 +108,7 @@
 
                 <div>
                     <label>Quốc Gia</label>
-                    <select>
+                    <select name="nation">
                         <option value=""></option>
                         <option value="VN" ${address.nation == 'VN' ? 'selected' : ''}>Việt Nam</option>
                         <option value="US" ${address.nation == 'US' ? 'selected' : ''}>Hoa Kỳ</option>
@@ -107,6 +131,11 @@
                         <option value="IT" ${address.nation == 'IT' ? 'selected' : ''}>Ý</option>
                         <option value="ES" ${address.nation == 'ES' ? 'selected' : ''}>Tây Ban Nha</option>
                     </select>
+                </div>
+
+                <div>
+                    <label>Mã bưu chính (Postcode)</label>
+                    <input type="text" name="postcode" value="${address.postcode}">
                 </div>
 
                 <div class="buttons block-full-width">
