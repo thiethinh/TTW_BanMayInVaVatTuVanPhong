@@ -427,7 +427,6 @@ public class UserDAO {
                 user.setLname(rs.getString("lname"));
                 user.setFullname(rs.getString("fullname"));
                 user.setEmail(rs.getString("email"));
-                user.setPasswordHash(rs.getString("password_hash"));
                 user.setPhoneNumber(rs.getString("phone_number"));
                 user.setGender(rs.getString("gender"));
                 user.setRole(rs.getString("role"));

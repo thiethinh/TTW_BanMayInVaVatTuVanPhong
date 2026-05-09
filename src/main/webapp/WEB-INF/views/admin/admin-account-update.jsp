@@ -54,22 +54,17 @@
                     <input type="text" value="${acc.lname}">
                 </div>
 
-                <div class="input-box">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="password" value="${acc.passwordHash}">
-                    <i class="bx bx-lock-alt"></i>
-                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
-                </div>
-
-
-                <!-- <div>
-                    <label>Ngày sinh</label>
-                    <input type="date" value="1990-05-12">
-                </div> -->
-
                 <div>
                     <label>Số điện thoại</label>
                     <input type="text" value="${acc.phoneNumber}">
+                </div>
+
+                <div>
+                    <label>Trạng thái tài khoản</label>
+                    <select>
+                        <option ${acc.status == true ? selected : ''}selected>Đang hoạt động</option>
+                        <option ${acc.status == false ? selected : ''}>Bị khóa</option>
+                    </select>
                 </div>
 
                 <div class="block-full-width">
@@ -88,23 +83,33 @@
                 </div>
 
                 <div>
-                    <label>Trạng thái tài khoản</label>
+                    <label>Quốc Gia</label>
                     <select>
-                        <option ${acc.status == true ? selected : ''}selected>Đang hoạt động</option>
-                        <option ${acc.status == false ? selected : ''}>Bị khóa</option>
+                        <option value=""></option>
+                        <option value="VN" ${address.nation == 'VN' ? 'selected' : ''}>Việt Nam</option>
+                        <option value="US" ${address.nation == 'US' ? 'selected' : ''}>Hoa Kỳ</option>
+                        <option value="UK" ${address.nation == 'UK' ? 'selected' : ''}>Vương quốc Anh</option>
+                        <option value="JP" ${address.nation == 'JP' ? 'selected' : ''}>Nhật Bản</option>
+                        <option value="KR" ${address.nation == 'KR' ? 'selected' : ''}>Hàn Quốc</option>
+                        <option value="CN" ${address.nation == 'CN' ? 'selected' : ''}>Trung Quốc</option>
+                        <option value="FR" ${address.nation == 'FR' ? 'selected' : ''}>Pháp</option>
+                        <option value="DE" ${address.nation == 'DE' ? 'selected' : ''}>Đức</option>
+                        <option value="RU" ${address.nation == 'RU' ? 'selected' : ''}>Nga</option>
+                        <option value="IN" ${address.nation == 'IN' ? 'selected' : ''}>Ấn Độ</option>
+                        <option value="CA" ${address.nation == 'CA' ? 'selected' : ''}>Canada</option>
+                        <option value="AU" ${address.nation == 'AU' ? 'selected' : ''}>Úc</option>
+                        <option value="BR" ${address.nation == 'BR' ? 'selected' : ''}>Brazil</option>
+                        <option value="TH" ${address.nation == 'TH' ? 'selected' : ''}>Thái Lan</option>
+                        <option value="MY" ${address.nation == 'MY' ? 'selected' : ''}>Malaysia</option>
+                        <option value="SG" ${address.nation == 'SG' ? 'selected' : ''}>Singapore</option>
+                        <option value="ID" ${address.nation == 'ID' ? 'selected' : ''}>Indonesia</option>
+                        <option value="PH" ${address.nation == 'PH' ? 'selected' : ''}>Philippines</option>
+                        <option value="IT" ${address.nation == 'IT' ? 'selected' : ''}>Ý</option>
+                        <option value="ES" ${address.nation == 'ES' ? 'selected' : ''}>Tây Ban Nha</option>
                     </select>
                 </div>
 
-
-                <!-- <div class="block-full-width">
-                    <label>Ghi chú nội bộ</label>
-                    <textarea>Khách hàng VIP, ưu tiên xử lý đơn hàng nhanh.</textarea>
-                </div> -->
-
                 <div class="buttons block-full-width">
-                    <a href="${pageContext.request.contextPath}/admin-account">
-                        <button type="button" class="bt cancel">Hủy</button>
-                    </a>
                     <button type="submit" class="bt save">💾 Lưu thay đổi</button>
                 </div>
             </form>
@@ -114,6 +119,5 @@
 </div>
 
 </body>
-<script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </html>
