@@ -173,8 +173,8 @@
                             </td>
 
                             <td class="block-action" style="white-space: nowrap;">
-                                <a href="admin-customer-details?id=${u.id}" id="link-view">Xem</a>
-                                <a href="admin-customer-update?id=${u.id}">Sửa</a>
+                                <a href="admin-account-details?id=${u.id}" id="link-view">Xem</a>
+                                <a href="admin-account-update?id=${u.id}">Sửa</a>
 
                                 <c:choose>
                                     <c:when test="${u.status == true}">

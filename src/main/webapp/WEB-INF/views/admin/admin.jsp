@@ -28,7 +28,7 @@
         <header class="admin-header">
             <h1>Bảng Điều Khiển</h1>
             <div class="admin-user-info">
-                <span>Xin chào, ADMIN</span>
+                <span>Xin chào, ${acc.lname}</span>
                 <a href="${pageContext.request.contextPath}/admin?logout=1" class="btn-logout">Đăng Xuất</a>
             </div>
         </header>
