@@ -1,6 +1,8 @@
 package com.papercraft.controller.admin;
 
+import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.UserDAO;
+import com.papercraft.model.Address;
 import com.papercraft.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,8 +23,12 @@ public class AdminAccUpdateServlet extends HttpServlet {
         UserDAO  userDAO = new UserDAO();
         User user = userDAO.getUserById(id);
 
+        AddressDAO addressDAO = new AddressDAO();
+        Address address = addressDAO.findDefaultAddress(id);
+
         if (user != null) {
             request.setAttribute("acc", user);
+            request.setAttribute("address", address);
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-account-update.jsp").forward(request, response);
         } else {
             response.sendRedirect("/admin-account");

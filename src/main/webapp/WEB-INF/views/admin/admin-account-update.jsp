@@ -28,7 +28,7 @@
             <a href="${pageContext.request.contextPath}/admin-account"><i class="fa-solid fa-arrow-left"></i>
                 Quay lại</a>
             <h1>Sửa thông tin khách hàng</h1>
-
+            <a href="admin-account-details?id=${acc.id}"><i class="fa-solid fa-info-circle"></i> Chi tiết</a>
         </header>
 
         <section class="customer-update-view">
@@ -36,27 +36,29 @@
             <form id="editForm">
                 <div>
                     <label>Mã khách hàng</label>
-                    <input type="text" value="KH001" disabled>
+                    <input type="text" value="${acc.id}" disabled>
                 </div>
 
                 <div>
                     <label>Email</label>
-                    <input type="email" value="nguyenvana@gmail.com" disabled>
+                    <input type="email" value="${acc.email}" disabled>
                 </div>
 
 
                 <div>
                     <label>Họ</label>
-                    <input type="text" value="Nguyễn Văn ">
+                    <input type="text" value="${acc.fname}">
                 </div>
                 <div>
                     <label>Tên</label>
-                    <input type="text" value="A">
+                    <input type="text" value="${acc.lname}">
                 </div>
 
-                <div>
+                <div class="input-box">
                     <label>Mật khẩu</label>
-                    <input type="password" value="*******">
+                    <input type="password" id="password" value="${acc.passwordHash}">
+                    <i class="bx bx-lock-alt"></i>
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
                 </div>
 
 
@@ -67,60 +69,29 @@
 
                 <div>
                     <label>Số điện thoại</label>
-                    <input type="text" value="0909123456">
+                    <input type="text" value="${acc.phoneNumber}">
                 </div>
 
                 <div class="block-full-width">
                     <label>Địa chỉ</label>
-                    <textarea>123 Lê Lợi, Phường Đông Hòa, Dĩ An</textarea>
+                    <textarea>${address.detailAddress}</textarea>
                 </div>
 
                 <div>
                     <label>Tỉnh/Thành</label>
                     <select>
-                        <option selected>TP. Hồ Chí Minh</option>
-                        <option>Hà Nội</option>
-                        <option>TP. Đà Nẵng</option>
-                        <option>TP. Hải Phòng</option>
-                        <option>TP. Cần Thơ</option>
-                        <option>An Giang</option>
-                        <option>Bắc Ninh</option>
-                        <option>Bến Tre</option>
-                        <option>Cà Mau</option>
-                        <option>Đắk Lắk</option>
-                        <option>Điện Biên</option>
-                        <option>Đồng Nai</option>
-                        <option>Đồng Tháp</option>
-                        <option>Gia Lai</option>
-                        <option>Hà Tĩnh</option>
-                        <option>Hưng Yên</option>
-                        <option>Khánh Hòa</option>
-                        <option>Lâm Đồng</option>
-                        <option>Lạng Sơn</option>
-                        <option>Nghệ An</option>
-                        <option>Ninh Bình</option>
-                        <option>Phú Quốc</option>
-                        <option>Phú Thọ</option>
-                        <option>Quảng Ninh</option>
-                        <option>Quảng Ngãi</option>
-                        <option>Quảng Trị</option>
-                        <option>Sơn La</option>
-                        <option>Tây Ninh</option>
-                        <option>Thái Nguyên</option>
-                        <option>Thanh Hóa</option>
-                        <option>Thừa Thiên Huế</option>
-                        <option>Thừa Thiên Huế</option>
-                        <option>Tuyên Quang</option>
-                        <option>Vĩnh Long</option>
-                        <option>Yên Bái</option>
+                        <option value=""></option>
+                        <option value="hcm" ${address.city == 'hcm' ? 'selected' : ''}>TP. Hồ Chí Minh</option>
+                        <option value="hn" ${address.city == 'hn' ? 'selected' : ''}>Hà Nội</option>
+                        <option value="dn" ${address.city == 'dn' ? 'selected' : ''}>Đà Nẵng</option>
                     </select>
                 </div>
 
                 <div>
                     <label>Trạng thái tài khoản</label>
                     <select>
-                        <option selected>Đang hoạt động</option>
-                        <option>Bị khóa</option>
+                        <option ${acc.status == true ? selected : ''}selected>Đang hoạt động</option>
+                        <option ${acc.status == false ? selected : ''}>Bị khóa</option>
                     </select>
                 </div>
 
@@ -143,5 +114,6 @@
 </div>
 
 </body>
+<script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 
 </html>

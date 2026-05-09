@@ -138,3 +138,27 @@
     .customer-update-view .bt.cancel:hover {
         background-color: #aaa;
     }
+
+    /* Toggle password */
+    .input-box {
+        position: relative;
+    }
+
+    .input-box i.toggle-password {
+        position: absolute;
+        left: auto;
+        right: 13px;
+        top: 33px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        z-index: 10;
+    }
+
+    .input-box i.toggle-password:hover {
+        color: var(--primary-color);
+    }
+
+    .input-box input[type="password"],
+    .input-box input[type="text"] {
+        padding-right: 50px;
+    }
