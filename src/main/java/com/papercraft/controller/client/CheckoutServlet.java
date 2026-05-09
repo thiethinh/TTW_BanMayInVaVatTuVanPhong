@@ -29,6 +29,12 @@ public class CheckoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
 
+        //Kiểm tra Login
+        if (session.getAttribute("acc") == null) {
+            response.sendRedirect(request.getContextPath() + "/login?redirect=/checkout");
+            return;
+        }
+
         User user = (User) session.getAttribute("acc");
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login?redirect=/checkout");
