@@ -51,12 +51,12 @@ public class CartDAO {
     }
 
     //Lưu 1 item vào DB
-    public void updateCartItem(int userId, int productId, int quantity) {
+    public void saveItem(int userId, int productId, int quantity) {
 
         String query = """
-            INSERT INTO cart_items (user_id, product_id, quantity)
+            INSERT INTO cart_item (user_id, product_id, quantity)
             VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE quantity = quantity + ?
+            ON DUPLICATE KEY UPDATE quantity = ?
             """;
 
 
@@ -87,6 +87,22 @@ public class CartDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public void deleteItem(int userId, int productId) {
+        String sql= """
+                Delete from cart_item where user_id= ? and product_id =?""";
+        try(Connection conn = DBConnect.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1,userId);
+            ps.setInt(2,productId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

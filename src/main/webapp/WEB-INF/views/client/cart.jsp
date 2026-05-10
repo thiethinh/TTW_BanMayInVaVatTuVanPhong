@@ -216,6 +216,9 @@
 </c:if>
 
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
+<script>
+    const IS_LOGGED_IN =${not empty sessionScope.acc};
+</script>
 
 <!-- ================= END MAIN===================== -->
 

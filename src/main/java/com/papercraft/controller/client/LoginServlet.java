@@ -1,6 +1,9 @@
 package com.papercraft.controller.client;
 
+import com.papercraft.dao.CartDAO;
 import com.papercraft.dao.UserDAO;
+import com.papercraft.model.Cart;
+import com.papercraft.model.Product;
 import com.papercraft.model.User;
 import com.papercraft.utils.MD5;
 import jakarta.servlet.ServletException;
@@ -44,8 +47,11 @@ public class LoginServlet extends HttpServlet {
             }
 
             HttpSession session = request.getSession();
+            //lấy guest sesion cart
+            Cart guestCart = (Cart) session.getAttribute("cart");
             session.setAttribute("acc", user);
             session.setAttribute("success", "Bạn đã đăng nhập thành công!");
+            mergeCart(guestCart,user.getId(),session);
 
             Cookie uEmail = new Cookie("cEmail", email);
             Cookie uPassword = new Cookie("cPassword", password);
@@ -89,5 +95,26 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("redirect", request.getParameter("redirect"));
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
         }
+    }
+
+    private void mergeCart(Cart guestCart, int userId, HttpSession session) {
+        CartDAO cartDAO= new CartDAO();
+        //lấy cart đang lưu trong db
+        Cart dbCart= cartDAO.getCartByUserId(userId);
+        //merge cart trong cart session hiện tại của guest vào
+        boolean hasGuestItems= (guestCart != null && guestCart.getTotalQuantity() >0);
+
+        if (hasGuestItems){
+            for (Product item : guestCart.list()){
+                dbCart.putWithCheckStock(item,item.getQuantity());
+            }
+            //lưu cart đã merge lại xuống db
+            cartDAO.clearCart(userId);
+
+            for (Product item : dbCart.list()){
+                cartDAO.saveItem(userId, item.getId(),item.getQuantity());
+            }
+        }
+        session.setAttribute("cart",dbCart);
     }
 }
