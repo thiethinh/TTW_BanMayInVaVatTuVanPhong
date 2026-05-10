@@ -179,11 +179,31 @@
                         </p>
                     </h2>
 
-                    <a href="${pageContext.request.contextPath}/checkout"
-                       id="bt-payment"
-                       class="block-bt-payment">
-                        TIẾN HÀNH THANH TOÁN
-                    </a>
+<%--                    <a href="${pageContext.request.contextPath}/checkout"--%>
+<%--                       id="bt-payment"--%>
+<%--                       class="block-bt-payment">--%>
+<%--                        TIẾN HÀNH THANH TOÁN--%>
+<%--                    </a>--%>
+                    <c:choose>
+<%--                        Đã đăng nhập--%>
+                        <c:when test="${not empty sessionScope.acc}">
+                            <a href="${pageContext.request.contextPath}/checkout"
+                                id="bt-payment"
+                                class="block-bt-payment">
+                                TIẾN HÀNH THANH TOÁN
+                            </a>
+                        </c:when>
+<%--                        Chưa ĐĂNG NHẬP--%>
+                        <c:otherwise>
+                            <a href="javascript:void(0)"
+                            id="bt-payment"
+                            class="block-bt-payment"
+                            onclick="handleGuestCheckout()">
+                                TIẾN HÀNH THANH TOÁN
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
+
                     <a href="#" onclick="history.back(); return false;"
                        id="bt-shopping-continous"
                        class="block-bt-shopping-continous">

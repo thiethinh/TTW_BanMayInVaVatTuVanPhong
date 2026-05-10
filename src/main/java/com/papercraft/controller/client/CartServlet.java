@@ -25,11 +25,11 @@ public class CartServlet extends HttpServlet {
         String action= request.getParameter("action");
         HttpSession session = request.getSession();
 
-        //== check login mới được thêm vào gior hàng( chặn từ server) ===
-        if (session.getAttribute("acc") == null && action == null) {
-            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
-            return;
-        }
+//        //== check login mới được thêm vào gior hàng( chặn từ server) ===
+//        if (session.getAttribute("acc") == null && action == null) {
+//            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
+//            return;
+//        }
 
 
         Cart cart = (Cart) session.getAttribute("cart");
