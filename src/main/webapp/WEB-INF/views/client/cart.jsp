@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN"/>
@@ -49,12 +48,36 @@
 
         <div class="container">
             <h1>GIỎ HÀNG CỦA BẠN</h1>
+                <%-- box search--%>
+            <div class="cart-search-wrapper">
+                <div class="cart-search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="cart-search-input"
+                           placeholder="Tìm sản phẩm trong giỏ hàng..."
+                           oninput="searchInCart(this.value)"
+                           autocomplete="off"/>
+                    <button type="button" id="cart-search-clear"
+                            onclick="clearCartSearch()"
+                            style="display: none">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                    <%-- Dropdown autocomplete--%>
+                <ul id="cart-autocomplete" class="cart-autocomplete-list"></ul>
+            </div>
+        <%-- Notify not Found--%>
+            <p id="cart-no-result" style="display: none;color: #e74c3c;padding: 10px 0;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Không tìm thấy sản phẩm nào khớp.
+            </p>
 
             <section class="view">
+
+
                 <div class="product-list">
 
                     <c:forEach items="${items}" var="item">
-                        <div class="product-detail">
+                        <div class="product-detail" id="row-${item.id}">
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
                                 <img src="${item.thumbnail}"/>
                             </a>
@@ -98,15 +121,15 @@
                                     Còn lại trong kho: <strong>${item.stockQuantity}</strong>
                                 </span>
 
-                                    <button id="bt-remove" onclick="removeItem(${item.id})">
-                                        <i class="fa fa-trash-can"></i> Xoá
-                                    </button>
+                                <button id="bt-remove" onclick="removeItem(${item.id})">
+                                    <i class="fa fa-trash-can"></i> Xoá
+                                </button>
 
                             </div>
 
                             <div class="item-cost">
                                 <span class="label">Giá:</span>
-                                <span class="price">
+                                <span class="price" id="item-total-${item.id}">
                                     <fmt:formatNumber value="${item.price * item.quantity}" type="number"
                                                       groupingUsed="true"/> ₫
                                 </span>
@@ -121,33 +144,37 @@
                     <h3>Tóm tắt đơn hàng</h3>
 
                     <p>Tạm tính:
-                        <span>
-                            <fmt:formatNumber value="${subTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                        <span id="bill-subTotal">
+                            <fmt:formatNumber value="${subTotal}" type="number" groupingUsed="true"
+                                              maxFractionDigits="0"/> ₫
                         </span>
                     </p>
 
                     <p>Phí vận chuyển:
-                        <span>
+                        <span id="bill-shippingFee">
                             <c:choose>
                                 <c:when test="${shippingFee == 0}">
                                     <strong style="color: #165FF2;">Miễn phí</strong>
                                 </c:when>
                                 <c:otherwise>
-                                    <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
+                                    <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true"
+                                                      maxFractionDigits="0"/> ₫
                                 </c:otherwise>
                             </c:choose>
                         </span>
                     </p>
 
                     <p>VAT (5%):
-                        <span>
+                        <span id="bill-vat">
                             <fmt:formatNumber value="${vat}" type="number" groupingUsed="true" maxFractionDigits="0"/> ₫
                         </span>
                     </p>
 
                     <h2>Tổng cộng:
                         <p style="color: var(--danger-color);">
-                            <strong><fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true" maxFractionDigits="0"/>
+                            <strong id="bill-grandTotal">
+                                <fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true"
+                                                  maxFractionDigits="0"/>
                                 ₫</strong>
                         </p>
                     </h2>

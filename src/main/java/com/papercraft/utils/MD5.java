@@ -9,7 +9,6 @@ public class MD5 {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] msgDigest = md.digest(input.getBytes());
 
-            // Chuyển byte sang hệ 16 để lưu vào DB
             StringBuilder sb = new StringBuilder();
             for (byte b : msgDigest) {
                 sb.append(String.format("%02x", b));

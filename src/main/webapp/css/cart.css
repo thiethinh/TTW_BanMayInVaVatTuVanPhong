@@ -506,3 +506,82 @@
 .stock-hint strong{
     color: #e53e3e;
 }
+/* Cart Search */
+.cart-search-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.cart-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.cart-search-box:focus-within {
+    border-color: #165FF2;
+}
+
+.cart-search-box i {
+    color: #888;
+}
+
+.cart-search-box input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 15px;
+}
+
+#cart-search-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    font-size: 16px;
+}
+
+/*   autocomplete dropdown  */
+.cart-autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    list-style: none;
+    margin: 0; padding: 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cart-autocomplete-list li {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-autocomplete-list li:hover {
+    background: #f0f4ff;
+    color: #165FF2;
+}
+
+.cart-autocomplete-list li mark {
+    background: #fff3cd;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.cart-autocomplete-list:empty {
+    display: none;
+}

@@ -36,7 +36,7 @@ public class OrderViewServlet extends HttpServlet {
         OrderDAO orderDAO = new OrderDAO();
         Order order = orderDAO.getOrderByID(orderId);
 
-        if (order == null || order.getUserId() != user.getId()) {
+        if (order == null || order.getUserId() != user.getId() && !user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("mod")) {
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
@@ -76,7 +76,7 @@ public class OrderViewServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             Order order = orderDAO.getOrderByID(orderId);
 
-            if (order != null  && order.getUserId() == user.getId() && "pending".equals(order.getStatus())) {
+            if (order != null && order.getUserId() == user.getId() && "pending".equals(order.getStatus())) {
                 boolean isCanceled = orderDAO.updateOrderStatus(orderId, "canceled");
 
                 if (isCanceled) {

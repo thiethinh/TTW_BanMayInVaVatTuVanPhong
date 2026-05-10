@@ -26,12 +26,8 @@ public class CartServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         //== check login mới được thêm vào gior hàng( chặn từ server) ===
-        if (session.getAttribute("acc") == null && !"count".equals(action)) {
-            if(action ==null){
-                response.sendRedirect((request.getContextPath() + "/login?redirect=/cart"));
-            }else{
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
+        if (session.getAttribute("acc") == null && action == null) {
+            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
             return;
         }
 
@@ -75,7 +71,18 @@ public class CartServlet extends HttpServlet {
                 int id = Integer.parseInt(request.getParameter("id"));
                 cart.remove(id);
                 session.setAttribute("cart", cart);
-                response.getWriter().print(cart.getTotalQuantity());
+
+                //Tính lại bill
+                double subTotal = Math.round(cart.total());
+                double shippingFee= (subTotal > 5000000 || subTotal == 0 ) ? 0 : 30000;
+                double vat= Math.round(subTotal * 0.05);
+                double grandTotal= Math.round(subTotal + vat + shippingFee);
+
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter().print(String.format(
+                        "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.0f,\"shippingFee\":%.0f,\"vat\":%.0f,\"grandTotal\":%.0f,\"empty\":%b}",
+                        cart.getTotalQuantity(),subTotal,shippingFee,vat,grandTotal,cart.list().isEmpty()
+                ));
                 return;
             }
             else if("update".equals(action)){
@@ -93,7 +100,19 @@ public class CartServlet extends HttpServlet {
                 if (error != null){
                     sendJson(response, false, error,cart.getTotalQuantity());
                 }else{
-                    sendJson(response,true, null, cart.getTotalQuantity());
+                    double subTotal    = Math.round(cart.total());
+                    double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+                    double vat         = Math.round(subTotal * 0.05);
+                    double grandTotal  = Math.round(subTotal + vat + shippingFee);
+
+                    //Capap nhật giá của item vừa update
+                    double itemTotal = p.getPrice() * quantity;
+
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().print(String.format(
+                            "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.0f,\"shippingFee\":%.0f,\"vat\":%.0f,\"grandTotal\":%.0f,\"itemTotal\":%.0f}",
+                            cart.getTotalQuantity(), subTotal, shippingFee, vat, grandTotal, itemTotal
+                    ));
                 }
                 return;
             }
