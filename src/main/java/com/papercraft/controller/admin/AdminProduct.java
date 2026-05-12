@@ -40,6 +40,20 @@ public class AdminProduct extends HttpServlet {
 
         String type = request.getParameter("type");
         String categoryId = request.getParameter("category");
+
+        if(type != null){
+            type = type.trim();
+            if(type.isEmpty()){
+                type = null;
+            }
+        }
+
+        if(categoryId != null){
+            categoryId = categoryId.trim();
+            if(categoryId.isEmpty()){
+                categoryId = null;
+            }
+        }
         if(type!=null&&categoryId==null){
             type = type.trim();
             CategoryDAO  categoryDAO = new CategoryDAO();

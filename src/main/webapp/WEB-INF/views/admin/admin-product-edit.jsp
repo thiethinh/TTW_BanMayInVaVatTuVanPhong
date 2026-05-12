@@ -22,6 +22,7 @@
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
+
         .current-gallery-item {
             position: relative;
             width: 80px;
@@ -30,11 +31,13 @@
             border-radius: 4px;
             overflow: hidden;
         }
+
         .current-gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         .image-preview-image {
             display: block !important;
             max-width: 100%;
@@ -59,7 +62,8 @@
             </a>
         </header>
 
-        <form action="${pageContext.request.contextPath}/admin-product-edit" method="post" enctype="multipart/form-data" class="admin-form-container">
+        <form action="${pageContext.request.contextPath}/admin-product-edit" method="post" enctype="multipart/form-data"
+              class="admin-form-container">
 
             <input type="hidden" name="id" value="${product.id}">
 
@@ -84,7 +88,7 @@
 
                     <div class="form-group">
                         <label for="product-price">Giá Gốc (đ)</label>
-                        <fmt:formatNumber value="${product.originPrice}" pattern="##0" var="formattedPrice" />
+                        <fmt:formatNumber value="${product.originPrice}" pattern="##0" var="formattedPrice"/>
                         <input type="number" id="product-price" name="price" class="form-input"
                                value="${formattedPrice}" required>
                     </div>
@@ -104,19 +108,41 @@
                     </div>
                     <div class="form-group">
                         <label>Giá bán ra (Read Only)</label>
-                        <input type="text" class="form-input" value="${product.price}" disabled style="background: #f0f0f0;">
+                        <input type="text" class="form-input" value="${product.price}" disabled
+                               style="background: #f0f0f0;">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="product-description">Mô Tả Ngắn</label>
-                    <textarea id="product-description" name="description" class="form-input" rows="6">${product.productDescription}</textarea>
+                    <textarea id="product-description" name="description" class="form-input"
+                              rows="6">${product.productDescription}</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="product-details">Chi Tiết Sản Phẩm (Bullet Points)</label>
-                    <textarea id="product-details" name="details" class="form-input" rows="6">${product.productDetail}</textarea>
-                    <small>Mỗi dòng sẽ là một gạch đầu dòng hiển thị ngoài trang chủ.</small>
+
+                    <label>Chi Tiết Sản Phẩm</label>
+
+                    <!--submit về server -->
+                    <textarea
+                            id="product-details"
+                            name="details"
+                            class="form-input"
+                            rows="6"
+                            hidden
+                    >${product.productDetail}</textarea>
+
+                    <!-- div rỗng chứa dữ liệu ban đầu và thay đổi-->
+                    <div id="raw-data"
+                         data-detail="${product.productDetail}">
+                    </div>
+
+                    <!-- bảng show dễ nhìn -->
+                    <div class="detail-wrapper">
+                        <table class="detail-table">
+                            <tbody id="detail-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -137,7 +163,8 @@
                             </c:choose>
                         </div>
                         <label for="product-image-upload" class="btn btn-secondary">Đổi Ảnh</label>
-                        <input type="file" id="product-image-upload" name="image" accept="image/*" style="display: none;">
+                        <input type="file" id="product-image-upload" name="image" accept="image/*"
+                               style="display: none;">
                     </div>
                 </div>
 
@@ -162,7 +189,8 @@
 
                     <div class="form-group">
                         <label for="product-gallery-upload">Tải Lại Gallery Mới (Sẽ thay thế ảnh cũ)</label>
-                        <input type="file" id="product-gallery-upload" name="gallery" class="form-input" multiple accept="image/*">
+                        <input type="file" id="product-gallery-upload" name="gallery" class="form-input" multiple
+                               accept="image/*">
                         <small>Giữ Ctrl để chọn nhiều ảnh (Tối đa 5).</small>
                     </div>
                 </div>
@@ -173,16 +201,72 @@
         </form>
     </main>
 </div>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // lấy dữ liệu thô
+        const rawData = document.getElementById("raw-data").dataset.detail;
+        const tbody = document.getElementById("detail-body");
+        if (!rawData) return;
+        // tách từng cặp
+        const items = rawData.split("#");
+
+        items.forEach(item => {
+            const index = item.indexOf(":");
+            if (index === -1) return;
+            const key = item.substring(0, index).trim();
+            const value = item.substring(index + 1).trim();
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="detail-title">\${key}</td>
+                <td class="detail-content">
+                    <textarea class="detail-input" data-key="\${key}">\${value}</textarea>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // update raw data khi edit
+        document.addEventListener("input", function () {
+            let result = [];
+            document.querySelectorAll(".detail-input")
+                .forEach(input => {
+                    const key = input.dataset.key;
+                    const value = input.value.trim();
+                    result.push(`\${key}: \${value}`);
+                });
+
+            // cập nhật textarea hidden
+            document.getElementById("product-details")
+                .value = result.join("#");
+        });
+
+        function autoResize(textarea){
+            textarea.style.height = "32px";
+            textarea.style.height =
+                textarea.scrollHeight + "px";
+        }
+
+        document.querySelectorAll(".detail-input")
+            .forEach(input => {
+                autoResize(input);
+                input.addEventListener("input", () => {
+                    autoResize(input);
+                });
+            });
+    });
+
+</script>
 
 <script>
     const imageUpload = document.getElementById('product-image-upload');
     const imagePreview = document.getElementById('image-preview');
 
-    imageUpload.addEventListener('change', function() {
+    imageUpload.addEventListener('change', function () {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 imagePreview.innerHTML = '<img src="' + e.target.result + '" class="image-preview-image">';
             }
             reader.readAsDataURL(file);
