@@ -96,7 +96,7 @@ public class AdminProductEdit extends HttpServlet {
             int stock = stockStr.isEmpty() ? old.getStockQuantity() : Integer.parseInt(stockStr);
 
             // Tính  giá bán
-            double salePrice = originPrice * (1.0 - discount);
+            //double salePrice = originPrice * (1.0 - discount);
 
             Product updated = new Product();
             updated.setId(id);
@@ -104,13 +104,13 @@ public class AdminProductEdit extends HttpServlet {
             updated.setCategoryId(categoryId);
             updated.setOriginPrice(originPrice);
             updated.setDiscount(discount);
-            updated.setPrice(salePrice);
+            //updated.setPrice(salePrice);
             updated.setStockQuantity(stock);
             updated.setProductDescription(description);
             updated.setProductDetail(details);
 
             // Update thông tin text
-            dao.updateProduct(updated);
+            boolean isUpdated = dao.updateProduct(updated);
 
             //    ẢNH
             String uploadDirPath = getServletContext().getRealPath("/images/upload");
@@ -158,7 +158,7 @@ public class AdminProductEdit extends HttpServlet {
                 }
             }
 
-            response.sendRedirect(request.getContextPath() + "/admin-product?msg=update_success");
+            response.sendRedirect(request.getContextPath() + "/admin-product-edit?id="+categoryId+"&msg=update_success");
 
         } catch (Exception e) {
             e.printStackTrace();

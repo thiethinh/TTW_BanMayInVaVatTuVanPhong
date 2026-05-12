@@ -348,13 +348,47 @@ public class ProductDAO {
     }
 
     // =========UpdateProduct =========
+//    public boolean updateProduct(Product p) {
+//        String sql = """
+//                UPDATE product
+//                        SET category_id = ?, product_name = ?, product_description = ?, product_detail = ?,
+//                            origin_price = ?, price = ?, stock_quantity = ?
+//                        WHERE id = ?
+//                """;
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//
+//            ps.setInt(1, p.getCategoryId());
+//            ps.setString(2, p.getProductName());
+//            ps.setString(3, p.getProductDescription());
+//            ps.setString(4, p.getProductDetail());
+//            ps.setDouble(5, p.getOriginPrice());
+//            ps.setDouble(6, p.getPrice());
+//            ps.setInt(7, p.getStockQuantity());
+//            ps.setInt(8, p.getId());
+//
+//            return ps.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+    //field price my sql computed
     public boolean updateProduct(Product p) {
+
         String sql = """
-                UPDATE product
-                        SET category_id = ?, product_name = ?, product_description = ?, product_detail = ?,
-                            origin_price = ?, price = ?, stock_quantity = ?
-                        WHERE id = ?
-                """;
+            UPDATE product
+            SET category_id = ?,
+                product_name = ?,
+                product_description = ?,
+                product_detail = ?,
+                origin_price = ?,
+                stock_quantity = ?
+            WHERE id = ?
+            """;
+
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -363,14 +397,14 @@ public class ProductDAO {
             ps.setString(3, p.getProductDescription());
             ps.setString(4, p.getProductDetail());
             ps.setDouble(5, p.getOriginPrice());
-            ps.setDouble(6, p.getPrice());
-            ps.setInt(7, p.getStockQuantity());
-            ps.setInt(8, p.getId());
+            ps.setInt(6, p.getStockQuantity());
+            ps.setInt(7, p.getId());
 
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (Exception e) {
+        }catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

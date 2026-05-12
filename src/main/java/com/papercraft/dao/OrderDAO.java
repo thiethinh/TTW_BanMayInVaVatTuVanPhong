@@ -274,4 +274,130 @@ public class OrderDAO {
         }
         return 0;
     }
+
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        String sql = """
+                SELECT o.id, u.fullname, o.created_at, o.total_price, o.status
+                FROM orders o
+                JOIN users u ON u.id = o.user_id
+                ORDER BY o.created_at DESC
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setId(rs.getInt("id"));
+                    order.setShippingName(rs.getString("fullname"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setStatus(rs.getString("status"));
+                    orders.add(order);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
+
+    // search theo ngày
+    public List<Order> searchOrderByDate(
+            int year,
+            int month,
+            int day
+    ) {
+
+        List<Order> orders = new ArrayList<>();
+
+        String sql = """
+            SELECT o.id, u.fullname, o.created_at,
+                   o.total_price, o.status
+            FROM orders o
+            JOIN users u ON u.id = o.user_id
+            WHERE YEAR(o.created_at) = ?
+              AND MONTH(o.created_at) = ?
+              AND DAY(o.created_at) = ?
+            ORDER BY o.created_at DESC
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, year);
+            ps.setInt(2, month);
+            ps.setInt(3, day);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Order order = new Order();
+
+                    order.setId(rs.getInt("id"));
+                    order.setShippingName(rs.getString("fullname"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setStatus(rs.getString("status"));
+
+                    orders.add(order);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orders;
+    }
+    // search theo tháng
+    public List<Order> searchOrderByMonth(
+            int year,
+            int month
+    ) {
+
+        List<Order> orders = new ArrayList<>();
+
+        String sql = """
+            SELECT o.id, u.fullname, o.created_at,
+                   o.total_price, o.status
+            FROM orders o
+            JOIN users u ON u.id = o.user_id
+            WHERE YEAR(o.created_at) = ?
+              AND MONTH(o.created_at) = ?
+            ORDER BY o.created_at DESC
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, year);
+            ps.setInt(2, month);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Order order = new Order();
+
+                    order.setId(rs.getInt("id"));
+                    order.setShippingName(rs.getString("fullname"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setStatus(rs.getString("status"));
+
+                    orders.add(order);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orders;
+    }
 }

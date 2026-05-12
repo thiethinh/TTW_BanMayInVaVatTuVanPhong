@@ -96,6 +96,66 @@ textarea.form-input {
     margin-right: 8px;
 }
 
+/*table infomation details*/
+.detail-wrapper{
+    margin-top: 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.detail-table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.detail-table tr{
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-table tr:last-child{
+    border-bottom: none;
+}
+
+.detail-title{
+    width: 220px;
+    background: #f7f8fa;
+    padding: 10px 14px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    vertical-align: top;
+    border-right: 1px solid #eee;
+    line-height: 1.5;
+}
+
+.detail-content{
+    padding: 6px 10px;
+}
+
+.detail-input{
+    width: 100%;
+    min-height: 25px;
+    overflow: hidden;
+    padding: 6px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    transition: 0.2s ease;
+    box-sizing: border-box;
+}
+
+.detail-input:focus{
+    border-color: #4096ff;
+    box-shadow: 0 0 0 2px rgba(64,150,255,0.15);
+}
+
+
 /* ----- Image Uploader ----- */
 .image-uploader {
     display: flex;
