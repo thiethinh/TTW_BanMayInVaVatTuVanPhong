@@ -83,6 +83,15 @@
             </li>
             </c:if>
 
+            <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('banner-manage')}">
+                <li>
+                    <a href="${pageContext.request.contextPath}/admin-banner"
+                       class="${fn:contains(uri, 'admin-banner') ? 'active' : ''}">
+                        <i class="fa-solid fa-gear"></i> Quản Lí Banner
+                    </a>
+                </li>
+            </c:if>
+
         </ul>
     </nav>
 
