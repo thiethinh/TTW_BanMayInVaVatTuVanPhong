@@ -5,9 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.papercraft.dao.CartDAO;
 import com.papercraft.dao.ProductDAO;
 import com.papercraft.model.Cart;
 import com.papercraft.model.Product;
+import com.papercraft.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,11 +27,11 @@ public class CartServlet extends HttpServlet {
         String action= request.getParameter("action");
         HttpSession session = request.getSession();
 
-        //== check login mới được thêm vào gior hàng( chặn từ server) ===
-        if (session.getAttribute("acc") == null && action == null) {
-            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
-            return;
-        }
+//        //== check login mới được thêm vào gior hàng( chặn từ server) ===
+//        if (session.getAttribute("acc") == null && action == null) {
+//            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
+//            return;
+//        }
 
 
         Cart cart = (Cart) session.getAttribute("cart");
@@ -38,6 +40,7 @@ public class CartServlet extends HttpServlet {
             session.setAttribute("cart",cart);
         }
         ProductDAO dao = new ProductDAO();
+        CartDAO cartDAO= new CartDAO();
         try{
             if("add".equals(action)){
                 int id=Integer.parseInt(request.getParameter("id"));
@@ -61,6 +64,13 @@ public class CartServlet extends HttpServlet {
                     sendJson(response, true, error, cart.getTotalQuantity());
 
                 }
+                if (session.getAttribute("acc") != null){
+                    User user= (User) session.getAttribute("acc");
+                    Product inCart= cart.get(id);
+                    if (inCart != null){
+                        cartDAO.saveItem(user.getId(), id, inCart.getQuantity());
+                    }
+                }
                 return;
             }
             else if ("count".equals(action)) {
@@ -83,6 +93,10 @@ public class CartServlet extends HttpServlet {
                         "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.0f,\"shippingFee\":%.0f,\"vat\":%.0f,\"grandTotal\":%.0f,\"empty\":%b}",
                         cart.getTotalQuantity(),subTotal,shippingFee,vat,grandTotal,cart.list().isEmpty()
                 ));
+                if (session.getAttribute("acc") != null){
+                    User user= (User) session.getAttribute("acc");
+                    cartDAO.deleteItem(user.getId(),id);
+                }
                 return;
             }
             else if("update".equals(action)){
@@ -113,6 +127,10 @@ public class CartServlet extends HttpServlet {
                             "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.0f,\"shippingFee\":%.0f,\"vat\":%.0f,\"grandTotal\":%.0f,\"itemTotal\":%.0f}",
                             cart.getTotalQuantity(), subTotal, shippingFee, vat, grandTotal, itemTotal
                     ));
+                }
+                if (session.getAttribute("acc") != null && error == null){
+                    User user = (User) session.getAttribute("acc");
+                    cartDAO.saveItem(user.getId(),id,quantity);
                 }
                 return;
             }
