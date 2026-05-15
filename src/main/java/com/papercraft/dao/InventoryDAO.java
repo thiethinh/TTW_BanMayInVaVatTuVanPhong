@@ -71,17 +71,25 @@ public class InventoryDAO {
         return false;
     }
 
-    public List<InventoryTransaction> getAllTransactions() {
+    public List<InventoryTransaction> getAllTransactions(String type) {
         List<InventoryTransaction> result = new ArrayList<>();
-        String sql = """
+        StringBuilder sql = new StringBuilder("""
                 SELECT i.*, u.fullname AS admin_name
                 FROM inventory_transactions i
                 JOIN users u ON i.user_id = u.id
-                ORDER BY i.created_at DESC
-                """;
+                """);
+
+        if (type != null && !type.trim().isEmpty() && !type.equals("all")) {
+            sql.append(" WHERE i.transaction_type = ? ");
+        }
+        sql.append(" ORDER BY i.created_at DESC");
 
         try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString());) {
+            if (type != null && !type.trim().isEmpty() && !type.equals("all")) {
+                ps.setString(1, type);
+            }
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 InventoryTransaction transaction = new InventoryTransaction();
