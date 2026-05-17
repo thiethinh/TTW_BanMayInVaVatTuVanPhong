@@ -27,7 +27,7 @@
         <div class="admin-header">
             <h1>Quản Lý Banner</h1>
 
-            <form action="admin-banners" method="get" class="searchbox">
+            <form action="admin-banner" method="get" class="searchbox">
                 <input type="text"
                        name="keyword"
                        value="${keyword}"
@@ -36,8 +36,12 @@
 
                 <button type="submit">Tìm</button>
 
+                <button type="button" onclick="window.location.href=location.search.includes('get-active')? 'admin-banner': 'admin-banner?action=get-active'">
+                    ${param.action == 'get-active'?'Tất cả banner'  : 'Banner đang hiển thị'}
+                </button>
+
                 <button type="button"
-                        onclick="window.location.href='admin-banner-form'">
+                        onclick="window.location.href='admin-banner?action=add-banner'">
                     Thêm Banner
                 </button>
             </form>
@@ -78,7 +82,7 @@
 
                         <td class="status-col">
 
-                            <a href="admin-banners?action=toggle&id=${b.id}">
+                            <a href="admin-banner?action=toggle&id=${b.id}">
                                 <c:choose>
                                     <c:when test="${b.active}">
                                         <i class="fa-solid fa-square-check"
@@ -98,21 +102,16 @@
 
                         <td class="action-col">
 
-                            <a href="admin-banner-form?id=${b.id}"
+                            <a href="admin-banner?action=edit&id=${b.id}"
                                class="btn-edit">
                                 Sửa
                             </a>
-
-                            <a href="#"
-                               class="btn-delete"
-                               data-id="${b.id}">
+                            <a href="admin-banner?action=delete&id=${b.id}"
+                               class="btn-delete">
                                 Xóa
                             </a>
-
                         </td>
-
                     </tr>
-
                 </c:forEach>
 
                 <c:if test="${empty banners}">
@@ -124,13 +123,9 @@
                 </c:if>
 
                 </tbody>
-
             </table>
-
         </section>
-
     </main>
 </div>
 </body>
-
 </html>

@@ -18,7 +18,7 @@ public class BannerDAO {
         String sql = """
                 SELECT *
                 FROM banner
-                WHERE title LIKE ?
+                WHERE title LIKE ? AND is_deleted=0
                 ORDER BY sort_order ASC
                 """;
 
@@ -58,7 +58,7 @@ public class BannerDAO {
         String sql = """
                 SELECT *
                 FROM banner
-                WHERE is_active = 1
+                WHERE is_active = 1 AND is_deleted=0
                 ORDER BY sort_order ASC
                 """;
 
@@ -93,7 +93,7 @@ public class BannerDAO {
         String sql = """
                 UPDATE banner
                 SET is_active = NOT is_active
-                WHERE id = ?
+                WHERE id = ? AND is_deleted=0
                 """;
 
         try (Connection conn = DBConnect.getConnection();
@@ -110,7 +110,7 @@ public class BannerDAO {
 
     public void deleteBanner(int id) {
 
-        String sql = "DELETE FROM banner WHERE id = ?";
+        String sql = "UPDATE banner SET is_deleted = 1 WHERE id = ?";
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -122,5 +122,62 @@ public class BannerDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateBanner(Banner b) {
+
+        String sql = """
+            UPDATE banners
+            SET
+            title = ?,
+            img_name = ?,
+            is_active = ?,
+            sort_order = ?
+            WHERE id = ?
+            """;
+
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, b.getTitle());
+            ps.setString(2, b.getImgName());
+            ps.setBoolean(3, b.isActive());
+            ps.setInt(4, b.getSortOrder());
+            ps.setInt(5, b.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Banner getBannerById(int id) {
+        String sql = "SELECT * FROM banner WHERE id = ?";
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1,id);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+
+                Banner b = new Banner();
+
+                b.setId(rs.getInt("id"));
+                b.setTitle(rs.getString("title"));
+                b.setImgName(rs.getString("img_name"));
+                b.setImagePath(rs.getString("img_name"));
+                b.setActive(rs.getBoolean("is_active"));
+                b.setSortOrder(rs.getInt("sort_order"));
+
+                return b;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
     }
 }
