@@ -29,6 +29,15 @@
             </li>
             </c:if>
 
+            <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('inventory-manage')}">
+                <li>
+                    <a href="${pageContext.request.contextPath}/admin/inventory-history"
+                       class="${fn:contains(uri, 'admin-inventory') ? 'active' : ''}">
+                        <i class="fa-solid fa-warehouse"></i> Quản Lý Kho
+                    </a>
+                </li>
+            </c:if>
+
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('review-manage')}">
             <li>
                 <a href="${pageContext.request.contextPath}/admin-review"

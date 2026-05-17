@@ -129,6 +129,9 @@
                                                 <option value="product-manage" ${fn:contains(u.permissions, 'product-manage') ? 'selected' : ''}>
                                                     Quản lý Sản phẩm
                                                 </option>
+                                                <option value="inventory-manage" ${fn:contains(u.permissions, 'inventory-manage') ? 'selected' : ''}>
+                                                    Quản lý Kho
+                                                </option>
                                                 <option value="review-manage" ${fn:contains(u.permissions, 'review-manage') ? 'selected' : ''}>
                                                     Quản lý Đánh giá
                                                 </option>

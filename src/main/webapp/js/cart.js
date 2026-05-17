@@ -288,6 +288,24 @@ function highlightKeyword(name, words) {
     return result;
 }
 
+function handleGuestCheckout(){
+    Swal.fire({
+        icon: 'info',
+        title: 'Bạn chưa đăng nhập!',
+        text: 'Vui lòng đăng nhập để tiến hành thanh toán.',
+        showCancelButton: true,
+        cancelButtonText: 'Để sau',
+        cancelButtonColor: '#718096',
+        confirmButtonText: 'Đăng nhập ngay',
+        confirmButtonColor: '#165FF2',
+        reverseButtons: true
+    }).then(function (result){
+        if (result.isConfirmed){
+            window.location.href= contextPath + '/login?redirect=/checkout';
+        }
+    })
+}
+
 //xoas kí tự trong ô tìm kiếm khi bấm x
 function clearCartSearch() {
     let input = document.getElementById('cart-search-input');
