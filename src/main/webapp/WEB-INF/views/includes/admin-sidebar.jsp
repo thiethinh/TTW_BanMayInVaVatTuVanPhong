@@ -96,7 +96,7 @@
                 <li>
                     <a href="${pageContext.request.contextPath}/admin-banner"
                        class="${fn:contains(uri, 'admin-banner') ? 'active' : ''}">
-                        <i class="fa-solid fa-gear"></i> Quản Lí Banner
+                        <i class="fa-solid fa-images"></i> Quản Lí Banner
                     </a>
                 </li>
             </c:if>

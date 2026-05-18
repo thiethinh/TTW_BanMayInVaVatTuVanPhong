@@ -58,20 +58,20 @@
                     </div>
                     <div class="form-group">
                         <label for="product-price">Giá (đ)</label>
-                        <input type="number" id="product-price" name="price" class="form-input" placeholder="Ví dụ: 4500000" required>
+                        <input type="text" id="product-price"  name="price" class="form-input" placeholder="Ví dụ: 4500000" required>
                     </div>
                 </div>
                     <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr  ; gap: 15px;">
 
-                    <div class="form-group">
-                        <label for="product-discount">Giảm giá (%)</label>
-                        <input type="number" id="product-discount" name="discount" class="form-input" placeholder="0 - 100" min="0" max="100" value="0">
-                    </div>
+                        <div class="form-group">
+                            <label for="product-discount">Giảm giá</label>
+                            <input type="text" id="product-discount" name="discount" class="form-input" placeholder="0.0 - 1.0" min="0" max="1" step="0.01" value="0.0" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="product-amount">Số lượng kho</label>
-                        <input type="number" id="product-amount" name="stock" class="form-input" placeholder="Số lượng: 10" required>
-                    </div>
+                        <div class="form-group">
+                            <label for="product-amount">Số lượng kho</label>
+                            <input type="text" id="product-amount" name="stock" class="form-input" placeholder="Số lượng: 10" required>
+                        </div>
                 </div>
 
                 <div class="form-group">
