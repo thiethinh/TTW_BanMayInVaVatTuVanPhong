@@ -20,7 +20,7 @@ public class ProductDAO {
                                     FROM product p
                                     JOIN category c ON p.category_id = c.id
                                     JOIN image i ON p.id = i.entity_id
-                                    WHERE i.is_thumbnail = 1 AND i.entity_type = 'Product';
+                                    WHERE i.is_thumbnail = 1 AND i.entity_type = 'Product' AND p.is_deleted=0;
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -65,7 +65,7 @@ public class ProductDAO {
                                     FROM product p
                                     JOIN category c ON p.category_id = c.id
                                     JOIN image i ON p.id = i.entity_id
-                                    WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product';
+                                    WHERE c.type = ? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'  AND p.is_deleted=0;
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,7 +110,7 @@ public class ProductDAO {
                                     FROM product p
                                     JOIN category c ON p.category_id = c.id
                                     JOIN image i ON p.id = i.entity_id
-                                    WHERE c.type = ? AND c.id =? AND i.is_thumbnail = 1 AND i.entity_type = 'Product';
+                                    WHERE c.type = ? AND c.id =? AND i.is_thumbnail = 1 AND i.entity_type = 'Product'  AND p.is_deleted=0;
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -223,7 +223,7 @@ public class ProductDAO {
     // =========== delete product ============
     public boolean deleteProductById(int id) {
         String sql = """
-                DELETE FROM product
+                UPDATE product set is_deleted=1
                 WHERE id =?
                 """;
         try (Connection conn = DBConnect.getConnection();
@@ -250,7 +250,7 @@ public class ProductDAO {
                                 LEFT JOIN image i ON i.entity_id = p.id
                                 AND i.is_thumbnail = 1
                                 AND i.entity_type = 'Product'
-                                WHERE c.type = ?
+                                WHERE c.type = ? AND p.is_deleted=0
                                 ORDER BY p.discount DESC
                                 LIMIT 10;
                 """;
@@ -308,6 +308,7 @@ public class ProductDAO {
                 LEFT JOIN image i ON p.id = i.entity_id
                     AND i.is_thumbnail = 1
                     AND i.entity_type = 'Product'
+                    AND p.is_deleted=0
                 WHERE p.id = ?
                 """;
         try (Connection conn = DBConnect.getConnection();
@@ -451,7 +452,7 @@ public class ProductDAO {
                      GROUP BY oi.product_id
                  ) s ON s.product_id = p.id
          
-                 WHERE c.type = ?
+                 WHERE c.type = ? AND p.is_deleted=0
              """
         );
 
@@ -525,7 +526,7 @@ public class ProductDAO {
     //======= countProducts =====
     public int countProducts(String keyword) {
         String sql = """
-                SELECT COUNT(*) FROM product WHERE product_name LIKE ?
+                SELECT COUNT(*) FROM product WHERE product_name LIKE ? AND p.is_deleted=0
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -555,7 +556,7 @@ public class ProductDAO {
                 SELECT DISTINCT p.brand
                 FROM product p
                 JOIN category c on c.id = p.category_id
-                WHERE c.type = ?
+                WHERE c.type = ? AND p.is_deleted=0
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -590,7 +591,7 @@ public class ProductDAO {
                     LEFT JOIN image i ON i.entity_id = p.id
                         AND i.entity_type = 'Product'
                         AND i.is_thumbnail = 1
-                    WHERE p.id = ?
+                    WHERE p.id = ? AND p.is_deleted=0
                 """;
 
         try (Connection conn = DBConnect.getConnection();
@@ -642,7 +643,7 @@ public class ProductDAO {
                            ON i.entity_id = p.id 
                           AND i.entity_type = 'Product'
                           AND i.is_thumbnail = 1
-                    WHERE LOWER(p.product_name) LIKE ?
+                    WHERE LOWER(p.product_name) LIKE ? AND p.is_deleted=0
                     ORDER BY p.id ASC
                 """;
 
@@ -681,7 +682,7 @@ public class ProductDAO {
                 SELECT p.product_name
                 FROM product p
                 JOIN category c ON c.id = p.category_id
-                WHERE p.product_name LIKE ? COLLATE utf8mb4_general_ci AND c.type = ?
+                WHERE p.product_name LIKE ? COLLATE utf8mb4_general_ci AND c.type = ? AND p.is_deleted=0
                 LIMIT 5
                 """;
         try (Connection conn = DBConnect.getConnection();
