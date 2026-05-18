@@ -127,7 +127,7 @@ public class BannerDAO {
     public void updateBanner(Banner b) {
 
         String sql = """
-            UPDATE banners
+            UPDATE banner
             SET
             title = ?,
             img_name = ?,
@@ -171,7 +171,6 @@ public class BannerDAO {
                 b.setImagePath(rs.getString("img_name"));
                 b.setActive(rs.getBoolean("is_active"));
                 b.setSortOrder(rs.getInt("sort_order"));
-
                 return b;
             }
 
@@ -180,4 +179,26 @@ public class BannerDAO {
         }
         return  null;
     }
+
+    public int insertBanner(Banner b) {
+        String sql = """
+            INSERT INTO banner(title,img_name,is_active,sort_order)
+            VALUES(?,?,?,?)
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1,b.getTitle());
+            ps.setString(2,b.getImgName());
+            ps.setBoolean(3,b.isActive());
+            ps.setInt(4,b.getSortOrder());
+            return ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  0;
+    }
+
 }
