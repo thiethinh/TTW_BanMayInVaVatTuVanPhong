@@ -1,5 +1,8 @@
-const contextPath = document.body.getAttribute('data-context') || "";
-
+const contextPath =
+    document.body.getAttribute('data-context')
+    || document.getElementById('globalContextPath')?.value
+    || window.CONTEXT_PATH
+    || "";
 
 function addToCart(productId, quantity = 1) {
 
@@ -90,7 +93,10 @@ function updateCartBadge(count) {
 function updateCartCount() {
     fetch(`${contextPath}/cart?action=count`)
         .then(res => res.text())
-        .then(count => updateCartBadge(parseInt(count)) || 0);
+        .then(count => {
+            updateCartBadge(parseInt(count) || 0);
+        })
+        .catch(err => console.error("Lỗi updateCartCount:", err));
 }
 
 // ==== remove Item
