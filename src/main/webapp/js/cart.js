@@ -160,6 +160,10 @@ function updateBillUI(data) {
     updateCartBadge(data.cartCount)
 }
 
+function handleSelectiveCheckout(isLoggedIn) {
+    //TODO
+}
+
 // cart search
 let cartItems = [];
 
@@ -319,6 +323,8 @@ function clearCartSearch() {
     input.focus();
     searchInCart('');
 }
+
+
 
 //dóng dropdown khi bấm ra vùng bên ngoài
 document.addEventListener('click', function (e) {
