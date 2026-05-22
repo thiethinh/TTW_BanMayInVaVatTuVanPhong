@@ -26,19 +26,21 @@
 
         <header class="admin-content-header">
             <h1>Thêm Sản Phẩm Mới</h1>
-            <a href="${pageContext.request.contextPath}/admin-product" class="btn btn-secondary">
+            <a href="javascript:history.back()" class="btn btn-secondary">
 
-            <i class="fa-solid fa-arrow-left"></i> Quay Lại Danh Sách
+                <i class="fa-solid fa-arrow-left"></i> Quay Lại Danh Sách
             </a>
         </header>
 
-        <form action="${pageContext.request.contextPath}/AddProductServlet" method="post" enctype="multipart/form-data"     class="admin-form-container">
+        <form action="${pageContext.request.contextPath}/AddProductServlet" method="post" enctype="multipart/form-data"
+              class="admin-form-container">
             <div class="admin-form-card">
                 <h2 class="form-card-title">Thông Tin Sản Phẩm</h2>
 
                 <div class="form-group">
                     <label for="product-name">Tên Sản Phẩm</label>
-                    <input type="text" id="product-name" name="name" class="form-input" placeholder="Ví dụ: Máy in Epson L3250" required>
+                    <input type="text" id="product-name" name="name" class="form-input"
+                           placeholder="Ví dụ: Máy in Epson L3250" required>
                 </div>
 
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr ; gap: 15px;">
@@ -58,20 +60,23 @@
                     </div>
                     <div class="form-group">
                         <label for="product-price">Giá (đ)</label>
-                        <input type="text" id="product-price"  name="price" class="form-input" placeholder="Ví dụ: 4500000" required>
+                        <input type="text" id="product-price" name="price" class="form-input"
+                               placeholder="Ví dụ: 4500000" required>
                     </div>
                 </div>
-                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr  ; gap: 15px;">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr  ; gap: 15px;">
 
-                        <div class="form-group">
-                            <label for="product-discount">Giảm giá</label>
-                            <input type="text" id="product-discount" name="discount" class="form-input" placeholder="0.0 - 1.0" min="0" max="1" step="0.01" value="0.0" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="product-discount">Giảm giá</label>
+                        <input type="text" id="product-discount" name="discount" class="form-input"
+                               placeholder="0.0 - 1.0" min="0" max="1" step="0.01" value="0.0" required>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="product-amount">Số lượng kho</label>
-                            <input type="text" id="product-amount" name="stock" class="form-input" placeholder="Số lượng: 10" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="product-amount">Số lượng kho</label>
+                        <input type="text" id="product-amount" name="stock" class="form-input"
+                               placeholder="Số lượng: 10" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -110,20 +115,37 @@
                                         <option value="multifunction">Máy In Đa Năng</option>
                                     </select>
                                 </div>
-                                <div class="form-group"><label>Thương hiệu</label><input type="text" data-key="brand" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Tốc độ in</label><input type="text" data-key="speed" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Độ phân giải</label><input type="text" data-key="resolution" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Kết nối</label><input type="text" data-key="connection" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Trọng lượng</label><input type="text" data-key="weight" class="spec-input form-input"></div>
+                                <div class="form-group"><label>Thương hiệu</label><input type="text" data-key="brand"
+                                                                                         class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Tốc độ in</label><input type="text" data-key="speed"
+                                                                                       class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Độ phân giải</label><input type="text"
+                                                                                          data-key="resolution"
+                                                                                          class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Kết nối</label><input type="text" data-key="connection"
+                                                                                     class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Trọng lượng</label><input type="text" data-key="weight"
+                                                                                         class="spec-input form-input">
+                                </div>
                             </div>
                         </div>
 
                         <div id="specs-stationery" class="specs-group">
                             <div class="form-row" style="grid-template-columns: 1fr 1fr;">
 
-                                <div class="form-group"><label>Thương hiệu</label><input type="text" data-key="brand" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Đơn vị tính</label><input type="text" data-key="unit" class="spec-input form-input"></div>
-                                <div class="form-group"><label>Xuất xứ</label><input type="text" data-key="origin" class="spec-input form-input"></div>
+                                <div class="form-group"><label>Thương hiệu</label><input type="text" data-key="brand"
+                                                                                         class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Đơn vị tính</label><input type="text" data-key="unit"
+                                                                                         class="spec-input form-input">
+                                </div>
+                                <div class="form-group"><label>Xuất xứ</label><input type="text" data-key="origin"
+                                                                                     class="spec-input form-input">
+                                </div>
                             </div>
                         </div>
 
@@ -138,11 +160,13 @@
                     <h2 class="form-card-title">Ảnh Đại Diện</h2>
                     <div class="image-uploader">
                         <div class="image-preview" id="image-preview">
-                            <img src="${pageContext.request.contextPath}/images/upload/${imgName}" class="image-preview-image" style="display: none;">
+                            <img src="${pageContext.request.contextPath}/images/upload/${imgName}"
+                                 class="image-preview-image" style="display: none;">
                             <span class="image-preview-text">Chưa chọn ảnh</span>
                         </div>
                         <label for="product-image-upload" class="btn btn-secondary">Tải Ảnh Lên</label>
-                        <input type="file" id="product-image-upload" name="image" accept="image/*" style="display: none;">
+                        <input type="file" id="product-image-upload" name="image" accept="image/*"
+                               style="display: none;">
                     </div>
                 </div>
 
@@ -151,7 +175,8 @@
 
                     <div class="form-group">
                         <label for="product-gallery-upload">Tải Thêm Ảnh</label>
-                        <input type="file" id="product-gallery-upload" name="gallery" class="form-input" multiple accept="image/*">
+                        <input type="file" id="product-gallery-upload" name="gallery" class="form-input" multiple
+                               accept="image/*">
                         <small>Giữ Ctrl để chọn nhiều ảnh (Tối đa 5).</small>
                     </div>
 
