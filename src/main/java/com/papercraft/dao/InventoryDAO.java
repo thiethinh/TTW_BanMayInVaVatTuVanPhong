@@ -36,8 +36,8 @@ public class InventoryDAO {
 
             String sqlDetail = "INSERT INTO inventory_transaction_details (transaction_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
             String sqlUpdateStock = transaction.getTransactionType().equals("IMPORT")
-                    ? "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?"
-                    : "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+                    ? "UPDATE product SET stock_quantity = stock_quantity + ? WHERE id = ? AND is_deleted = 0"
+                    : "UPDATE product SET stock_quantity = stock_quantity - ? WHERE id = ? AND is_deleted = 0";
 
             psDetail = conn.prepareStatement(sqlDetail);
             psUpdateStock = conn.prepareStatement(sqlUpdateStock);

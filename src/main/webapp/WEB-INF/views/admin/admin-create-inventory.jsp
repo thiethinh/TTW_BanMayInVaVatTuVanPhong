@@ -26,10 +26,12 @@
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
 
-        <c:if test="${not empty sessionScope.error}">
-            <div class="alert alert-danger" style="color: red; margin: 10px 0;">${sessionScope.error}</div>
-            <c:remove var="error" scope="session"/>
-        </c:if>
+        <div id="error-msg-container">
+            <c:if test="${not empty sessionScope.error}">
+                <div class="alert alert-danger" style="color: red; margin: 10px 0;">${sessionScope.error}</div>
+                <c:remove var="error" scope="session"/>
+            </c:if>
+        </div>
 
         <form action="${pageContext.request.contextPath}/admin/create-inventory" method="POST" id="inventoryForm">
             <div class="form-section">
@@ -51,17 +53,16 @@
             <div class="form-section">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h4>Chi tiết sản phẩm</h4>
-                    <a href="${pageContext.request.contextPath}/admin-product-add" class="btn btn-success"
-                       id="addRowBtn">
-                        <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm Mới
-                    </a>
+                    <button type="button" class="btn btn-success" id="addRowBtn">
+                        <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm
+                    </button>
                 </div>
 
                 <table class="table-products" id="productTable">
                     <thead>
                     <tr>
                         <th style="width: 35%;">Sản phẩm</th>
-                        <th style="width: 20%;">Số lượng</th>
+                        <th style="width: 15%;">Số lượng</th>
                         <th style="width: 20%;">Đơn giá (đ)</th>
                         <th style="width: 20%;">Thành tiền (đ)</th>
                         <th style="width: 10%;">Xóa</th>
@@ -82,12 +83,11 @@
                                 </c:if>
                             </select>
                         </td>
-                        <td><input type="number" name="quantity[]" class="form-control" min="1" required></td>
-                        <td><input type="number" name="price[]" class="form-control" min="0" required></td>
+                        <td><input type="number" name="quantity[]" class="form-control qty-input" min="1" required></td>
+                        <td><input type="number" name="price[]" class="form-control price-input" min="0" required></td>
                         <td class="text-center" style="font-weight: 600;"><span class="row-total">0</span></td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-danger remove-btn"><i class="fas fa-trash"></i>
-                            </button>
+                            <button type="button" class="btn btn-danger remove-btn"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     </tbody>
@@ -133,5 +133,6 @@
     </tr>
 </template>
 
+<script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>
