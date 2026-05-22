@@ -93,7 +93,7 @@
                                        class="checkout-item-checkbox"
                                        value="${item.id}"
                                        checked
-                                       onchange="updateSelectedCheckoutBill()">
+                                       onchange="updateSelectedBill()">
                             </div>
 
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
@@ -198,26 +198,12 @@
                     </h2>
 
 
-                    <c:choose>
-                        <%--                        Đã đăng nhập--%>
-                        <c:when test="${not empty sessionScope.acc}">
-                            <a href="javascript:void(0)"
-                               id="bt-payment"
-                               class="block-bt-payment"
-                               onclick="handleSelectiveCheckout(${not empty sessionScope.acc})">
-                                TIẾN HÀNH THANH TOÁN
-                            </a>
-                        </c:when>
-                        <%--                        Chưa ĐĂNG NHẬP--%>
-                        <c:otherwise>
-                            <a href="javascript:void(0)"
-                               id="bt-payment"
-                               class="block-bt-payment"
-                               onclick="handleGuestCheckout()">
-                                TIẾN HÀNH THANH TOÁN
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
+                    <a href="javascript:void(0)"
+                       id="bt-payment"
+                       class="block-bt-payment"
+                       onclick="handleSelectiveCheckout(${not empty sessionScope.acc})">
+                        TIẾN HÀNH THANH TOÁN
+                    </a>
 
                     <a href="#" onclick="history.back(); return false;"
                        id="bt-shopping-continous"
@@ -230,10 +216,10 @@
     </main>
 </c:if>
 
-<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 <script>
     const IS_LOGGED_IN =${not empty sessionScope.acc};
 </script>
+<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 
 <!-- ================= END MAIN===================== -->
 
