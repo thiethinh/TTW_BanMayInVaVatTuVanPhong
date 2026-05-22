@@ -1,6 +1,7 @@
 package com.papercraft.controller.client;
 
 import com.papercraft.dao.CartDAO;
+import com.papercraft.dao.ProductDAO;
 import com.papercraft.dao.UserDAO;
 import com.papercraft.model.Cart;
 import com.papercraft.model.Product;
@@ -99,20 +100,29 @@ public class LoginServlet extends HttpServlet {
 
     private void mergeCart(Cart guestCart, int userId, HttpSession session) {
         CartDAO cartDAO= new CartDAO();
+        ProductDAO productDAO= new ProductDAO();
+
         //lấy cart đang lưu trong db
         Cart dbCart= cartDAO.getCartByUserId(userId);
         //merge cart trong cart session hiện tại của guest vào
         boolean hasGuestItems= (guestCart != null && guestCart.getTotalQuantity() >0);
 
-        if (hasGuestItems){
-            for (Product item : guestCart.list()){
-                dbCart.putWithCheckStock(item,item.getQuantity());
-            }
-            //lưu cart đã merge lại xuống db
-            cartDAO.clearCart(userId);
+        if (hasGuestItems) {
+            for(Product guestItem : guestCart.list()){
+                Product fresh= productDAO.getProductById(guestItem.getId());
+                if (fresh == null){
+                    continue;
+                }
+                //Giuwx sluong Guest muốn thêm
+                fresh.setQuantity(guestItem.getQuantity());
 
+                //check tồn kho db
+                dbCart.putWithCheckStock(fresh, fresh.getStockQuantity());
+            }
+            // lưu ngược lại xuống db cho lần sau
+            cartDAO.clearCart(userId);
             for (Product item : dbCart.list()){
-                cartDAO.saveItem(userId, item.getId(),item.getQuantity());
+                cartDAO.saveItem(userId,item.getId(), item.getQuantity());
             }
         }
         session.setAttribute("cart",dbCart);

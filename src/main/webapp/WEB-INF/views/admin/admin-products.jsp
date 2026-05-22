@@ -195,7 +195,7 @@
 
                             <button type="button"
                                     class="btn-action delete"
-                                    onclick="confirmDelete(${p.id},'$p.productName')">
+                                    onclick="confirmDelete(${p.id},'${p.productName}')">
                                 Xóa
 
                             </button>
@@ -286,7 +286,7 @@
     function confirmDelete(id, name) {
         Swal.fire({
             title: "Xác nhận xóa?",
-            html: `Bạn có chắc muốn xóa sản phẩm <br><strong>"${name}"</strong>?<br><small style="color:#e74c3c">Hành động này không thể hoàn tác!</small>`,
+            html: `Bạn có chắc muốn xóa sản phẩm <br><strong>\${name}</strong>?<br><small style="color:#e74c3c">Hành động này không thể hoàn tác!</small>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e74c3c',
@@ -296,7 +296,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '${pageContext.request.contextPath}/admin-product?delete=${id}';
+                window.location.href = `${pageContext.request.contextPath}/admin-product?delete=\${id}`;
             }
         });
     }

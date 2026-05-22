@@ -13,6 +13,54 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+
+    const discountInput=document.getElementById("product-discount");
+    const stockInput=document.getElementById("product-amount");
+    const priceInput=document.getElementById("product-price");
+
+    function validateDiscount(){
+
+        let value=discountInput.value;
+
+        value=value.replace(/[^0-9.]/g,'');
+
+        const parts=value.split('.');
+
+        if(parts.length>2){
+            value=parts[0]+'.'+parts.slice(1).join('');
+        }
+
+        let number=parseFloat(value);
+
+        if(!isNaN(number)){
+            if(number<0) number=0;
+            if(number>1) number=1;
+        }
+
+        discountInput.value=value;
+    }
+
+    function validateStock(){
+        let value=stockInput.value.replace(/[^0-9]/g,'');
+        if(value===''){
+            stockInput.value='';
+            return;
+        }
+        stockInput.value=parseInt(value);
+    }
+    function validatePrice(){
+        let value=priceInput.value.replace(/[^0-9]/g,'');
+        if(value===''){
+            priceInput.value='';
+            return;
+        }
+        priceInput.value=parseInt(value);
+    }
+
+    discountInput.addEventListener("input",validateDiscount);
+    stockInput.addEventListener("input",validateStock);
+    priceInput.addEventListener("input",validatePrice);
+
     // Cọn danh mục chính (Category_type)
     const categoryTypeSelect = document.getElementById('product-category');
     const subCategorySelect = document.getElementById('product-sub-category');
