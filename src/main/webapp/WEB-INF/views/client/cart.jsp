@@ -214,9 +214,9 @@
     </main>
 </c:if>
 
-<script>
-    const IS_LOGGED_IN =${not empty sessionScope.acc};
-</script>
+<%--<script>--%>
+<%--    const IS_LOGGED_IN =${not empty sessionScope.acc};--%>
+<%--</script>--%>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
 
 <!-- ================= END MAIN===================== -->
