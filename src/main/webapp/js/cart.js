@@ -42,6 +42,17 @@ function updateQuantity(productId, change) {
     const input = document.getElementById(`qty-${productId}`);
     if (!input) return;
 
+    if (change === 0 && input.value.trim() === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Số lượng không hợp lệ',
+            text: 'Vui lòng nhập số lượng trước khi cập nhật.',
+            confirmButtonColor: '#165FF2'
+        });
+        input.value = 1; //reset về 1 nếu để trống
+        return;
+    }
+
     let newQty = (change === 0) ? parseInt(input.value) : parseInt(input.value) + change;
 
     // Nếu giảm xuống dưới 1 -> Hỏi để xóa
@@ -61,6 +72,7 @@ function updateQuantity(productId, change) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                 input.value = newQty;
                 //update gias
                 const itemTotalEl = document.getElementById(`item-total-${productId}`);
                 if (itemTotalEl) itemTotalEl.textContent = formatVND(data.itemTotal);
@@ -187,12 +199,12 @@ function handleSelectiveCheckout(isLoggedIn) {
             reverseButtons: true
         }).then(function (result) {
             if (result.isConfirmed) {
-                window.location.href = contextPath + "/login?redirect=" + encodeURIComponent("/checkout?selectedIds=" + selectedIdsPagram);
+                window.location.href = contextPath + "/login?redirect=" + encodeURIComponent("/checkout?selectedIds=" + selectedIdsParam);
             }
         });
         return;
     }
-    window.location.href = contextPath + "/checkout?selectedIds=" + selectedIdsPagram;
+    window.location.href = contextPath + "/checkout?selectedIds=" + selectedIdsParam;
 }
 
 //getSelectedProductIds
