@@ -82,15 +82,19 @@ public class CartServlet extends HttpServlet {
 
                 double[] bill = calculateBillBySelectedItems(cart, selectedIds);
 
+                response.setContentType("application/json; charset=UTF-8");
+
                 response.getWriter().print(String.format(
-                        "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.Of,\"shippingFee\":%.Of.\"vat\":%.Of,\"grandTotal\":%.Of}",
+                        "{\"success\":true,\"cartCount\":%d,\"subTotal\":%.0f,\"shippingFee\":%.0f,\"vat\":%.0f,\"grandTotal\":%.0f}",
                         cart.getTotalQuantity(),
                         bill[0],
                         bill[1],
                         bill[2],
                         bill[3]
                 ));
+
                 return;
+
 
             } else if ("remove".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -224,7 +228,6 @@ public class CartServlet extends HttpServlet {
                 int id = Integer.parseInt(part.trim());
                 ids.add(id);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
 
             }
         }
