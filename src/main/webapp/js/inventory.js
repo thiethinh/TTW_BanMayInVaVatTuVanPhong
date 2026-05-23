@@ -62,6 +62,7 @@ export function initializeInventory() {
         grandTotalInput.value = result;
     }
 
+    // Thêm hàng
     addRowBtn.addEventListener('click', function (e) {
         e.preventDefault();
         const clone = rowTemplate.content.cloneNode(true);

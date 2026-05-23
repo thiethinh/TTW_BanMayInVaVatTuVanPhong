@@ -1,5 +1,6 @@
 package com.papercraft.dao;
 
+import com.papercraft.dto.InventoryDetailDTO;
 import com.papercraft.model.InventoryTransaction;
 import com.papercraft.model.InventoryTransactionDetail;
 import com.papercraft.utils.DBConnect;
@@ -71,23 +72,39 @@ public class InventoryDAO {
         return false;
     }
 
-    public List<InventoryTransaction> getAllTransactions(String type) {
+    public List<InventoryTransaction> getAllTransactions(String type, String search) {
         List<InventoryTransaction> result = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
                 SELECT i.*, u.fullname AS admin_name
                 FROM inventory_transactions i
                 JOIN users u ON i.user_id = u.id
+                WHERE 1=1
                 """);
 
         if (type != null && !type.trim().isEmpty() && !type.equals("all")) {
-            sql.append(" WHERE i.transaction_type = ? ");
+            sql.append(" AND i.transaction_type = ? ");
         }
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (i.id LIKE ? OR i.note LIKE ? OR i.total_value LIKE ? OR u.fullname LIKE ?) ");
+        }
+
         sql.append(" ORDER BY i.created_at DESC");
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString());) {
+            int paramIndex = 1;
+
             if (type != null && !type.trim().isEmpty() && !type.equals("all")) {
-                ps.setString(1, type);
+                ps.setString(paramIndex++, type);
+            }
+
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
+                ps.setString(paramIndex++, searchPattern);
+                ps.setString(paramIndex++, searchPattern);
+                ps.setString(paramIndex++, searchPattern);
             }
 
             ResultSet rs = ps.executeQuery();
@@ -101,6 +118,32 @@ public class InventoryDAO {
                 transaction.setTotalValue(rs.getDouble("total_value"));
                 transaction.setAdminName(rs.getString("admin_name"));
                 result.add(transaction);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<InventoryDetailDTO> getTransactionDetails(int transactionId) {
+        List<InventoryDetailDTO> result = new ArrayList<>();
+        String sql = """
+                SELECT p.product_name, d.quantity, d.price
+                FROM inventory_transaction_details d
+                JOIN product p ON d.product_id = p.id
+                WHERE d.transaction_id = ?
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, transactionId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                InventoryDetailDTO detail = new InventoryDetailDTO();
+                detail.setProductName(rs.getString("product_name"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setPrice(rs.getDouble("price"));
+                result.add(detail);
             }
         } catch (Exception e) {
             e.printStackTrace();

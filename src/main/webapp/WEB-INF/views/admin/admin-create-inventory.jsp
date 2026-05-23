@@ -127,7 +127,7 @@
         <td><input type="number" name="quantity[]" class="form-control qty-input" min="1" required></td>
         <td><input type="number" name="price[]" class="form-control price-input" min="0" required></td>
         <td class="text-center" style="font-weight: 600;"><span class="row-total">0</span></td>
-        <td class="text-center">
+        <td class="text-center" style="text-align: center;">
             <button type="button" class="btn btn-danger remove-btn"><i class="fas fa-trash"></i></button>
         </td>
     </tr>
