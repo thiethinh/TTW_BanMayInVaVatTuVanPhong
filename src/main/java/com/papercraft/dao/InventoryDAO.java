@@ -72,7 +72,7 @@ public class InventoryDAO {
         return false;
     }
 
-    public List<InventoryTransaction> getAllTransactions(String type, String search) {
+    public List<InventoryTransaction> getAllTransactions(String type, String search, String fromDate, String toDate) {
         List<InventoryTransaction> result = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
                 SELECT i.*, u.fullname AS admin_name
@@ -87,6 +87,14 @@ public class InventoryDAO {
 
         if (search != null && !search.trim().isEmpty()) {
             sql.append(" AND (i.id LIKE ? OR i.note LIKE ? OR i.total_value LIKE ? OR u.fullname LIKE ?) ");
+        }
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND DATE(i.created_at) >= ? ");
+        }
+
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND DATE(i.created_at) <= ? ");
         }
 
         sql.append(" ORDER BY i.created_at DESC");
@@ -105,6 +113,14 @@ public class InventoryDAO {
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
+            }
+
+            if (fromDate != null && !fromDate.isEmpty()) {
+                ps.setString(paramIndex++, fromDate);
+            }
+
+            if (toDate != null && !toDate.isEmpty()) {
+                ps.setString(paramIndex++, toDate);
             }
 
             ResultSet rs = ps.executeQuery();

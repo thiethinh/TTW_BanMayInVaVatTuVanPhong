@@ -40,10 +40,12 @@ public class AdminInventoryHistoryServlet extends HttpServlet {
 
         String type = request.getParameter("type");
         String search = request.getParameter("search");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
         if (type == null) type = "all";
 
         InventoryDAO inventoryDAO = new InventoryDAO();
-        List<InventoryTransaction> transactions = inventoryDAO.getAllTransactions(type, search);
+        List<InventoryTransaction> transactions = inventoryDAO.getAllTransactions(type, search, fromDate, toDate);
 
         request.setAttribute("transactions", transactions);
         request.setAttribute("type", type);

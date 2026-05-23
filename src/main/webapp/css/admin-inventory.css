@@ -116,6 +116,12 @@
     box-shadow: var(--color-text);
 }
 
+.search-type label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
 .custom-dropdown {
     position: relative;
 }

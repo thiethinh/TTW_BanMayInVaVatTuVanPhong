@@ -34,7 +34,7 @@
               id="filterForm">
 
             <div style="width: 250px;">
-                <label style="font-weight: 600; margin-bottom: 5px; display: block;">Lọc theo loại phiếu:</label>
+                <label>Lọc theo loại phiếu:</label>
 
                 <div class="custom-dropdown">
                     <input type="hidden" name="type" id="transactionType" value="${selectedType}">
@@ -65,11 +65,25 @@
             </div>
 
             <div style="flex: 1; min-width: 250px;">
-                <label style="font-weight: 600; margin-bottom: 5px; display: block;">Tìm kiếm phiếu:</label>
+                <label>Tìm kiếm phiếu:</label>
 
                 <input type="text" name="search" value="${param.search}" class="select-trigger"
                        style="width: 100%; box-sizing: border-box;"
                        placeholder="Nhập mã phiếu, tên người tạo...">
+            </div>
+
+            <div style="width: 140px;">
+                <label>Từ ngày:</label>
+                <input type="date" name="fromDate" value="${param.fromDate}" class="select-trigger">
+            </div>
+
+            <div style="width: 140px;">
+                <label>Đến ngày:</label>
+                <input type="date" name="toDate" value="${param.toDate}" class="select-trigger">
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary select-trigger"><i class="fas fa-filter"></i> Lọc</button>
             </div>
         </form>
 
@@ -246,7 +260,7 @@
     }
 
     // Đóng Popup và Dropdown nếu click ra ngoài
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         // Dropdown
         if (!event.target.matches('.select-trigger') && !event.target.closest('.select-trigger')) {
             var dropdowns = document.getElementsByClassName("option-value");
