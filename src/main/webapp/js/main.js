@@ -103,4 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
             module.initializeAccount();
         });
     }
+
+    if (document.getElementById('inventoryForm')) {
+        import('./inventory.js').then(module => {
+            module.initializeInventory();
+        });
+    }
 });
