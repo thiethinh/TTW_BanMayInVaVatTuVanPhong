@@ -13,31 +13,42 @@ public class CartDAO {
     //lẤY CART TỪ DB lên theo userId
     public Cart getCartByUserId(int userId){
         Cart cart= new Cart();
-        String sql= """
-                select ci.product_id,ci.quantity,
-                        p.product_name,p.price,p.stock_quantity,i.img_name
-                from cart_item ci
-                join product p ON p.id= ci.product_id
-                left join image i ON i.entity_id=p.id
-                AND i.entity_type = 'Product'
-                AND i.is_thumbnail=1
-                where ci.user_id=?
+        String sql = """
+                SELECT ci.product_id,
+                       ci.quantity,
+                       p.product_name,
+                       p.price,
+                       p.origin_price,
+                       p.discount,
+                       p.stock_quantity,
+                       i.img_name
+                FROM cart_item ci
+                JOIN product p ON p.id = ci.product_id
+                LEFT JOIN image i ON i.entity_id = p.id
+                    AND i.entity_type = 'Product'
+                    AND i.is_thumbnail = 1
+                WHERE ci.user_id = ?
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps= conn.prepareStatement(sql))   {
 
             ps.setInt(1,userId);
             try (ResultSet rs= ps.executeQuery()){
-                while (rs.next()){
+                while (rs.next()) {
                     Product p = new Product();
+
                     p.setId(rs.getInt("product_id"));
                     p.setProductName(rs.getString("product_name"));
+
                     p.setPrice(rs.getDouble("price"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setDiscount(rs.getDouble("discount"));
+
                     p.setStockQuantity(rs.getInt("stock_quantity"));
                     p.setQuantity(rs.getInt("quantity"));
 
-                    String imgName= rs.getString("img_name");
-                    p.setThumbnail(imgName != null ? "images/upload/"+ imgName : "images/logo.webp");
+                    String imgName = rs.getString("img_name");
+                    p.setThumbnail(imgName != null ? "images/upload/" + imgName : "images/logo.webp");
 
                     cart.put(p);
                 }

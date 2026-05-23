@@ -42,6 +42,17 @@ function updateQuantity(productId, change) {
     const input = document.getElementById(`qty-${productId}`);
     if (!input) return;
 
+    if (change === 0 && input.value.trim() === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Số lượng không hợp lệ',
+            text: 'Vui lòng nhập số lượng trước khi cập nhật.',
+            confirmButtonColor: '#165FF2'
+        });
+        input.value = 1; //reset về 1 nếu để trống
+        return;
+    }
+
     let newQty = (change === 0) ? parseInt(input.value) : parseInt(input.value) + change;
 
     // Nếu giảm xuống dưới 1 -> Hỏi để xóa
@@ -61,6 +72,7 @@ function updateQuantity(productId, change) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                 input.value = newQty;
                 //update gias
                 const itemTotalEl = document.getElementById(`item-total-${productId}`);
                 if (itemTotalEl) itemTotalEl.textContent = formatVND(data.itemTotal);
@@ -158,6 +170,123 @@ function updateBillUI(data) {
         shippingEl.innerHTML = data.shippingFee === 0 ? '<strong style="color:#165FF2 ">Miễn phí</strong>' : fmt(data.shippingFee);
     }
     updateCartBadge(data.cartCount)
+}
+
+
+function handleSelectiveCheckout(isLoggedIn) {
+    const selectedIds = getSelectedProductIds();
+
+    if (selectedIds.length == 0) {
+        Swal.fire({
+            icon: "warning",
+            title: "Chưa chọn sản phẩm",
+            text: "Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.",
+            confirmButtonColor: "#165FF2"
+        });
+        return;
+    }
+    const selectedIdsParam  = encodeURIComponent(selectedIds.join(","));
+    if (!isLoggedIn) {
+        Swal.fire({
+            icon: "info",
+            title: "Bạn chưa đăng nhập!",
+            text: "Vui lòng đăng nhập để tiến hành thanh toán.",
+            showCancelButton: true,
+            confirmButtonText: "Đăng nhập ngay",
+            cancelButtonText: "Để sau",
+            confirmButtonColor: "#165FF2",
+            cancelButtonColor: "#718096",
+            reverseButtons: true
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                window.location.href = contextPath + "/login?redirect=" + encodeURIComponent("/checkout?selectedIds=" + selectedIdsParam);
+            }
+        });
+        return;
+    }
+    window.location.href = contextPath + "/checkout?selectedIds=" + selectedIdsParam;
+}
+
+//getSelectedProductIds
+function getSelectedProductIds() {
+    const selectedIds = [];
+
+    const checkedBoxes = document.querySelectorAll('.checkout-item-checkbox:checked');
+    checkedBoxes.forEach(function (checkbox) {
+        selectedIds.push(checkbox.value);
+    });
+    return selectedIds;
+}
+
+function toggleSelectAllCheckout(selectAllCheckbox) {
+    const itemCheckboxes = document.querySelectorAll(".checkout-item-checkbox");
+
+    itemCheckboxes.forEach(function (checkbox) {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+
+    updateSelectedBill();
+}
+
+//updateSelectedBill
+function updateSelectedBill(){
+    updateSelectedAllStatus();
+
+    const selectedIds= getSelectedProductIds();
+    if (selectedIds.length === 0){
+        updateBillUI({
+            cartCount: parseInt(document.getElementById("cartCount")?.innerText) || 0,
+            subTotal: 0,
+            shippingFee: 0,
+            vat: 0,
+            grandTotal: 0
+        });
+        return;
+    }
+    fetch(contextPath + "/cart",{
+        method: "POST",
+        headers:{
+            "Content-type": "application/x-www-form-urlencoded"
+        },
+        body: "action=calculateSelected&selectedIds=" + encodeURIComponent(selectedIds.join(","))
+    })
+        .then(function (response){
+        return response.json();
+    })
+        .then(function (data){
+            if (data.success){
+                updateBillUI(data);
+            }
+        })
+        .catch(function (error){
+            console.error("Lỗi updateSelectedBill:",error);
+        });
+}
+
+//updateSelectedAllStatus
+function updateSelectedAllStatus(){
+    const selectAllCheckbox= document.getElementById("selectAllCheckout");
+    const itemCheckboxes= document.querySelectorAll(".checkout-item-checkbox");
+    const checkedItems= document.querySelectorAll(".checkout-item-checkbox:checked");
+
+    if (!selectAllCheckbox){
+        return;
+    }
+    if (itemCheckboxes.length === 0){
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        return;
+    }
+    if (checkedItems.length === itemCheckboxes.length){
+        selectAllCheckbox.checked =true;
+        selectAllCheckbox.indeterminate=false;
+    }else if (checkedItems.length ===0 ){
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate=false;
+    }else {
+        selectAllCheckbox.checked=false;
+        selectAllCheckbox.indeterminate= true;
+    }
 }
 
 // cart search
@@ -294,7 +423,7 @@ function highlightKeyword(name, words) {
     return result;
 }
 
-function handleGuestCheckout(){
+function handleGuestCheckout() {
     Swal.fire({
         icon: 'info',
         title: 'Bạn chưa đăng nhập!',
@@ -305,9 +434,9 @@ function handleGuestCheckout(){
         confirmButtonText: 'Đăng nhập ngay',
         confirmButtonColor: '#165FF2',
         reverseButtons: true
-    }).then(function (result){
-        if (result.isConfirmed){
-            window.location.href= contextPath + '/login?redirect=/checkout';
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            window.location.href = contextPath + '/login?redirect=/checkout';
         }
     })
 }
@@ -320,6 +449,7 @@ function clearCartSearch() {
     searchInCart('');
 }
 
+
 //dóng dropdown khi bấm ra vùng bên ngoài
 document.addEventListener('click', function (e) {
     let wrapper = document.querySelector('.cart-search-wrapper');
@@ -331,7 +461,8 @@ document.addEventListener('click', function (e) {
 });
 
 
-document.addEventListener("DOMContentLoaded", function (){
+document.addEventListener("DOMContentLoaded", function () {
     updateCartCount();
     collectCartItems();
+    updateSelectedBill();
 });

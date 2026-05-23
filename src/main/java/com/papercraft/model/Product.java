@@ -47,7 +47,7 @@ public class Product implements Serializable {
         this.thumbnail = thumbnail;
         this.imageList = imageList;
         this.avgRating = avgRating;
-        this.soldQuantity= soldQuantity;
+        this.soldQuantity = soldQuantity;
     }
 
     public int getId() {
@@ -114,15 +114,31 @@ public class Product implements Serializable {
         this.soldQuantity = soldQuantity;
     }
 
+    //    public double getPrice() {
+//        if(this.originPrice > 0 && this.discount >0){
+//            if(this.discount < 1){
+//                return this.originPrice * (1.0-this.discount);
+//            }else{
+//                return this.originPrice * (1.0 - (this.discount/100.0));
+//            }
+//        }
+//        return this.originPrice;
+//    }
+
     public double getPrice() {
-        if(this.originPrice > 0 && this.discount >0){
-            if(this.discount < 1){
-                return this.originPrice * (1.0-this.discount);
-            }else{
-                return this.originPrice * (1.0 - (this.discount/100.0));
+        if (this.originPrice > 0) {
+            if (this.discount > 0) {
+                if (this.discount < 1) {
+                    return this.originPrice * (1.0 - this.discount);
+                } else {
+                    return this.originPrice * (1.0 - (this.discount / 100.0));
+                }
             }
+
+            return this.originPrice;
         }
-        return this.originPrice;
+
+        return this.price;
     }
 
     public void setPrice(double price) {
@@ -205,6 +221,7 @@ public class Product implements Serializable {
         this.quantity += qty;
 
     }
+
     //tính giá sale
     public double getSalePrice() {
         if (this.originPrice > 0 && this.discount > 0 && this.discount < 1) {
