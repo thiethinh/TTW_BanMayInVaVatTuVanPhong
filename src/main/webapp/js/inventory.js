@@ -16,6 +16,17 @@ export function initializeInventory() {
         const priceInput = row.querySelector('.price-input');
         const removeBtn = row.querySelector('.remove-btn');
 
+        if (select && !select.tomselect) {
+            new TomSelect(select, {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "Gõ để tìm kiếm sản phẩm..."
+            });
+        }
+
         if (removeBtn) {
             removeBtn.addEventListener('click', function () {
                 if (tableBody.querySelectorAll('.product-row').length > 1) {
@@ -27,16 +38,18 @@ export function initializeInventory() {
             });
         }
 
+        // Sự kiện khi chọn sản phẩm
         select.addEventListener('change', function () {
-           const selectedOption = select.options[select.selectedIndex];
-           if (selectedOption.value) {
-               priceInput.value = selectedOption.getAttribute('data-price');
-               qtyInput.value = 1;
-           } else {
-               priceInput.value = '';
-               qtyInput.value = '';
-           }
-           calculateRowTotal(row);
+            const selectedOption = this.options[this.selectedIndex];
+
+            if (selectedOption && selectedOption.value) {
+                priceInput.value = selectedOption.getAttribute('data-price');
+                qtyInput.value = 1;
+            } else {
+                priceInput.value = '';
+                qtyInput.value = '';
+            }
+            calculateRowTotal(row);
         });
 
         qtyInput.addEventListener('input', () => calculateRowTotal(row));
@@ -86,7 +99,7 @@ export function initializeInventory() {
             const qty = parseInt(row.querySelector('.qty-input').value) || 0;
             const selectedOption = select.options[select.selectedIndex];
 
-            if (!selectedOption.value) {
+            if (!selectedOption || !selectedOption.value) {
                 showErrorMessage(`Vui lòng chọn sản phẩm ở dòng thứ ${i + 1}`);
                 isValid = false;
                 break;

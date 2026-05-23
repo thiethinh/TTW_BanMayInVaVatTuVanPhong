@@ -339,3 +339,18 @@
 .btn-danger:hover {
     background-color: #c82333;
 }
+
+.ts-control {
+    font-size: 15px;
+    box-shadow: none;
+    border: none;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0;
+    margin: 0;
+}
+
+.ts-dropdown {
+    font-size: 15px;
+    border-radius: 5px;
+}

@@ -11,6 +11,7 @@
 
     <link rel="icon" href="${pageContext.request.contextPath}/images/logo.webp"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-inventory.css">
@@ -81,7 +82,7 @@
                                 <tr class="product-row">
                                     <td>
                                         <select name="productId[]" class="form-control product-select" required>
-                                            <option value="">Chọn sản phẩm</option>
+                                            <option value="">Gõ để tìm sản phẩm...</option>
                                             <c:if test="${not empty productList}">
                                                 <c:forEach items="${productList}" var="p">
                                                     <option value="${p.id}" data-price="${p.price}"
@@ -116,7 +117,7 @@
                             <tr class="product-row">
                                 <td>
                                     <select name="productId[]" class="form-control product-select" required>
-                                        <option value="">Chọn sản phẩm</option>
+                                        <option value="">Gõ để tìm sản phẩm...</option>
                                         <c:if test="${not empty productList}">
                                             <c:forEach items="${productList}" var="p">
                                                 <option value="${p.id}" data-price="${p.price}"
@@ -168,7 +169,7 @@
     <tr class="product-row">
         <td>
             <select name="productId[]" class="form-control product-select" required>
-                <option value="">Chọn sản phẩm</option>
+                <option value="">Gõ để tìm sản phẩm...</option>
                 <c:if test="${not empty productList}">
                     <c:forEach items="${productList}" var="p">
                         <option value="${p.id}" data-price="${p.price}" data-stock="${p.stockQuantity}">
@@ -187,6 +188,7 @@
     </tr>
 </template>
 
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>
