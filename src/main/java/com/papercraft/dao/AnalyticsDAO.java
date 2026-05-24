@@ -60,7 +60,7 @@ public class AnalyticsDAO {
                             COALESCE((SELECT SUM(quantity) 
                                       FROM inventory_transaction_details itd
                                       JOIN inventory_transactions it ON itd.transaction_id = it.id
-                                      WHERE idt.product_id = p.id AND it.transaction_type = 'IMPORT'), 0) AS total_imported,
+                                      WHERE itd.product_id = p.id AND it.transaction_type = 'IMPORT'), 0) AS total_imported,
                             COALESCE((SELECT SUM(quantity)
                                       FROM order_item oi
                                       JOIN orders o ON oi.order_id = o.id
@@ -92,28 +92,35 @@ public class AnalyticsDAO {
 
     private void calculateForecastForProduct(Connection conn, ProductPerformanceDTO dto) {
         String sql = """
-                SELECT created_at 
-                FROM inventory_transactions it
-                JOIN inventory_transaction_details itd ON itd.transaction_id = it.id
-                WHERE itd.product_id = ? AND it.transaction_type = 'IMPORT'
-                ORDER BY it.created_at DESC 
-                LIMIT 3;
+                    SELECT created_at
+                    FROM inventory_transactions it
+                    JOIN inventory_transaction_details itd ON itd.transaction_id = it.id
+                    WHERE itd.product_id = ? AND it.transaction_type = 'IMPORT'
+                    ORDER BY it.created_at DESC
+                    LIMIT 3;
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, dto.getProductId());
             ResultSet rs = ps.executeQuery();
-            if (rs.last()) {
-                Timestamp oldestImportDate = rs.getTimestamp("created_at");
+
+            Timestamp oldestImportDate = null;
+
+            while (rs.next()) {
+                oldestImportDate = rs.getTimestamp("created_at");
+            }
+
+            if (oldestImportDate != null) {
                 long diffInMillies = Math.abs(System.currentTimeMillis() - oldestImportDate.getTime());
                 long diffInDays = (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
 
                 String sqlSoldSince = """
-                        SELECT SUM(oi.quantity) AS sold_since
-                        FROM order_item oi
-                        JOIN orders o ON oi.order_id = o.id
-                        WHERE oi.product_id = ? AND o.created_at >= ?
+                            SELECT SUM(oi.quantity) AS sold_since 
+                            FROM order_item oi 
+                            JOIN orders o ON oi.order_id = o.id 
+                            WHERE oi.product_id = ? AND o.created_at >= ? AND o.status = 'completed'
                         """;
+
                 try (PreparedStatement psSold = conn.prepareStatement(sqlSoldSince);) {
                     psSold.setInt(1, dto.getProductId());
                     psSold.setTimestamp(2, oldestImportDate);
@@ -125,7 +132,7 @@ public class AnalyticsDAO {
 
                         int targetStockFor30Days = (int) Math.ceil(velocity * 30);
                         int needToImport = targetStockFor30Days - dto.getCurrentStock();
-                        dto.setRecommendedImportQty(needToImport);
+                        dto.setRecommendedImportQty(Math.max(0, needToImport));
                     }
                 }
             } else {

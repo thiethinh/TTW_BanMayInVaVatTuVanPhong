@@ -117,33 +117,37 @@
                 </select>
             </div>
 
-            <canvas id="profitChart"></canvas>
+            <div style="height: 400px">
+                <canvas id="profitChart"></canvas>
+            </div>
         </section>
 
-        <%-- dashboard dự báo nhập hàng --%>
+        <%-- table dự báo nhập hàng --%>
         <section id="restock-forecast" class="content-table-card">
             <h2>Dự Báo Nhập Kho & Gợi Ý Nhập Hàng Cho 30 Ngày Tới</h2>
 
-            <table class="content-table">
-                <thead>
-                <tr>
-                    <th>Mã SP</th>
-                    <th>Tên Sản Phẩm</th>
-                    <th>Tồn Kho</th>
-                    <th>Đã Nhập</th>
-                    <th>Đã Bán</th>
-                    <th>Vận Tốc (SP/Ngày)</th>
-                    <th>Đề Xuất Nhập</th>
-                    <th>Trạng Thái</th>
-                </tr>
-                </thead>
+            <div style="height: 400px; overflow-y: auto">
+                <table class="content-table">
+                    <thead>
+                    <tr>
+                        <th>Mã SP</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Tồn Kho</th>
+                        <th>Đã Nhập</th>
+                        <th>Đã Bán</th>
+                        <th>Vận Tốc (SP/Ngày)</th>
+                        <th>Đề Xuất Nhập</th>
+                        <th>Trạng Thái</th>
+                    </tr>
+                    </thead>
 
-                <tbody id="restockTableBody" style="text-align: center;">
-                <tr>
-                    <td colspan="8">Đang tải dữ liệu phân tích</td>
-                </tr>
-                </tbody>
-            </table>
+                    <tbody id="restockTableBody" style="text-align: center;">
+                    <tr>
+                        <td colspan="8">Đang tải dữ liệu phân tích</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <%-- dashboard don hang chua phan hoi --%>
@@ -252,6 +256,13 @@
 <script src="${pageContext.request.contextPath}/js/admin-dashboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/js/revenue.js"></script>
+<script type="module">
+    import {initializeAnalytics} from '${pageContext.request.contextPath}/js/analytics.js';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeAnalytics('${pageContext.request.contextPath}');
+    });
+</script>
 
 </body>
 

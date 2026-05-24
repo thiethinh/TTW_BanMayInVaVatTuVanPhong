@@ -247,7 +247,7 @@
     padding: 14px 18px;
     font-weight: 600;
     color: #333;
-    text-align: left;
+    text-align: center;
 }
 
 /* ====body========== */
@@ -289,12 +289,12 @@
     color: #165FF2;
 }
 
-.status-badge.completed {
+.status-badge.completed, .status-badge.status-safe {
     background-color: #e6f7f0;
     color: #2e7d32;
 }
 
-.status-badge.canceled {
+.status-badge.canceled, .status-badge.status-import {
     background-color: #f8d7da;
     color: #842029;
 }
