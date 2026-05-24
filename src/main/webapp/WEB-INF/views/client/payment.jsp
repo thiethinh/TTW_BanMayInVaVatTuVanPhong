@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <fmt:setLocale value="vi_VN"/>
 
 <!DOCTYPE html>
@@ -160,10 +161,24 @@
                         </th>
                     </tr>
 
+                    <c:if test="${discountAmount > 0}">
+                        <tr>
+                            <th>Giảm giá:</th>
+
+                            <th style="text-align:right;color:#16a34a;">
+
+                                -<fmt:formatNumber
+                                    value="${discountAmount}"
+                                    pattern="#,###"/> ₫
+
+                            </th>
+                        </tr>
+                    </c:if>
+
 
                     <tr id="total">
                         <th>Tổng Đơn Hàng:</th>
-                        <th style="color: #d70018; font-size: 18px; text-align: right;">
+                        <th style="color:#d70018;font-size:18px;text-align:right;">
                             <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
                         </th>
                     </tr>
@@ -219,15 +234,17 @@
                             Áp dụng
                         </button>
                     </div>
-                    <c:if test="${not empty successVoucher or not empty errorVoucher}">
-                        <span id="voucherMessage" style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty successVoucher ? '#16a34a' : '#dc2626'};">
-                             ${not empty successVoucher ? successVoucher : errorVoucher}
+                    <c:if test="${not empty saveVoucherSuccess  or not empty saveVoucherError}">
+                        <span id="voucherMessage" style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty saveVoucherSuccess ? '#16a34a' : '#dc2626'};">
+                             ${not empty saveVoucherSuccess  ? saveVoucherSuccess  : saveVoucherError}
                         </span>
                     </c:if>
 
                     <div class="voucher-dropdown" id="voucherDropdown">
                         <div class="voucher-selected" id="voucherSelected">
-                            <span>Chọn voucher của bạn</span>
+                            <span>
+                                ${not empty selectedVoucher? selectedVoucher.code: 'Chọn voucher của bạn'}
+                            </span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </div>
 
@@ -261,7 +278,14 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                        <input type="hidden" name="voucherId" id="voucherId">
+
+                        <input type="hidden" name="voucherId" id="voucherId" value="${selectedVoucher.id}">
+                        <c:if test="${not empty successVoucher or not empty errorVoucher}">
+                            <span style="display:block;margin-top:10px;font-size:13px;font-weight:500;color:${not empty successVoucher? '#16a34a': '#dc2626'};">
+                                    ${not empty successVoucher? successVoucher: errorVoucher}
+                            </span>
+                        </c:if>
+
                     </div>
                 </div>
 
