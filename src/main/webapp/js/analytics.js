@@ -111,8 +111,26 @@ export function initializeAnalytics(contextPath) {
         let html = '';
         if (filteredData && filteredData.length > 0) {
             filteredData.forEach(item => {
-                let badgeClass = item.recommendedImportQty > 0 ? 'status-badge status-import' : 'status-badge status-safe';
-                let statusText = item.recommendedImportQty > 0 ? 'Cần Nhập Hàng' : 'An Toàn';
+                const consumptionRate = item.totalImported > 0 ? (item.totalSold / item.totalImported) * 100 : 0;
+
+                let status = {text: "An Toàn", class: "status-badge safe", color: "#2e7d32"};
+                if (item.recommendedImportQty > 0) {
+                    status = {text: "Cần Nhập", class: "status-badge restock", color: "#842029"};
+                } else if (item.totalSold === 0 && item.currentStock > 0) {
+                    status = {text: "Tồn Đọng", class: "status-badge dead", color: "#616161"};
+                } else if (consumptionRate < 15) {
+                    status = {text: "Bán Chậm", class: "status-badge slow", color: "#f5a623"};
+                }
+
+                if (statusFilter !== 'all') {
+                    const mapping = {
+                        'need_restock': 'Cần Nhập',
+                        'slow_moving': 'Bán Chậm',
+                        'dead_stock': 'Tồn Đọng',
+                        'safe': 'An Toàn'
+                    };
+                    if (status.text !== mapping[statusFilter]) return;
+                }
 
                 html += `
                         <tr>
@@ -122,8 +140,9 @@ export function initializeAnalytics(contextPath) {
                             <td>${item.totalImported}</td>
                             <td>${item.totalSold}</td>
                             <td>${item.dailySalesVelocity}</td>
+                            <td><small style="font-weight: 600; color: ${status.color}">${consumptionRate.toFixed(1)}%</small></td>
                             <td><strong>${item.recommendedImportQty}</strong></td>
-                            <td><span class="${badgeClass}">${statusText}</span></td>
+                            <td><span class="${status.class}">${status.text}</span></td>
                         </tr>`;
             });
         } else {

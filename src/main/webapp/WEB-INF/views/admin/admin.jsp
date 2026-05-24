@@ -40,7 +40,7 @@
                 </div>
                 <div class="stat-info">
                     <span class="stat-number"><fmt:formatNumber value="${totalRevenue}" type="currency"/></span>
-                    <span class="stat-label">Tin nhắn chưa phản hồinh Thu Trong Tháng</span>
+                    <span class="stat-label">Doanh Thu Trong Tháng</span>
                 </div>
             </div>
 
@@ -132,6 +132,8 @@
                     <select id="restockStatusFilter" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
                         <option value="all">Tất cả trạng thái</option>
                         <option value="need_restock">Cần Nhập Hàng</option>
+                        <option value="slow_moving">Bán Chậm</option>
+                        <option value="dead_stock">Tồn đọng</option>
                         <option value="safe">An Toàn</option>
                     </select>
                 </div>
@@ -147,6 +149,7 @@
                         <th>Đã Nhập</th>
                         <th>Đã Bán</th>
                         <th>Vận Tốc (SP/Ngày)</th>
+                        <th>Tỷ Lệ Tiêu Thụ</th>
                         <th>Đề Xuất Nhập</th>
                         <th>Trạng Thái</th>
                     </tr>
