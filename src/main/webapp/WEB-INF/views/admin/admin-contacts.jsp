@@ -56,6 +56,7 @@
                     <th>Email</th>
                     <th>Chủ đề</th>
                     <th>Nội dung</th>
+                    <th>Ngày tạo</th>
                     <th class="status-col">Phản hồi</th>
                     <th>Hành động</th>
                 </tr>
@@ -69,6 +70,7 @@
                         <td>${c.email}</td>
                         <td>${c.contactTitle}</td>
                         <td>${c.content}</td>
+                        <td>${c.createdAt}</td>
                         <td class="status-col">
                             <a href="admin-contacts?action=toggle&id=${c.id}&status=${c.rely}&keyword=${keyword}&reply=${currentReplied}">
                                 <c:choose>

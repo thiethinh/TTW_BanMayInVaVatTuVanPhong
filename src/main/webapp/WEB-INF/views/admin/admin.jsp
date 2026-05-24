@@ -40,7 +40,7 @@
                 </div>
                 <div class="stat-info">
                     <span class="stat-number"><fmt:formatNumber value="${totalRevenue}" type="currency"/></span>
-                    <span class="stat-label">Doanh Thu Trong Tháng</span>
+                    <span class="stat-label">Tin nhắn chưa phản hồinh Thu Trong Tháng</span>
                 </div>
             </div>
 
