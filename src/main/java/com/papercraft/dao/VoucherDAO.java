@@ -9,7 +9,7 @@ import java.util.List;
 
 public class VoucherDAO {
 
-    private Voucher mapRow(ResultSet rs) throws SQLException {
+    private Voucher mapAllRowVoucher(ResultSet rs) throws SQLException {
         Voucher v = new Voucher();
         v.setId(rs.getInt("id"));
         v.setCode(rs.getString("code"));
@@ -39,7 +39,7 @@ public class VoucherDAO {
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) list.add(mapRow(rs));
+            while (rs.next()) list.add(mapAllRowVoucher(rs));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,7 +52,7 @@ public class VoucherDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return mapRow(rs);
+            if (rs.next()) return mapAllRowVoucher(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,5 +138,28 @@ public class VoucherDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Voucher getVoucherByCode(String code) {
+
+        String sql = """
+        SELECT *
+        FROM vouchers
+        WHERE code = ?
+          AND is_deleted = 0
+    """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, code);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapAllRowVoucher(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

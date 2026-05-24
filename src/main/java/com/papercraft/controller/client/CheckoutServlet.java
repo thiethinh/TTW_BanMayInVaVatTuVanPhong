@@ -2,12 +2,9 @@ package com.papercraft.controller.client;
 
 import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.CartDAO;
-import com.papercraft.model.Address;
-import com.papercraft.model.Cart;
-import com.papercraft.model.Order;
-import com.papercraft.model.OrderItem;
-import com.papercraft.model.Product;
-import com.papercraft.model.User;
+import com.papercraft.dao.UserVoucherDAO;
+import com.papercraft.dao.VoucherDAO;
+import com.papercraft.model.*;
 import com.papercraft.service.OrderService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -62,6 +59,29 @@ public class CheckoutServlet extends HttpServlet {
         AddressDAO addressDAO = new AddressDAO();
         Address userAddr = addressDAO.findDefaultAddress(user.getId());
         request.setAttribute("addr", userAddr);
+
+        UserVoucherDAO  userVoucherDAO = new UserVoucherDAO();
+        List<Voucher> vouchers = userVoucherDAO.getVouchersByUserId(user.getId());
+        request.setAttribute("vouchers", vouchers);
+
+        String voucherCode=request.getParameter("voucherCode");
+        if(voucherCode!=null&&!voucherCode.trim().isEmpty()){
+            Voucher voucher=new VoucherDAO().getVoucherByCode(voucherCode.trim());
+            if(voucher==null){
+                request.setAttribute("errorVoucher", "Mã voucher không tồn tại");
+            }else if(!voucher.isAvailable()){
+                request.setAttribute("errorVoucher", "Voucher hiện không khả dụng");
+            }else{
+                boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
+                if(!success){
+                    request.setAttribute("errorVoucher", "Bạn đã lưu voucher này rồi");
+                }else{
+                    request.setAttribute("successVoucher", "Áp dụng voucher thành công");
+                    request.setAttribute("selectedVoucher",voucher);
+                }
+            }
+        }
+
 
         List<OrderItem> items = new ArrayList<>();
         double subTotal = 0;
