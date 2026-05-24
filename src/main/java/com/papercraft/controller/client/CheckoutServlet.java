@@ -217,9 +217,9 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         OrderService orderService = new OrderService();
-        boolean success= orderService.placeOrder(user,selectedCart,order,paymentMethod);
+        int orderId = orderService.placeOrderAndReturnId(user, selectedCart, order, paymentMethod);
 
-        if (success) {
+        if (orderId > 0) {
             CartDAO cartDAO = new CartDAO();
 
             for (Integer id : selectedIds) {
@@ -229,8 +229,11 @@ public class CheckoutServlet extends HttpServlet {
 
             session.setAttribute("cart", cart);
 
-            // Đánh dấu vừa đặt hàng thành công để cho phép vào /order-success
+            // Cho phép vào trang /orderSuccess
             session.setAttribute("orderSuccess", true);
+
+            // Lưu orderId vừa đặt
+            session.setAttribute("lastOrderId", orderId);
 
             response.sendRedirect(request.getContextPath() + "/order-success");
         } else {

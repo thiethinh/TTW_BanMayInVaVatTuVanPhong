@@ -27,6 +27,10 @@
 
         <h1>Cảm ơn bạn đã đặt hàng!</h1>
 
+        <p class="order-code">
+            Mã đơn hàng của bạn:
+            <strong>#${orderId}</strong>
+        </p>
         <p id="p1">
             Đơn hàng của bạn đã được ghi nhận thành công. PaperCraft sẽ xử lý sớm nhất.
         </p>
@@ -62,7 +66,7 @@
                 Tiếp tục mua sắm
             </a>
 
-            <a href="${pageContext.request.contextPath}/order-view?orderId=13" class="btn-secondary">
+            <a href="${pageContext.request.contextPath}/order-view?orderId=${orderId}" class="btn-secondary">
                 Xem lịch sử đơn hàng
             </a>
         </div>

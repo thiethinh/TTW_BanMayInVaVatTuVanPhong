@@ -124,4 +124,108 @@ public class OrderService {
             }
         }
     }
+// để lấy được orderId
+    public int placeOrderAndReturnId(User user, Cart cart, Order order, String paymentMethod) {
+        if (user == null || cart == null || cart.list().isEmpty() || order == null) {
+            return 0;
+        }
+
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            paymentMethod = "COD";
+        }
+
+        Connection conn = null;
+
+        try {
+            conn = DBConnect.getConnection();
+            conn.setAutoCommit(false);
+
+            double subTotal = 0;
+            List<OrderItem> orderItems = new ArrayList<>();
+
+            for (Product product : cart.list()) {
+                if (product == null || product.getId() <= 0 || product.getQuantity() <= 0) {
+                    conn.rollback();
+                    return 0;
+                }
+
+                BigDecimal price = BigDecimal.valueOf(product.getPrice());
+                BigDecimal total = price.multiply(BigDecimal.valueOf(product.getQuantity()));
+
+                OrderItem item = new OrderItem();
+                item.setProductId(product.getId());
+                item.setQuantity(product.getQuantity());
+                item.setPrice(price);
+                item.setTotal(total);
+                item.setProduct(product);
+
+                orderItems.add(item);
+                subTotal += total.doubleValue();
+            }
+
+            subTotal = Math.round(subTotal);
+            double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+            double vat = Math.round(subTotal * 0.05);
+            double grandTotal = Math.round(subTotal + shippingFee + vat);
+
+            order.setUserId(user.getId());
+            order.setStatus("pending");
+            order.setShippingFee(BigDecimal.valueOf(shippingFee));
+            order.setTotalPrice(BigDecimal.valueOf(grandTotal));
+
+            int orderId = orderDAO.insertOrder(conn, order);
+
+            if (orderId <= 0) {
+                conn.rollback();
+                return 0;
+            }
+
+            for (OrderItem item : orderItems) {
+                item.setOrderId(orderId);
+            }
+
+            orderItemDAO.insertOrderItem(conn, orderItems);
+
+            Payment payment = new Payment();
+            payment.setOrderId(orderId);
+            payment.setPaymentMethod(paymentMethod);
+            payment.setPaymentAmount(BigDecimal.valueOf(grandTotal));
+            payment.setStatus(false);
+            payment.setTransactionCode(null);
+            payment.setPaidAt(null);
+
+            boolean paymentInserted = paymentDAO.insertPayment(conn, payment);
+
+            if (!paymentInserted) {
+                conn.rollback();
+                return 0;
+            }
+
+            conn.commit();
+            return orderId;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            return 0;
+
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
