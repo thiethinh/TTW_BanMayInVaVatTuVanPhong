@@ -52,6 +52,19 @@ public class AdminVoucherServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        if ("insert".equals(action)) {
+            Voucher v = buildVoucherFromRequest(request);
+            voucherDAO.insertVoucher(v);
+            response.sendRedirect("admin-voucher");
+
+        } else if ("update".equals(action)) {
+            Voucher v = buildVoucherFromRequest(request);
+            v.setId(Integer.parseInt(request.getParameter("id")));
+            voucherDAO.updateVoucher(v);
+            response.sendRedirect("admin-voucher");
+        }
     }
 
     private void loadVoucherPage(HttpServletRequest request, HttpServletResponse response)

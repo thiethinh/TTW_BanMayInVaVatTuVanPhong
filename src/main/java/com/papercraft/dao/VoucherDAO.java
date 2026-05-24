@@ -85,4 +85,58 @@ public class VoucherDAO {
             e.printStackTrace();
         }
     }
+
+    public void insertVoucher(Voucher v) {
+        String sql = """
+                INSERT INTO vouchers
+                (code, name, description, discount_type, discount_value, max_discount,
+                 min_order_value, quantity, start_date, end_date, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, v.getCode());
+            ps.setString(2, v.getName());
+            ps.setString(3, v.getDescription());
+            ps.setString(4, v.getDiscountType());
+            ps.setBigDecimal(5, v.getDiscountValue());
+            ps.setBigDecimal(6, v.getMaxDiscount());
+            ps.setBigDecimal(7, v.getMinOrderValue());
+            ps.setInt(8, v.getQuantity());
+            ps.setTimestamp(9, v.getStartDate());
+            ps.setTimestamp(10, v.getEndDate());
+            ps.setString(11, v.getStatus());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateVoucher(Voucher v) {
+        String sql = """
+                UPDATE vouchers SET
+                    code = ?, name = ?, description = ?, discount_type = ?,
+                    discount_value = ?, max_discount = ?, min_order_value = ?,
+                    quantity = ?, start_date = ?, end_date = ?, status = ?
+                WHERE id = ?
+                """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, v.getCode());
+            ps.setString(2, v.getName());
+            ps.setString(3, v.getDescription());
+            ps.setString(4, v.getDiscountType());
+            ps.setBigDecimal(5, v.getDiscountValue());
+            ps.setBigDecimal(6, v.getMaxDiscount());
+            ps.setBigDecimal(7, v.getMinOrderValue());
+            ps.setInt(8, v.getQuantity());
+            ps.setTimestamp(9, v.getStartDate());
+            ps.setTimestamp(10, v.getEndDate());
+            ps.setString(11, v.getStatus());
+            ps.setInt(12, v.getId());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -20,10 +20,9 @@
             <h1>Quản Lý Voucher</h1>
             <form action="admin-voucher" method="get" class="searchbox">
                 <input type="text" name="keyword" value="${keyword}"
-                       placeholder="Tìm theo tên, mã voucher..." class="search-control">
+                       placeholder="Tìm theo tên, mã voucher...">
                 <button type="submit">Tìm</button>
-                <button type="button"
-                        onclick="window.location.href='admin-voucher?action=add'">
+                <button type="button" onclick="window.location.href='admin-voucher?action=add'">
                     Thêm Voucher
                 </button>
             </form>
@@ -50,27 +49,41 @@
                         <td>${v.id}</td>
                         <td><strong>${v.code}</strong></td>
                         <td>${v.name}</td>
-                        <td>${v.discountType}</td>
                         <td>
                             <c:choose>
                                 <c:when test="${v.discountType == 'PERCENT'}">
-                                    ${v.discountValue}%
+                                    <span class="badge badge-percent">PERCENT</span>
                                 </c:when>
                                 <c:otherwise>
-                                    ${v.discountValue} đ
+                                    <span class="badge badge-fixed">FIXED</span>
                                 </c:otherwise>
                             </c:choose>
                         </td>
-                        <td>${v.quantity}</td>
+                        <td>${v.getDiscountDisplay()}</td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${v.quantity == 0}">Không giới hạn</c:when>
+                                <c:otherwise>${v.quantity}</c:otherwise>
+                            </c:choose>
+                        </td>
                         <td>${v.endDate}</td>
                         <td class="status-col">
                             <a href="admin-voucher?action=toggle&id=${v.id}">
                                 <c:choose>
                                     <c:when test="${v.status == 'ACTIVE'}">
-                                        <i class="fa-solid fa-square-check" style="color: green;"></i>
+                                        <span class="badge badge-active">
+                                            <i class="fa-solid fa-circle-check"></i> ACTIVE
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${v.status == 'INACTIVE'}">
+                                        <span class="badge badge-inactive">
+                                            <i class="fa-solid fa-circle-xmark"></i> INACTIVE
+                                        </span>
                                     </c:when>
                                     <c:otherwise>
-                                        <i class="fa-regular fa-square" style="color: red;"></i>
+                                        <span class="badge badge-expired">
+                                            <i class="fa-solid fa-clock"></i> EXPIRED
+                                        </span>
                                     </c:otherwise>
                                 </c:choose>
                             </a>
@@ -84,7 +97,9 @@
                 </c:forEach>
                 <c:if test="${empty vouchers}">
                     <tr>
-                        <td colspan="9" style="text-align: center;">Không tìm thấy voucher nào.</td>
+                        <td colspan="9" style="text-align: center; padding: 2rem; color: #888;">
+                            Không tìm thấy voucher nào.
+                        </td>
                     </tr>
                 </c:if>
                 </tbody>
