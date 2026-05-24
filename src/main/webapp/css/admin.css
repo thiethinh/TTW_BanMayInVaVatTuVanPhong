@@ -36,6 +36,11 @@
 .admin-nav {
     flex-grow: 1;
     padding: 20px 0;
+    overflow-y: auto;
+}
+
+.admin-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .admin-nav ul {
