@@ -103,8 +103,50 @@
             <canvas id="revenueChartMonth"></canvas>
         </section>
 
+        <%-- dashboard phân tích doanh thu và lợi nhuận gộp --%>
+        <section id="profit-analytics" class="content-table-card">
+            <h2>Phân Tích Doanh Thu & Lợi Nhuận Gộp</h2>
 
-        <%-- dasshboard don hang chua phan hoi --%>
+            <div>
+                <label for="yearFilter">Xem Thống Kê Theo Năm: </label>
+                <select id="yearFilter" class="select-trigger"
+                        style="width: 120px; padding: 8px; border-radius: 5px; border: 1px solid #ccc">
+                    <option value="2026" selected>2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+
+            <canvas id="profitChart"></canvas>
+        </section>
+
+        <%-- dashboard dự báo nhập hàng --%>
+        <section id="restock-forecast" class="content-table-card">
+            <h2>Dự Báo Nhập Kho & Gợi Ý Nhập Hàng Cho 30 Ngày Tới</h2>
+
+            <table class="content-table">
+                <thead>
+                <tr>
+                    <th>Mã SP</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Tồn Kho</th>
+                    <th>Đã Nhập</th>
+                    <th>Đã Bán</th>
+                    <th>Vận Tốc (SP/Ngày)</th>
+                    <th>Đề Xuất Nhập</th>
+                    <th>Trạng Thái</th>
+                </tr>
+                </thead>
+
+                <tbody id="restockTableBody" style="text-align: center;">
+                <tr>
+                    <td colspan="8">Đang tải dữ liệu phân tích</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <%-- dashboard don hang chua phan hoi --%>
         <section id="order-pending" class="content-table-card">
             <h2>Đơn Hàng Chưa Phản Hồi</h2>
 
@@ -173,7 +215,7 @@
             </div>
         </section>
 
-        <%-- dasshboard khach hang --%>
+        <%-- dashboard khach hang --%>
         <section id="account" class="content-table-card">
             <h2>Thống Kê Tài Khoản</h2>
 
