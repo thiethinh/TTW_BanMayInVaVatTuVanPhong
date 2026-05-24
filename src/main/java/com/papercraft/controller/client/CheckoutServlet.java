@@ -220,16 +220,19 @@ public class CheckoutServlet extends HttpServlet {
         boolean success= orderService.placeOrder(user,selectedCart,order,paymentMethod);
 
         if (success) {
-            CartDAO cartDAO= new CartDAO();
+            CartDAO cartDAO = new CartDAO();
 
-            for (Integer id: selectedIds){
+            for (Integer id : selectedIds) {
                 cart.remove(id);
-                cartDAO.deleteItem(user.getId(),id);
+                cartDAO.deleteItem(user.getId(), id);
             }
 
-            session.setAttribute("cart",cart);
-            session.setAttribute("success", "Đơn hàng của bạn đã được đặt thành công!");
-            response.sendRedirect(request.getContextPath() + "/home");
+            session.setAttribute("cart", cart);
+
+            // Đánh dấu vừa đặt hàng thành công để cho phép vào /order-success
+            session.setAttribute("orderSuccess", true);
+
+            response.sendRedirect(request.getContextPath() + "/order-success");
         } else {
             request.setAttribute("error", "Đặt hàng thất bại, vui lòng thử lại!");
             doGet(request, response);

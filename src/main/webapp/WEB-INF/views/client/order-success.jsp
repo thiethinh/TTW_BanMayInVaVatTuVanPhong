@@ -58,11 +58,11 @@
         </div>
 
         <div class="success-actions">
-            <a href="${pageContext.request.contextPath}/home" class="btn-primary">
+            <a href="${pageContext.request.contextPath}/printer" class="btn-primary">
                 Tiếp tục mua sắm
             </a>
 
-            <a href="${pageContext.request.contextPath}/account" class="btn-secondary">
+            <a href="${pageContext.request.contextPath}/order-view?orderId=13" class="btn-secondary">
                 Xem lịch sử đơn hàng
             </a>
         </div>
