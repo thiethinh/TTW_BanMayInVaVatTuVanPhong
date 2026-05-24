@@ -16,7 +16,7 @@
 
 <body data-context="${pageContext.request.contextPath}">
 
-<jsp:include page="WEB-INF/views/includes/header.jsp"/>
+<jsp:include page="../includes/header.jsp"/>
 
 <main class="order-success-main">
 
@@ -100,7 +100,7 @@
 
 </main>
 
-<jsp:include page="WEB-INF/views/includes/footer.jsp"/>
+<jsp:include page="../includes/footer.jsp"/>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
