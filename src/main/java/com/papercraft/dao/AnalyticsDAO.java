@@ -22,7 +22,7 @@ public class AnalyticsDAO {
                 FROM (
                     SELECT created_at AS calc_date, total_price AS revenue, 0 AS cost
                     FROM orders
-                    WHERE YEAR(created_at) = ?
+                    WHERE YEAR(created_at) = ? AND status = 'completed'
                 
                     UNION ALL
                 
@@ -44,6 +44,7 @@ public class AnalyticsDAO {
                 dto.setMonth(rs.getString("month_val"));
                 dto.setRevenue(rs.getDouble("total_revenue"));
                 dto.setCost(rs.getDouble("total_cost"));
+                dto.setProfit(rs.getDouble("total_revenue") - rs.getDouble("total_cost"));
                 result.add(dto);
             }
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class AnalyticsDAO {
                             COALESCE((SELECT SUM(quantity)
                                       FROM order_item oi
                                       JOIN orders o ON oi.order_id = o.id
-                                      WHERE oi.product_id = p.id), 0) AS total_sold
+                                      WHERE oi.product_id = p.id AND o.status = 'completed'), 0) AS total_sold
                         FROM product p
                         WHERE p.is_deleted = 0
                 """;
