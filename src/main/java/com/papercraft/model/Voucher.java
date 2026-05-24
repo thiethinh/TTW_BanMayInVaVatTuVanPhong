@@ -19,6 +19,7 @@ public class Voucher {
     private Timestamp endDate;
     private String status; // 'ACTIVE', 'INACTIVE', 'EXPIRED'
     private Timestamp createdAt;
+    private Boolean isDeleted;
 
     public Voucher() {
     }
@@ -126,6 +127,22 @@ public class Voucher {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    //logic of voucher
+
+    //xóa mềm cho voucher
+    public void softDeleteVoucher(){
+        isDeleted=false;
+    }
+
 
     public boolean isAvailable(){
         return isStatusActive() && isNotExpired() && hasQuantityLeft();
