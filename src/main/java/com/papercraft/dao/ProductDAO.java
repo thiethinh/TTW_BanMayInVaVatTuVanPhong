@@ -426,8 +426,8 @@ public class ProductDAO {
                      p.price, 
                      i.img_name,
          
-                     COALESCE(r.avg_rating, 5) AS avg_rating,
-                     COALESCE(s.sold_quantity, 1) AS sold_quantity
+                     COALESCE(r.avg_rating, 0) AS avg_rating,
+                     COALESCE(s.sold_quantity, 0) AS sold_quantity
          
                  FROM product p
          
