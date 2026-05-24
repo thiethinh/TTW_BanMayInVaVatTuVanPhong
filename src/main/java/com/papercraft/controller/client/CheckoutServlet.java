@@ -2,12 +2,9 @@ package com.papercraft.controller.client;
 
 import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.CartDAO;
-import com.papercraft.model.Address;
-import com.papercraft.model.Cart;
-import com.papercraft.model.Order;
-import com.papercraft.model.OrderItem;
-import com.papercraft.model.Product;
-import com.papercraft.model.User;
+import com.papercraft.dao.UserVoucherDAO;
+import com.papercraft.dao.VoucherDAO;
+import com.papercraft.model.*;
 import com.papercraft.service.OrderService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -63,6 +60,29 @@ public class CheckoutServlet extends HttpServlet {
         Address userAddr = addressDAO.findDefaultAddress(user.getId());
         request.setAttribute("addr", userAddr);
 
+        UserVoucherDAO  userVoucherDAO = new UserVoucherDAO();
+        List<Voucher> vouchers = userVoucherDAO.getVouchersByUserId(user.getId());
+        request.setAttribute("vouchers", vouchers);
+
+        String voucherCode=request.getParameter("voucherCode");
+        if(voucherCode!=null&&!voucherCode.trim().isEmpty()){
+            Voucher voucher=new VoucherDAO().getVoucherByCode(voucherCode.trim());
+            if(voucher==null){
+                request.setAttribute("saveVoucherError", "Mã voucher không tồn tại");
+            }else if(!voucher.isAvailable()){
+                request.setAttribute("saveVoucherError", "Voucher hiện không khả dụng");
+            }else{
+                boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
+                if(!success){
+                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
+                }else{
+                    request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
+                    request.setAttribute("selectedVoucher",voucher);
+                }
+            }
+        }
+
+
         List<OrderItem> items = new ArrayList<>();
         double subTotal = 0;
 
@@ -99,10 +119,41 @@ public class CheckoutServlet extends HttpServlet {
         double vat = Math.round(subTotal * 0.05);
         double grandTotal = Math.round(subTotal + vat + shippingFee);
 
+
+        //tính voucher
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        String voucherIdRaw = request.getParameter("voucherId");
+        Voucher selectedVoucher = null;
+        if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
+            try {
+                int voucherId = Integer.parseInt(voucherIdRaw);
+                selectedVoucher = new VoucherDAO().getVoucherById(voucherId);
+                if (selectedVoucher != null) {
+                    String voucherError = selectedVoucher.validateString(BigDecimal.valueOf(grandTotal));
+
+                    if (voucherError != null) {
+                        request.setAttribute("errorVoucher", voucherError);
+
+                    } else {
+                        discountAmount = selectedVoucher.calculateDiscount(BigDecimal.valueOf(grandTotal));
+                        grandTotal = selectedVoucher.applyDiscount(BigDecimal.valueOf(grandTotal)).toBigInteger().doubleValue();
+                        request.setAttribute("successVoucher", "Áp dụng voucher thành công");
+                        request.setAttribute("selectedVoucher", selectedVoucher);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorVoucher", "Voucher không hợp lệ"
+                );
+            }
+        }
+
+
+
         request.setAttribute("items", items);
         request.setAttribute("subTotal", subTotal);
         request.setAttribute("vat", vat);
         request.setAttribute("shippingFee", shippingFee);
+        request.setAttribute("discountAmount", discountAmount);
         request.setAttribute("grandTotal", grandTotal);
 
         request.setAttribute("selectedIds",selectedIdsRaw);

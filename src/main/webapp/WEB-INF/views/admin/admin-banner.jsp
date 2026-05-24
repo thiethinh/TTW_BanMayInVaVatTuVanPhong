@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-banner.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-voucher.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/pagination.css">
 
 </head>

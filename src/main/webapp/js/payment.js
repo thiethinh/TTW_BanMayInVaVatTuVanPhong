@@ -94,4 +94,45 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+
+    //func for voucher
+    const voucherDropdown = document.getElementById("voucherDropdown");
+    const voucherSelected = document.getElementById("voucherSelected");
+    const voucherIdInput = document.getElementById("voucherId");
+    voucherSelected.addEventListener("click", () => {
+        voucherDropdown.classList.toggle("active");
+    });
+
+    document.querySelectorAll(".voucher-item").forEach(item => {
+            item.addEventListener("click", () => {
+                document.querySelectorAll(".voucher-item").forEach(v => v.classList.remove("active"));
+                item.classList.add("active");
+                const voucherId = item.dataset.id;
+                voucherIdInput.value = voucherId;
+                voucherSelected.querySelector("span").innerText = item.querySelector("h4").innerText;
+                voucherDropdown.classList.remove("active");
+
+                // reload checkout
+                const params = new URLSearchParams(window.location.search);
+                const selectedIds = params.get("selectedIds");
+                window.location.href = `${contextPath}/checkout?selectedIds=${selectedIds}&voucherId=${voucherId}`;
+            });
+        });
+
+    document.addEventListener("click", (e) => {
+
+        if (!voucherDropdown.contains(e.target)) {
+            voucherDropdown.classList.remove("active");
+        }
+    });
+
+    document.getElementById("applyVoucherBtn").addEventListener("click", function () {
+            const code = document.getElementById("voucherCodeInput").value.trim();
+            const params = new URLSearchParams(window.location.search);
+            const selectedIds = params.get("selectedIds");
+            window.location.href= `${contextPath}/checkout?selectedIds=${selectedIds}&voucherCode=${encodeURIComponent(code)}`;
+        });
+
+
 });
