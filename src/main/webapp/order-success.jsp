@@ -16,7 +16,7 @@
 
 <body data-context="${pageContext.request.contextPath}">
 
-<jsp:include page="../includes/header.jsp"/>
+<jsp:include page="WEB-INF/views/includes/header.jsp"/>
 
 <main class="order-success-main">
 
@@ -27,9 +27,12 @@
 
         <h1>Cảm ơn bạn đã đặt hàng!</h1>
 
+        <p id="p1">
+            Đơn hàng của bạn đã được ghi nhận thành công. PaperCraft sẽ xử lý sớm nhất.
+        </p>
         <p>
-            Đơn hàng của bạn đã được ghi nhận thành công.
-            PaperCraft sẽ xử lý và liên hệ xác nhận trong thời gian sớm nhất.
+            Nếu có thắc mắc về đơn hàng vui lòng liên hệ với chúng tôi!
+
         </p>
 
         <div class="order-status">
@@ -60,7 +63,7 @@
             </a>
 
             <a href="${pageContext.request.contextPath}/account" class="btn-secondary">
-                Xem tài khoản của tôi
+                Xem lịch sử đơn hàng
             </a>
         </div>
     </section>
@@ -97,7 +100,7 @@
 
 </main>
 
-<jsp:include page="../includes/footer.jsp"/>
+<jsp:include page="WEB-INF/views/includes/footer.jsp"/>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
