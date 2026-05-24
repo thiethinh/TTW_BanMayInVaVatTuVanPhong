@@ -111,9 +111,6 @@
                 <label for="yearFilter">Xem Thống Kê Theo Năm: </label>
                 <select id="yearFilter" class="select-trigger"
                         style="width: 120px; padding: 8px; border-radius: 5px; border: 1px solid #ccc">
-                    <option value="2026" selected>2026</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
                 </select>
             </div>
 
@@ -125,6 +122,20 @@
         <%-- table dự báo nhập hàng --%>
         <section id="restock-forecast" class="content-table-card">
             <h2>Dự Báo Nhập Kho & Gợi Ý Nhập Hàng Cho 30 Ngày Tới</h2>
+
+            <div style="margin: 15px 0; display: flex; align-items: center; gap: 30px">
+                <div style="flex: 1;">
+                    <input type="text" id="restockSearch" placeholder="Tìm kiếm theo Tên hoặc Mã SP..."
+                           style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
+                <div>
+                    <select id="restockStatusFilter" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="need_restock">Cần Nhập Hàng</option>
+                        <option value="safe">An Toàn</option>
+                    </select>
+                </div>
+            </div>
 
             <div style="height: 400px; overflow-y: auto">
                 <table class="content-table">
@@ -253,6 +264,7 @@
 
     </main>
 </div>
+
 <script src="${pageContext.request.contextPath}/js/admin-dashboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/js/revenue.js"></script>

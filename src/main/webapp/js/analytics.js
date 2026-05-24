@@ -1,5 +1,6 @@
 export function initializeAnalytics(contextPath) {
     let myChart = null;
+    let restockData = [];
 
     function loadProfitChart() {
         const yearFilter = document.getElementById('yearFilter');
@@ -83,35 +84,76 @@ export function initializeAnalytics(contextPath) {
         fetch(`${contextPath}/admin/analytics-data?action=restock`, {})
             .then(response => response.json())
             .then(data => {
-                let html = '';
-                if (data && data.length > 0) {
-                    data.forEach(item => {
-                        let badgeClass = item.recommendedImportQty > 0 ? 'status-badge status-import' : 'status-badge status-safe';
-                        let statusText = item.recommendedImportQty > 0 ? 'Cần Nhập Hàng' : 'An Toàn';
-
-                        html += `
-                            <tr>
-                                <td>${item.productId}</td>
-                                <td>${item.productName}</td>
-                                <td>${item.currentStock}</td>
-                                <td>${item.totalImported}</td>
-                                <td>${item.totalSold}</td>
-                                <td>${item.dailySalesVelocity}</td>
-                                <td><strong>${item.recommendedImportQty}</strong></td>
-                                <td><span class="${badgeClass}">${statusText}</span></td>
-                            </tr>`;
-                    });
-                } else {
-                    html = '<tr><td colspan="8">Không có dữ liệu</td></tr>';
-                }
-                tableBody.innerHTML = html;
+                restockData = data;
+                renderRestockTable()
             }).catch(error => console.error("Lỗi: " + error));
+    }
+
+    function renderRestockTable() {
+        const tableBody = document.getElementById('restockTableBody');
+        const searchFilter = document.getElementById('restockSearch')?.value.toLowerCase().trim() || '';
+        const statusFilter = document.getElementById('restockStatusFilter')?.value || 'all';
+
+        let filteredData = restockData.filter(item => {
+            const matchSearch = item.productName.toLowerCase().includes(searchFilter) ||
+                item.productId.toString().includes(searchFilter);
+
+            let matchStatus = true;
+            if (statusFilter === 'need_restock') {
+                matchStatus = item.recommendedImportQty > 0;
+            } else if (statusFilter === 'safe') {
+                matchStatus = item.recommendedImportQty === 0;
+            }
+
+            return matchSearch && matchStatus;
+        });
+
+        let html = '';
+        if (filteredData && filteredData.length > 0) {
+            filteredData.forEach(item => {
+                let badgeClass = item.recommendedImportQty > 0 ? 'status-badge status-import' : 'status-badge status-safe';
+                let statusText = item.recommendedImportQty > 0 ? 'Cần Nhập Hàng' : 'An Toàn';
+
+                html += `
+                        <tr>
+                            <td>${item.productId}</td>
+                            <td>${item.productName}</td>
+                            <td>${item.currentStock}</td>
+                            <td>${item.totalImported}</td>
+                            <td>${item.totalSold}</td>
+                            <td>${item.dailySalesVelocity}</td>
+                            <td><strong>${item.recommendedImportQty}</strong></td>
+                            <td><span class="${badgeClass}">${statusText}</span></td>
+                        </tr>`;
+            });
+        } else {
+            html = '<tr><td colspan="8">Không tìm thấy sản phẩm nào phù hợp</td></tr>';
+        }
+        tableBody.innerHTML = html;
+    }
+
+    const yearFilter = document.getElementById('yearFilter');
+    if (yearFilter) {
+        const currentYear = new Date().getFullYear();
+        let optionsHtml = '';
+        for (let i = 0; i < 10; i++) {
+            const year = currentYear - i;
+            optionsHtml += `<option value="${year}" ${i === 0 ? 'selected' : ''}>${year}</option>`;
+        }
+        yearFilter.innerHTML = optionsHtml;
+        yearFilter.addEventListener('change', loadProfitChart);
     }
 
     loadProfitChart();
     loadRestockForecast();
-    const yearFilter = document.getElementById('yearFilter');
-    if (yearFilter) {
-        yearFilter.addEventListener('change', loadProfitChart);
+
+    const searchInput = document.getElementById('restockSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', renderRestockTable);
+    }
+
+    const statusSelect = document.getElementById('restockStatusFilter');
+    if (statusSelect) {
+        statusSelect.addEventListener('change', renderRestockTable);
     }
 }
