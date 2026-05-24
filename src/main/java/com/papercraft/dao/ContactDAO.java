@@ -112,7 +112,7 @@ public class ContactDAO {
     public List<Contact> getContact(String keyword, int replied) {
         List<Contact> contacts = new ArrayList<>();
         String sqlRaw = """
-                SELECT c.id, c.user_fullname, u.email ,c.contact_title, c.content, c.rely
+                SELECT c.id, c.user_fullname, u.email ,c.contact_title, c.content, c.rely, c.created_at
                 FROM contact c
                 LEFT JOIN users u ON u.id = c.user_id
                 WHERE 1=1
@@ -157,6 +157,7 @@ public class ContactDAO {
                     contact.setEmail(rs.getString("email")); // Lấy từ bảng contact
                     contact.setContactTitle(rs.getString("contact_title"));
                     contact.setContent(rs.getString("content"));
+                    contact.setCreatedAt(rs.getTimestamp("created_at"));
                     contact.setRely(rs.getBoolean("rely"));
 
                     contacts.add(contact);

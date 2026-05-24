@@ -246,13 +246,19 @@
 .content-table thead tr {
     background: #f1f3f5;
     border-radius: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 2000;
 }
 
 .content-table thead th {
     padding: 14px 18px;
     font-weight: 600;
     color: #333;
-    text-align: left;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 2000;
 }
 
 /* ====body========== */
@@ -284,7 +290,7 @@
     font-weight: 600;
 }
 
-.status-badge.pending {
+.status-badge.pending, .status-badge.slow {
     background-color: #fef4e6;
     color: #f5a623;
 }
@@ -294,14 +300,19 @@
     color: #165FF2;
 }
 
-.status-badge.completed {
+.status-badge.completed, .status-badge.safe {
     background-color: #e6f7f0;
     color: #2e7d32;
 }
 
-.status-badge.canceled {
+.status-badge.canceled, .status-badge.restock {
     background-color: #f8d7da;
     color: #842029;
+}
+
+.status-badge.dead {
+    background-color: #f5f5f5;
+    color: #616161;
 }
 
 .btn-action {
