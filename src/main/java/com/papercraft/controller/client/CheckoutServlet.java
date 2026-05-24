@@ -1,6 +1,7 @@
 package com.papercraft.controller.client;
 
 import com.papercraft.dao.AddressDAO;
+import com.papercraft.dao.CartDAO;
 import com.papercraft.model.Address;
 import com.papercraft.model.Cart;
 import com.papercraft.model.Order;
@@ -18,7 +19,9 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -47,6 +50,15 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
+
+        String selectedIdsRaw = request.getParameter("selectedIds");
+        Set<Integer> selectedIds= parseSelectedIdSet(selectedIdsRaw);
+
+        if (selectedIds.isEmpty()){
+            response.sendRedirect(request.getContextPath()+ "/cart");
+            return;
+        }
+
         AddressDAO addressDAO = new AddressDAO();
         Address userAddr = addressDAO.findDefaultAddress(user.getId());
         request.setAttribute("addr", userAddr);
@@ -55,6 +67,12 @@ public class CheckoutServlet extends HttpServlet {
         double subTotal = 0;
 
         for (Product p : cart.list()) {
+
+            //nếu sp khng được tick
+            if (!selectedIds.contains(p.getId())){
+                continue;
+            }
+
             OrderItem item = new OrderItem();
             item.setProduct(p);
             item.setProductId(p.getId());
@@ -70,6 +88,12 @@ public class CheckoutServlet extends HttpServlet {
             subTotal += total.doubleValue();
         }
 
+        //nếu selectedId gửi lên không khớp sp trong cart => không cho checkout(về cart )
+        if (items.isEmpty()){
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        }
+
         subTotal = Math.round(subTotal);
         double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
         double vat = Math.round(subTotal * 0.05);
@@ -80,6 +104,8 @@ public class CheckoutServlet extends HttpServlet {
         request.setAttribute("vat", vat);
         request.setAttribute("shippingFee", shippingFee);
         request.setAttribute("grandTotal", grandTotal);
+
+        request.setAttribute("selectedIds",selectedIdsRaw);
 
         request.getRequestDispatcher("/WEB-INF/views/client/payment.jsp").forward(request, response);
     }
@@ -94,10 +120,29 @@ public class CheckoutServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
         Cart cart = (Cart) session.getAttribute("cart");
 
+        String selectedIdsRaw= request.getParameter("selectedIds");
+        Set<Integer> selectedIds= parseSelectedIdSet(selectedIdsRaw);
+
         if (user == null || cart == null || cart.list().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
+
+        if (selectedIds.isEmpty()){
+            response.sendRedirect(request.getContextPath()+ "/cart");
+            return;
+        }
+        Cart selectedCart= new Cart();
+        for (Product p: cart.list()){
+            if (selectedIds.contains(p.getId())){
+                selectedCart.put(p);
+            }
+        }
+        if (selectedCart.list().isEmpty()){
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        }
+
 
         String fullname = request.getParameter("fullname");
         String phone = request.getParameter("phone");
@@ -113,10 +158,6 @@ public class CheckoutServlet extends HttpServlet {
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
         order.setShippingAddress(fullAddress);
-//        order.setNote((note == null ? "" : note.trim()) + " (PTTT: " + paymentMethod + ")");
-//
-//        OrderService orderService = new OrderService();
-//        boolean success = orderService.placeOrder(user, cart, order);
 
         order.setNote(note ==null ? "": note.trim());
 
@@ -125,15 +166,42 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         OrderService orderService = new OrderService();
-        boolean success= orderService.placeOrder(user,cart,order,paymentMethod);
+        boolean success= orderService.placeOrder(user,selectedCart,order,paymentMethod);
 
         if (success) {
-            session.removeAttribute("cart");
+            CartDAO cartDAO= new CartDAO();
+
+            for (Integer id: selectedIds){
+                cart.remove(id);
+                cartDAO.deleteItem(user.getId(),id);
+            }
+
+            session.setAttribute("cart",cart);
             session.setAttribute("success", "Đơn hàng của bạn đã được đặt thành công!");
             response.sendRedirect(request.getContextPath() + "/home");
         } else {
             request.setAttribute("error", "Đặt hàng thất bại, vui lòng thử lại!");
             doGet(request, response);
         }
+    }
+
+    //parseSelectedIdSet
+    private Set<Integer> parseSelectedIdSet(String selectedIdsRaw){
+        Set<Integer> result = new HashSet<>();
+
+        //check đàu vào rỗng
+        boolean isEmpty= selectedIdsRaw == null || selectedIdsRaw.trim().isEmpty();
+        if (isEmpty){
+            return result;
+        }
+        //tách chuỗi thành mảng theo ","
+        String[] parts= selectedIdsRaw.split(",");
+        for (String part : parts){
+            String trimmed = part.trim();
+            if (trimmed.matches("\\d+")){
+                result.add(Integer.parseInt(trimmed));
+            }
+        }
+        return result;
     }
 }

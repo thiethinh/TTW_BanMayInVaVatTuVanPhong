@@ -33,6 +33,9 @@
 
     <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm" novalidate>
 
+        // để doPost biết user đang thanh toán sp nào
+        <input type="hidden" name="selectedIds" value="${selectedIds}">
+
         <div class="block-paymentDetails-finalBill">
 
             <section class="payment-details">

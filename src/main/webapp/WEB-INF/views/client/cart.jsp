@@ -48,6 +48,14 @@
 
         <div class="container">
             <h1>GIỎ HÀNG CỦA BẠN</h1>
+
+            <div class="select-all-box" style="margin: 15px 0; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="selectAllCheckout" checked onchange="toggleSelectAllCheckout(this)">
+                <label for="selectAllCheckout" style="font-weight: 600;">
+                    Chọn tất cả sản phẩm
+                </label>
+            </div>
+
                 <%-- box search--%>
             <div class="cart-search-wrapper">
                 <div class="cart-search-box">
@@ -65,7 +73,7 @@
                     <%-- Dropdown autocomplete--%>
                 <ul id="cart-autocomplete" class="cart-autocomplete-list"></ul>
             </div>
-        <%-- Notify not Found--%>
+                <%-- Notify not Found--%>
             <p id="cart-no-result" style="display: none;color: #e74c3c;padding: 10px 0;">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 Không tìm thấy sản phẩm nào khớp.
@@ -78,6 +86,16 @@
 
                     <c:forEach items="${items}" var="item">
                         <div class="product-detail" id="row-${item.id}">
+
+                            <div class="checkout-check-wrapper"
+                                 style="display:flex; align-items:center; padding: 0 10px;">
+                                <input type="checkbox"
+                                       class="checkout-item-checkbox"
+                                       value="${item.id}"
+                                       checked
+                                       onchange="updateSelectedBill()">
+                            </div>
+
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
                                 <img src="${item.thumbnail}"/>
                             </a>
@@ -102,13 +120,11 @@
                                                max="${item.stockQuantity}"
                                                class="input-qty"
                                                onchange="updateQuantity(${item.id}, 0)"
-                                               oninput="
-                                                       this.value = this.value.replace(/\D/g,'').slice(0,2);
-                                                       this.value = Math.min(Math.max(1, this.value || 1), ${item.stockQuantity})"
+                                               oninput="this.value = this.value.replace(/\D/g,'').slice(0,2);"
                                                onblur="
                                                        if(this.value === '' || parseInt(this.value) < 1) this.value = 1;
                                                        if(parseInt(this.value) > ${item.stockQuantity}) this.value = ${item.stockQuantity};
-                                                       "
+                                                       updateQuantity(${item.id}, 0);"
                                         />
 
                                         <button type="button" class="btn-qty"
@@ -179,30 +195,13 @@
                         </p>
                     </h2>
 
-<%--                    <a href="${pageContext.request.contextPath}/checkout"--%>
-<%--                       id="bt-payment"--%>
-<%--                       class="block-bt-payment">--%>
-<%--                        TIẾN HÀNH THANH TOÁN--%>
-<%--                    </a>--%>
-                    <c:choose>
-<%--                        Đã đăng nhập--%>
-                        <c:when test="${not empty sessionScope.acc}">
-                            <a href="${pageContext.request.contextPath}/checkout"
-                                id="bt-payment"
-                                class="block-bt-payment">
-                                TIẾN HÀNH THANH TOÁN
-                            </a>
-                        </c:when>
-<%--                        Chưa ĐĂNG NHẬP--%>
-                        <c:otherwise>
-                            <a href="javascript:void(0)"
-                            id="bt-payment"
-                            class="block-bt-payment"
-                            onclick="handleGuestCheckout()">
-                                TIẾN HÀNH THANH TOÁN
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
+
+                    <a href="javascript:void(0)"
+                       id="bt-payment"
+                       class="block-bt-payment"
+                       onclick="handleSelectiveCheckout(${not empty sessionScope.acc})">
+                        TIẾN HÀNH THANH TOÁN
+                    </a>
 
                     <a href="#" onclick="history.back(); return false;"
                        id="bt-shopping-continous"
@@ -215,10 +214,10 @@
     </main>
 </c:if>
 
+<%--<script>--%>
+<%--    const IS_LOGGED_IN =${not empty sessionScope.acc};--%>
+<%--</script>--%>
 <script src="${pageContext.request.contextPath}/js/cart.js"></script>
-<script>
-    const IS_LOGGED_IN =${not empty sessionScope.acc};
-</script>
 
 <!-- ================= END MAIN===================== -->
 
