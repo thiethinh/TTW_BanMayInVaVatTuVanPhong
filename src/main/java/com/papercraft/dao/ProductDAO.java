@@ -768,5 +768,24 @@ public class ProductDAO {
 
         return result;
     }
+    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng -> sẽ k nằm trong transaction vs order
+    public boolean decreaseStockIfEnough(Connection conn, int productId, int quantity) throws SQLException {
+        String sql = """
+            UPDATE product
+            SET stock_quantity = stock_quantity - ?
+            WHERE id = ?
+              AND stock_quantity >= ?
+              AND is_deleted = b'0'
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }
+    }
 }
 

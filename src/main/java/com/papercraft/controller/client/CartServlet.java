@@ -44,34 +44,49 @@ public class CartServlet extends HttpServlet {
         try {
             if ("add".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
-                System.out.println("Debug: id = " + id);
                 int qty = Integer.parseInt(request.getParameter("quantity"));
 
                 Product p = dao.getProductById(id);
-                System.out.println("Debug: product = " + p);
+
                 if (p == null) {
                     sendJson(response, false, "Sản phẩm không tồn tại", cart.getTotalQuantity());
                     return;
-
                 }
+
+                if (qty <= 0) {
+                    sendJson(response, false, "Số lượng thêm vào giỏ phải lớn hơn 0", cart.getTotalQuantity());
+                    return;
+                }
+
+                if (p.getStockQuantity() <= 0) {
+                    sendJson(response, false, "Sản phẩm đã hết hàng", cart.getTotalQuantity());
+                    return;
+                }
+
                 p.setQuantity(qty);
+
                 String error = cart.putWithCheckStock(p, p.getStockQuantity());
-                session.setAttribute("cart", cart);
 
                 if (error != null) {
                     sendJson(response, false, error, cart.getTotalQuantity());
-                } else {
-                    sendJson(response, true, error, cart.getTotalQuantity());
-
+                    return;
                 }
+
+                session.setAttribute("cart", cart);
+
                 if (session.getAttribute("acc") != null) {
                     User user = (User) session.getAttribute("acc");
                     Product inCart = cart.get(id);
+
                     if (inCart != null) {
                         cartDAO.saveItem(user.getId(), id, inCart.getQuantity());
                     }
                 }
+
+                sendJson(response, true, "Thêm vào giỏ hàng thành công", cart.getTotalQuantity());
                 return;
+
+
             } else if ("count".equals(action)) {
                 response.getWriter().print(cart.getTotalQuantity());
                 return;
@@ -121,11 +136,23 @@ public class CartServlet extends HttpServlet {
                 int id = Integer.parseInt(request.getParameter("id"));
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
 
+                if (quantity <= 0) {
+                    sendJson(response, false, "Số lượng sản phẩm phải ít nhất là 1", cart.getTotalQuantity());
+                    return;
+                }
+
                 Product p = dao.getProductById(id);
+
                 if (p == null) {
                     sendJson(response, false, "Sản phẩm không tồn tại!", cart.getTotalQuantity());
                     return;
                 }
+
+                if (p.getStockQuantity() <= 0) {
+                    sendJson(response, false, "Sản phẩm đã hết hàng", cart.getTotalQuantity());
+                    return;
+                }
+
                 String error = cart.updateWithStock(id, quantity, p.getStockQuantity());
                 session.setAttribute("cart", cart);
 
@@ -238,7 +265,7 @@ public class CartServlet extends HttpServlet {
                           String message, int cartCount) throws IOException {
         response.setContentType("application/json; charset=UTF-8");
 
-        //=== Escape all ký tự nguy hiểm trong message
+        //=== Escape-bỏ all ký tự nguy hiểm trong message
         String safeMsg = (message == null) ? "" : message
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")

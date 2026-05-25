@@ -237,7 +237,7 @@ public class CheckoutServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/order-success");
         } else {
-            request.setAttribute("error", "Đặt hàng thất bại, vui lòng thử lại!");
+            request.setAttribute("error", "Đặt hàng thất bại. Có thể một số sản phẩm không còn đủ tồn kho, vui lòng kiểm tra lại giỏ hàng.");
             doGet(request, response);
         }
     }
