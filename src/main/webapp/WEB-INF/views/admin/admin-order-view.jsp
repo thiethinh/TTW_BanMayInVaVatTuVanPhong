@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<fmt:setTimeZone value="Asia/Ho_Chi_Minh" />
+<fmt:setTimeZone value="Asia/Ho_Chi_Minh"/>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,7 +32,7 @@
             <!-- -------------UP--------- -->
             <section class="up">
                 <div class="back">
-                    <a id="icon-back" href="javascript:history.back()"><i
+                    <a id="icon-back" href=..admin/admin-order-manage"><i
                             class="fa-solid fa-arrow-left"></i></a>
                     <h1> Chi Tiết Đơn Hàng</h1>
                 </div>
@@ -119,31 +119,73 @@
                             <h4>Tóm tắt thanh toán: </h4>
                             <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice  - order.shippingFee}"
                                                                   pattern="#,###"/> đ</span></p>
-                            <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}" pattern="#,###"/> đ</span>
+                            <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}"
+                                                                        pattern="#,###"/> đ</span>
                             </p>
                             <p> Thuế(VAT): <span>Đã bao gồm</span></p>
                             <h3>Tổng Cộng: <span><fmt:formatNumber value="${order.totalPrice}"
                                                                    pattern="#,###"/> đ</span></h3>
 
                         </div>
-                        <button class="btn update-status" type="submit" name="btn-update-status"> Cập nhật trạng
-                            thái
-                        </button>
+<%--                        <button class="btn update-status" type="submit" name="btn-update-status"> Cập nhật trạng--%>
+<%--                            thái--%>
+<%--                        </button>--%>
 
                         <div id="block-accept-cancel">
-                            <button
-                                    class="btn-accept"
-                                    type="button"
-                                    onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=shipped&orderId=${order.id}'">
-                                Xác nhận
-                            </button>
 
-                            <button
-                                    class="btn-cancel"
-                                    type="button"
-                                    onclick="location.href='${pageContext.request.contextPath}/admin-order-view?cancel=canceled&orderId=${order.id}'">
-                                Hủy đơn
-                            </button>
+                            <c:choose>
+
+                                <c:when test="${order.status == 'pending'}">
+                                    <button
+                                            class="btn-accept"
+                                            type="button"
+                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=shipped&orderId=${order.id}'">
+                                        Duyệt đơn / Giao hàng
+                                    </button>
+
+                                    <button
+                                            class="btn-cancel"
+                                            type="button"
+                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?cancel=canceled&orderId=${order.id}'">
+                                        Hủy đơn
+                                    </button>
+                                </c:when>
+
+                                <c:when test="${order.status == 'shipped'}">
+                                    <button
+                                            class="btn-accept"
+                                            type="button"
+                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=completed&orderId=${order.id}'">
+                                        Xác nhận hoàn thành
+                                    </button>
+
+                                    <button
+                                            class="btn-cancel"
+                                            type="button"
+                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?cancel=canceled&orderId=${order.id}'">
+                                        Hủy đơn
+                                    </button>
+                                </c:when>
+
+                                <c:when test="${order.status == 'completed'}">
+                                    <p style="text-align:center;color:green;font-weight:bold;">
+                                        Đơn hàng đã hoàn thành
+                                    </p>
+                                </c:when>
+
+                                <c:when test="${order.status == 'canceled'}">
+                                    <p style="text-align:center;color:red;font-weight:bold;">
+                                        Đơn hàng đã bị hủy
+                                    </p>
+                                </c:when>
+
+                                <c:otherwise>
+                                    <p style="text-align:center;color:#666;font-weight:bold;">
+                                        Trạng thái đơn hàng không xác định
+                                    </p>
+                                </c:otherwise>
+                            </c:choose>
+
                         </div>
 
                     </div>
@@ -157,9 +199,15 @@
 
                             <c:when test="${isAccept == true}">
                                 <p style="text-align:center;color:green">
-                                    Đơn hàng đã giao
+                                    Cập nhật trạng thái đơn hàng thành công
                                 </p>
                             </c:when>
+
+                            <c:otherwise>
+                                <p style="text-align:center;color:green">
+                                    Cập nhật thành công
+                                </p>
+                            </c:otherwise>
                         </c:choose>
                     </c:if>
                     <div class="payment-type">
@@ -200,7 +248,8 @@
                                 <input type="hidden" name="verifyPayment" value="1">
 
                                 <c:if test="${payment.paymentMethod != 'COD'}">
-                                    <input class="input" type="text" name="transactionCode" placeholder="Nhập mã giao dịch (nếu có)">
+                                    <input class="input" type="text" name="transactionCode"
+                                           placeholder="Nhập mã giao dịch (nếu có)">
                                 </c:if>
 
                                 <button type="submit" class="btn">
