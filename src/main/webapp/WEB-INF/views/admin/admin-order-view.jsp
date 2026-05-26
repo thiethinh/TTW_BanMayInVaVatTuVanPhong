@@ -40,7 +40,7 @@
                     <h2>Mã đơn: <span>${order.id}</span></h2>
                     <a href="${pageContext.request.contextPath}/invoice-print?orderId=${order.id}" target="_blank"
                        class="btn">
-                        In hóa đơn
+                        In hóa đơn 🖨️
                     </a>
                 </div>
             </section>
