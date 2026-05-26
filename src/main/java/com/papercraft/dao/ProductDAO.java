@@ -440,7 +440,7 @@ public class ProductDAO {
              
                      LEFT JOIN (
                          SELECT product_id, AVG(rating) AS avg_rating
-                         FROM review
+                         FROM review 
                          GROUP BY product_id
                      ) r ON r.product_id = p.id
              
@@ -526,7 +526,7 @@ public class ProductDAO {
     //======= countProducts =====
     public int countProducts(String keyword) {
         String sql = """
-                SELECT COUNT(*) FROM product WHERE product_name LIKE ? AND p.is_deleted=0
+                SELECT COUNT(*) FROM product p WHERE p.product_name LIKE ? AND p.is_deleted=0
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -798,15 +798,15 @@ public class ProductDAO {
         return result;
     }
 
-    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng -> sẽ k nằm trong transaction vs order
+    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng từ try -> sẽ k nằm trong transaction vs order
     public boolean decreaseStockIfEnough(Connection conn, int productId, int quantity) throws SQLException {
         String sql = """
-            UPDATE product
-            SET stock_quantity = stock_quantity - ?
-            WHERE id = ?
-              AND stock_quantity >= ?
-              AND is_deleted = b'0'
-            """;
+                    UPDATE product
+                    SET stock_quantity = stock_quantity - ?
+                    WHERE id = ?
+                      AND stock_quantity >= ?
+                      AND is_deleted = 0
+                        """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quantity);
