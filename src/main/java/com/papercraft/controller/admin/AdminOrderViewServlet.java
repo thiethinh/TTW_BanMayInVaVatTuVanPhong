@@ -34,13 +34,22 @@ public class AdminOrderViewServlet extends HttpServlet {
         boolean isCancel = false;
 
         if (accept != null) {
-            updated = orderDAO.updateOrderStatus(id, accept);
-            isAccept = true;
+            Order currentOrder = orderDAO.getOrderByID(id);
+
+            if (currentOrder != null && isValidStatusChange(currentOrder.getStatus(), accept)) {
+                updated = orderDAO.updateOrderStatus(id, accept);
+                isAccept = true;
+            }
+
         } else if (cancel != null) {
-            updated = orderDAO.updateOrderStatus(id, cancel);
-            isCancel = true;
+            Order currentOrder = orderDAO.getOrderByID(id);
+
+            if (currentOrder != null && isValidStatusChange(currentOrder.getStatus(), cancel)) {
+                updated = orderDAO.updateOrderStatus(id, cancel);
+                isCancel = true;
+            }
         }
-    // Xuwr lys VerifyPayment
+        // Xuwr lys VerifyPayment
         boolean isVeryfyPayment= false;
         boolean verifiedPayment = false;
 
@@ -55,7 +64,7 @@ public class AdminOrderViewServlet extends HttpServlet {
                 //Gia su cho COD verify khi owr trang thai shipping/complete
                 if ("COD".equalsIgnoreCase(method)){
                     if (currentOrder != null && ("shipped".equalsIgnoreCase(currentOrder.getStatus())
-                    || "completed".equalsIgnoreCase(currentOrder.getStatus()))){
+                            || "completed".equalsIgnoreCase(currentOrder.getStatus()))){
                         verifiedPayment= paymentDAO.verifyPaymentSuccess(id,transactionCode);
                         isVeryfyPayment= true;
                     }
@@ -92,6 +101,30 @@ public class AdminOrderViewServlet extends HttpServlet {
 
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-order-view.jsp").forward(request, response);
 
+    }
+
+    private boolean isValidStatusChange(String currentStatus, String newStatus) {
+        if (currentStatus == null || newStatus == null) {
+            return false;
+        }
+
+        currentStatus = currentStatus.trim().toLowerCase();
+        newStatus = newStatus.trim().toLowerCase();
+
+        switch (currentStatus) {
+            case "pending":
+                return newStatus.equals("shipped") || newStatus.equals("canceled");
+
+            case "shipped":
+                return newStatus.equals("completed") || newStatus.equals("canceled");
+
+            case "completed":
+            case "canceled":
+                return false;
+
+            default:
+                return false;
+        }
     }
 
     @Override

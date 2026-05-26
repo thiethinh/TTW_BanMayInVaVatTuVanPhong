@@ -3,6 +3,7 @@ package com.papercraft.service;
 import com.papercraft.dao.OrderDAO;
 import com.papercraft.dao.OrderItemDAO;
 import com.papercraft.dao.PaymentDAO;
+import com.papercraft.dao.ProductDAO;
 import com.papercraft.model.*;
 import com.papercraft.utils.DBConnect;
 
@@ -16,12 +17,125 @@ public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final OrderItemDAO orderItemDAO = new OrderItemDAO();
     private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final ProductDAO productDAO = new ProductDAO();
 
-    public boolean placeOrder(User user, Cart cart, Order order, String paymentMethod) {
-        if (user == null || cart == null || cart.list() == null || cart.list().isEmpty() || order == null) {
-            return false;
+//    public boolean placeOrder(User user, Cart cart, Order order, String paymentMethod) {
+//        if (user == null || cart == null || cart.list() == null || cart.list().isEmpty() || order == null) {
+//            return false;
+//        }
+//        if (paymentMethod == null || paymentMethod.isBlank()) {
+//            paymentMethod = "COD";
+//        }
+//
+//        Connection conn = null;
+//
+//        try {
+//            conn = DBConnect.getConnection();
+//            conn.setAutoCommit(false);
+//
+//            double subTotal = 0;
+//            List<OrderItem> orderItems = new ArrayList<>();
+//
+//            for (Product product : cart.list()) {
+//                if (product == null || product.getId() <= 0 || product.getQuantity() == null || product.getQuantity() <= 0) {
+//                    conn.rollback();
+//                    return false;
+//                }
+//
+//                int quantity = product.getQuantity();
+//                BigDecimal price = BigDecimal.valueOf(product.getPrice());
+//                BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(quantity));
+//
+//                OrderItem orderItem = new OrderItem();
+//                orderItem.setProductId(product.getId());
+//                orderItem.setQuantity(quantity);
+//                orderItem.setPrice(price);
+//                orderItem.setProduct(product);
+//                orderItem.setTotal(lineTotal);
+//
+//                orderItems.add(orderItem);
+//                subTotal += lineTotal.doubleValue();
+//            }
+//
+//            subTotal = Math.round(subTotal);
+//            double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+//            double vat = Math.round(subTotal * 0.05);
+//            double grandTotal = Math.round(subTotal + vat + shippingFee);
+//
+//            order.setUserId(user.getId());
+//            order.setStatus("pending");
+//            order.setShippingFee(BigDecimal.valueOf(shippingFee));
+//            order.setTotalPrice(BigDecimal.valueOf(grandTotal));
+//
+//            int orderId = orderDAO.insertOrder(conn, order);
+//            if (orderId <= 0) {
+//                conn.rollback();
+//                return false;
+//            }
+//
+//            for (OrderItem item : orderItems) {
+//                item.setOrderId(orderId);
+//            }
+//            orderItemDAO.insertOrderItem(conn, orderItems);
+//
+//            Payment payment = new Payment();
+//            payment.setOrderId(orderId);
+//            payment.setPaymentMethod(paymentMethod);
+//            payment.setPaymentAmount(BigDecimal.valueOf(grandTotal));
+//            payment.setStatus(false);
+//            payment.setTransactionCode(null);
+//            payment.setPaidAt(null);
+//
+//            boolean paymentInserted = paymentDAO.insertPayment(conn, payment);
+//            if (!paymentInserted) {
+//                conn.rollback();
+//                return false;
+//            }
+//
+//            //trừ tồn kho sau khi tạo order, payment thành công
+//            for (OrderItem item : orderItems) {
+//                boolean stockUpdated = productDAO.decreaseStockIfEnough(conn ,item.getProductId(), item.getQuantity());
+//
+//                if (!stockUpdated) {
+//                    conn.rollback();
+//                    return false;
+//                }
+//            }
+//
+//            conn.commit();
+//            return true;
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//
+//            if (conn != null) {
+//                try {
+//                    conn.rollback();
+//                } catch (SQLException ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//            return false;
+//
+//        } finally {
+//            if (conn != null) {
+//                try {
+//                    conn.setAutoCommit(true);
+//                    conn.close();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
+
+    // để lấy được orderId
+    public int placeOrderAndReturnId(User user, Cart cart, Order order, String paymentMethod) {
+        if (user == null || cart == null || cart.list().isEmpty() || order == null) {
+            return 0;
         }
-        if(paymentMethod ==null || paymentMethod.isBlank()){
+
+        if (paymentMethod == null || paymentMethod.isBlank()) {
             paymentMethod = "COD";
         }
 
@@ -35,30 +149,29 @@ public class OrderService {
             List<OrderItem> orderItems = new ArrayList<>();
 
             for (Product product : cart.list()) {
-                if (product == null || product.getId() <= 0 || product.getQuantity() == null || product.getQuantity() <= 0) {
+                if (product == null || product.getId() <= 0 || product.getQuantity() <= 0) {
                     conn.rollback();
-                    return false;
+                    return 0;
                 }
 
-                int quantity = product.getQuantity();
                 BigDecimal price = BigDecimal.valueOf(product.getPrice());
-                BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(quantity));
+                BigDecimal total = price.multiply(BigDecimal.valueOf(product.getQuantity()));
 
-                OrderItem orderItem = new OrderItem();
-                orderItem.setProductId(product.getId());
-                orderItem.setQuantity(quantity);
-                orderItem.setPrice(price);
-                orderItem.setProduct(product);
-                orderItem.setTotal(lineTotal);
+                OrderItem item = new OrderItem();
+                item.setProductId(product.getId());
+                item.setQuantity(product.getQuantity());
+                item.setPrice(price);
+                item.setTotal(total);
+                item.setProduct(product);
 
-                orderItems.add(orderItem);
-                subTotal += lineTotal.doubleValue();
+                orderItems.add(item);
+                subTotal += total.doubleValue();
             }
 
             subTotal = Math.round(subTotal);
             double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
             double vat = Math.round(subTotal * 0.05);
-            double grandTotal = Math.round(subTotal + vat + shippingFee);
+            double grandTotal = Math.round(subTotal + shippingFee + vat);
 
             order.setUserId(user.getId());
             order.setStatus("pending");
@@ -66,26 +179,19 @@ public class OrderService {
             order.setTotalPrice(BigDecimal.valueOf(grandTotal));
 
             int orderId = orderDAO.insertOrder(conn, order);
+
             if (orderId <= 0) {
                 conn.rollback();
-                return false;
+                return 0;
             }
 
-//            for (OrderItem item : orderItems) {
-//                item.setOrderId(orderId);
-//            }
-//
-//            orderItemDAO.insertOrderItem(conn, orderItems);
-//
-//            conn.commit();
-//            return true;
-
-            for (OrderItem item: orderItems){
+            for (OrderItem item : orderItems) {
                 item.setOrderId(orderId);
             }
-            orderItemDAO.insertOrderItem(conn,orderItems);
 
-            Payment payment= new Payment();
+            orderItemDAO.insertOrderItem(conn, orderItems);
+
+            Payment payment = new Payment();
             payment.setOrderId(orderId);
             payment.setPaymentMethod(paymentMethod);
             payment.setPaymentAmount(BigDecimal.valueOf(grandTotal));
@@ -93,13 +199,29 @@ public class OrderService {
             payment.setTransactionCode(null);
             payment.setPaidAt(null);
 
-            boolean paymentInserted= paymentDAO.insertPayment(conn,payment);
-            if (!paymentInserted){
+            boolean paymentInserted = paymentDAO.insertPayment(conn, payment);
+
+            if (!paymentInserted) {
                 conn.rollback();
-                return false;
+                return 0;
             }
+
+            // Trừ tồn kho sau khi tạo order và payment thành công
+            for (OrderItem item : orderItems) {
+                boolean stockUpdated = productDAO.decreaseStockIfEnough(
+                        conn,
+                        item.getProductId(),
+                        item.getQuantity()
+                );
+
+                if (!stockUpdated) {
+                    conn.rollback();
+                    return 0;
+                }
+            }
+
             conn.commit();
-            return true;
+            return orderId;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,7 +233,8 @@ public class OrderService {
                     ex.printStackTrace();
                 }
             }
-            return false;
+
+            return 0;
 
         } finally {
             if (conn != null) {

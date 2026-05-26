@@ -674,7 +674,7 @@ public class ProductDAO {
         }
         return list;
     }
-
+    // ========== insertImage ============
     public List<String> findTop5NameProductMatchest(String keyword, String type) {
         List<String> names = new ArrayList<>();
 
@@ -702,6 +702,90 @@ public class ProductDAO {
         }
         return names;
     }
+
+
+    public List<Product> getSuggestedProductsSimple(int limit) {
+        List<Product> result = new ArrayList<>();
+
+        if (limit <= 0) {
+            limit = 4;
+        }
+
+        String sql = """
+            SELECT
+                p.id,
+                p.product_name,
+                p.category_id,
+                p.origin_price,
+                p.discount,
+                p.price,
+                p.stock_quantity,
+                i.img_name
+            FROM product p
+            LEFT JOIN image i ON i.entity_id = p.id
+                AND LOWER(i.entity_type) = 'product'
+                AND i.is_thumbnail = 1
+            WHERE p.is_deleted = b'0'
+              AND p.stock_quantity > 0
+            ORDER BY
+                p.discount DESC,
+                p.price ASC
+            LIMIT ?
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, limit);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setId(rs.getInt("id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setOriginPrice(rs.getDouble("origin_price"));
+                    p.setDiscount(rs.getDouble("discount"));
+                    p.setPrice(rs.getDouble("price"));
+                    p.setStockQuantity(rs.getInt("stock_quantity"));
+
+                    String imgName = rs.getString("img_name");
+
+                    if (imgName != null && !imgName.trim().isEmpty()) {
+                        p.setThumbnail("images/upload/" + imgName.trim());
+                    } else {
+                        p.setThumbnail("images/logo.webp");
+                    }
+
+                    result.add(p);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng -> sẽ k nằm trong transaction vs order
+    public boolean decreaseStockIfEnough(Connection conn, int productId, int quantity) throws SQLException {
+        String sql = """
+            UPDATE product
+            SET stock_quantity = stock_quantity - ?
+            WHERE id = ?
+              AND stock_quantity >= ?
+              AND is_deleted = b'0'
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }
+    }
 }
 
-// ========== insertImage ============

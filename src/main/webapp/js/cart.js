@@ -29,7 +29,7 @@ function addToCart(productId, quantity = 1) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Không thể thêm',
-                    text: data.message,
+                    text: data.message || 'Sản phẩm hiện không thể thêm vào giỏ hàng.',
                     confirmButtonColor: '#165FF2'
                 });
             }

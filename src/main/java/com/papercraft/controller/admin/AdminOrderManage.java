@@ -54,7 +54,13 @@ public class AdminOrderManage extends HttpServlet {
             if (idParam != null && newStatus != null) {
                 try {
                     int orderId = Integer.parseInt(idParam);
-                    orderDAO.updateOrderStatus(orderId, newStatus);
+
+                    Order order = orderDAO.getOrderByID(orderId);
+                    if (order != null && isValidStatusChange(order.getStatus(), newStatus)){
+                        orderDAO.updateOrderStatus(orderId, newStatus);
+
+                    }
+
                 } catch (NumberFormatException e) {
                     System.err.println("Invalid order ID: " + idParam);
                     e.printStackTrace();
@@ -111,6 +117,31 @@ public class AdminOrderManage extends HttpServlet {
         // request.setAttribute("currentPage", currentPage);
         // request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-order-manage.jsp").forward(request, response);
+    }
+
+    private boolean isValidStatusChange(String currentStatus, String newStatus) {
+        if (currentStatus == null || newStatus ==null){
+            return false;
+        }
+
+        currentStatus= currentStatus.trim().toLowerCase();
+        newStatus = newStatus.trim().toLowerCase();
+
+        switch (currentStatus){
+            case "pending":
+                return newStatus.equals("shipped") || newStatus.equals("canceled");
+
+            case "shipped":
+                return newStatus.equals("completed") || newStatus.equals("canceled");
+
+            case "completed":
+            case "canceled":
+                return false;
+
+            default:
+                return false;
+        }
+
     }
 
     @Override

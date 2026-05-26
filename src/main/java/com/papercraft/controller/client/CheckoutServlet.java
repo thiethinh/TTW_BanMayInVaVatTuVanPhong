@@ -217,21 +217,27 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         OrderService orderService = new OrderService();
-        boolean success= orderService.placeOrder(user,selectedCart,order,paymentMethod);
+        int orderId = orderService.placeOrderAndReturnId(user, selectedCart, order, paymentMethod);
 
-        if (success) {
-            CartDAO cartDAO= new CartDAO();
+        if (orderId > 0) {
+            CartDAO cartDAO = new CartDAO();
 
-            for (Integer id: selectedIds){
+            for (Integer id : selectedIds) {
                 cart.remove(id);
-                cartDAO.deleteItem(user.getId(),id);
+                cartDAO.deleteItem(user.getId(), id);
             }
 
-            session.setAttribute("cart",cart);
-            session.setAttribute("success", "Đơn hàng của bạn đã được đặt thành công!");
-            response.sendRedirect(request.getContextPath() + "/home");
+            session.setAttribute("cart", cart);
+
+            // Cho phép vào trang /orderSuccess
+            session.setAttribute("orderSuccess", true);
+
+            // Lưu orderId vừa đặt
+            session.setAttribute("lastOrderId", orderId);
+
+            response.sendRedirect(request.getContextPath() + "/order-success");
         } else {
-            request.setAttribute("error", "Đặt hàng thất bại, vui lòng thử lại!");
+            request.setAttribute("error", "Đặt hàng thất bại. Có thể một số sản phẩm không còn đủ tồn kho, vui lòng kiểm tra lại giỏ hàng.");
             doGet(request, response);
         }
     }
