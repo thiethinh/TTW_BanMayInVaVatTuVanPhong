@@ -204,9 +204,9 @@
 
                 <%--                //shipping Provider--%>
                 <div class="shipping-method">
-                    <h3>Vận chuyển</h3>
+                    <h3>Vận chuyển:</h3>
 
-                    <div class="shipping-provider-box">
+                    <div class="shipping-provider-box" >
                         <div class="shipping-provider-left">
                             <i class="fa-solid fa-truck-fast"></i>
 
@@ -225,6 +225,7 @@
                 </div>
 
                 <div class="pay-method">
+                    <h3>Phương thức thanh toán:</h3>
 
                     <div class="method cod-method" style="margin-bottom: 10px;">
                         <input type="radio" name="paymentMethod" id="cod" value="COD" checked>
