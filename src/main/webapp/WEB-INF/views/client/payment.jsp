@@ -34,8 +34,16 @@
 
     <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm" novalidate>
 
-<%--        // để doPost biết user đang thanh toán sp nào--%>
+        <%-- để doPost biết user đang thanh toán sp nào --%>
         <input type="hidden" name="selectedIds" value="${selectedIds}">
+
+        <%-- Các value để cập nhật bill --%>
+        <input type="hidden" id="subTotalValue" value="${subTotal}">
+        <input type="hidden" id="vatValue" value="${vat}">
+        <input type="hidden" id="discountValue" value="${discountAmount}">
+
+        <%-- Dlieu vận chuyển gửi về CheckoutServlet --%>
+        <input type="hidden" name="shippingFee" id="shippingFeeInput" value="${shippingFee}">
 
         <div class="block-paymentDetails-finalBill">
 
@@ -142,14 +150,18 @@
                     <tr>
                         <th class="shiping">Vận chuyển:</th>
                         <th class="shiping" style="text-align: right;">
-                            <c:choose>
-                                <c:when test="${shippingFee == 0}">
-                                    <p style="color: green;">Miễn phí</p>
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:formatNumber value="${shippingFee}" pattern="#,###"/> ₫
-                                </c:otherwise>
-                            </c:choose>
+                            <span id="shippingFeeText">
+                                <c:choose>
+                                    <c:when test="${shippingFee == 0}">
+                                        Miễn phí
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <fmt:formatNumber value="${shippingFee}" pattern="#,###"/> ₫
+                                    </c:otherwise>
+
+                                </c:choose>
+                            </span>
                         </th>
                     </tr>
                     <tr>
@@ -179,11 +191,38 @@
                     <tr id="total">
                         <th>Tổng Đơn Hàng:</th>
                         <th style="color:#d70018;font-size:18px;text-align:right;">
-                            <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
+
+                            <span id="grandTotalText">
+                                <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
+                            </span>
+
                         </th>
                     </tr>
+
                     </tfoot>
                 </table>
+
+                <%--                //shipping Provider--%>
+                <div class="shipping-method">
+                    <h3>Vận chuyển</h3>
+
+                    <div class="shipping-provider-box">
+                        <div class="shipping-provider-left">
+                            <i class="fa-solid fa-truck-fast"></i>
+
+                            <div>
+                                <strong>Giao Hàng Nhanh (GHN)</strong>
+                                <p id="shippingStatusText">
+                                    Phí vận chuyển sẽ được tính theo địa chỉ nhận hàng.
+                                </p>
+                            </div>
+                        </div>
+
+                        <span class="shipping-provider-badge">Mặc định</span>
+                    </div>
+
+                    <input type="hidden" name="shippingProvider" id="shippingProviderInput" value="GHN">
+                </div>
 
                 <div class="pay-method">
 
@@ -235,8 +274,9 @@
                         </button>
                     </div>
                     <c:if test="${not empty saveVoucherSuccess  or not empty saveVoucherError}">
-                        <span id="voucherMessage" style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty saveVoucherSuccess ? '#16a34a' : '#dc2626'};">
-                             ${not empty saveVoucherSuccess  ? saveVoucherSuccess  : saveVoucherError}
+                        <span id="voucherMessage"
+                              style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty saveVoucherSuccess ? '#16a34a' : '#dc2626'};">
+                                ${not empty saveVoucherSuccess  ? saveVoucherSuccess  : saveVoucherError}
                         </span>
                     </c:if>
 
@@ -298,7 +338,7 @@
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 
 <script>
-    const contextPath='${pageContext.request.contextPath}';
+    const contextPath = '${pageContext.request.contextPath}';
 </script>
 <script src="${pageContext.request.contextPath}/js/payment.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>

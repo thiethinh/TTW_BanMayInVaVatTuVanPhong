@@ -105,20 +105,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelectorAll(".voucher-item").forEach(item => {
-            item.addEventListener("click", () => {
-                document.querySelectorAll(".voucher-item").forEach(v => v.classList.remove("active"));
-                item.classList.add("active");
-                const voucherId = item.dataset.id;
-                voucherIdInput.value = voucherId;
-                voucherSelected.querySelector("span").innerText = item.querySelector("h4").innerText;
-                voucherDropdown.classList.remove("active");
+        item.addEventListener("click", () => {
+            document.querySelectorAll(".voucher-item").forEach(v => v.classList.remove("active"));
+            item.classList.add("active");
+            const voucherId = item.dataset.id;
+            voucherIdInput.value = voucherId;
+            voucherSelected.querySelector("span").innerText = item.querySelector("h4").innerText;
+            voucherDropdown.classList.remove("active");
 
-                // reload checkout
-                const params = new URLSearchParams(window.location.search);
-                const selectedIds = params.get("selectedIds");
-                window.location.href = `${contextPath}/checkout?selectedIds=${selectedIds}&voucherId=${voucherId}`;
-            });
+            // reload checkout
+            const params = new URLSearchParams(window.location.search);
+            const selectedIds = params.get("selectedIds");
+            window.location.href = `${contextPath}/checkout?selectedIds=${selectedIds}&voucherId=${voucherId}`;
         });
+    });
 
     document.addEventListener("click", (e) => {
 
@@ -128,11 +128,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById("applyVoucherBtn").addEventListener("click", function () {
-            const code = document.getElementById("voucherCodeInput").value.trim();
-            const params = new URLSearchParams(window.location.search);
-            const selectedIds = params.get("selectedIds");
-            window.location.href= `${contextPath}/checkout?selectedIds=${selectedIds}&voucherCode=${encodeURIComponent(code)}`;
-        });
+        const code = document.getElementById("voucherCodeInput").value.trim();
+        const params = new URLSearchParams(window.location.search);
+        const selectedIds = params.get("selectedIds");
+        window.location.href = `${contextPath}/checkout?selectedIds=${selectedIds}&voucherCode=${encodeURIComponent(code)}`;
+    });
 
 
+});
+
+function formatCurrencyVND(value) {
+    return Math.round(value).toLocaleString("vi-VN") + " ₫";
+}
+
+function updateBillUI(newShippingFee) {
+    const subTotal = Number(document.getElementById("subTotalValue")?.value || 0);
+    const vat = Number(document.getElementById("vatValue")?.value || 0);
+    const discount = Number(document.getElementById("discountValue")?.value || 0);
+
+    const shippingFeeInput = document.getElementById("shippingFeeInput");
+    const shippingFeeText = document.getElementById("shippingFeeText");
+    const grandTotalText = document.getElementById("grandTotalText");
+
+    const shippingFee = Number(newShippingFee || 0);
+    const grandTotal = subTotal + vat + shippingFee - discount;
+
+    if (shippingFeeInput) {
+        shippingFeeInput.value = String(Math.round(shippingFee));
+    }
+
+    if (shippingFeeText) {
+        shippingFeeText.textContent = shippingFee <= 0
+            ? "Miễn phí"
+            : formatCurrencyVND(shippingFee);
+    }
+
+    if (grandTotalText) {
+        grandTotalText.textContent = formatCurrencyVND(grandTotal);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        // test: ghn trả về 30.000
+        updateBillUI(30000);
+    });
+
+    // Test: chọn GHN => set phí ship test
+    if (ghnRadio && ghnRadio.checked) {
+        updateBillUI(Number(document.getElementById("shippingFeeInput")?.value || 0));
+    }
 });

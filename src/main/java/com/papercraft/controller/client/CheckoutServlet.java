@@ -202,6 +202,24 @@ public class CheckoutServlet extends HttpServlet {
         String city = request.getParameter("city");
         String nation = request.getParameter("nation");
         String paymentMethod = request.getParameter("paymentMethod");
+        String shippingProvider = request.getParameter("shippingProvider");
+        String shippingFeeRaw = request.getParameter("shippingFee");
+
+        //parse phí ship
+        BigDecimal shippingFee = BigDecimal.ZERO;
+
+        try {
+            if (shippingFeeRaw != null && !shippingFeeRaw.isBlank()) {
+                shippingFee = new BigDecimal(shippingFeeRaw.trim());
+            }
+        } catch (NumberFormatException e) {
+            shippingFee = BigDecimal.ZERO;
+        }
+
+        if (shippingProvider == null || shippingProvider.isBlank()) {
+            shippingProvider = "GHN";
+        }
+
 
         String fullAddress = address + ", " + city + ", " + nation;
 
@@ -209,10 +227,12 @@ public class CheckoutServlet extends HttpServlet {
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
         order.setShippingAddress(fullAddress);
+        order.setShippingProvider(shippingProvider);
+        order.setShippingFee(shippingFee);
 
-        //test
-        order.setShippingProvider("GHN");
-        order.setShippingFee(BigDecimal.valueOf(30000));
+//        //test
+//        order.setShippingProvider("GHN");
+//        order.setShippingFee(BigDecimal.valueOf(30000));
 
         order.setNote(note ==null ? "": note.trim());
 
