@@ -13,6 +13,7 @@ public class Order implements Serializable {
     public BigDecimal totalPrice;
     public String note;
     public BigDecimal shippingFee;
+    private String shippingProvider;
     public String shippingName;
     public String shippingPhone;
     public String shippingAddress;
@@ -22,13 +23,15 @@ public class Order implements Serializable {
     public Order() {
     }
 
-    public Order(int id, Integer userId, String status, BigDecimal totalPrice, String note, BigDecimal shippingFee, String shippingName, String shippingPhone, String shippingAddress, Timestamp createdAt) {
+    public Order(int id, Integer userId, String status, BigDecimal totalPrice, String note, BigDecimal shippingFee, String shippingProvider,
+                 String shippingName, String shippingPhone, String shippingAddress, Timestamp createdAt) {
         this.id = id;
         this.userId = userId;
         this.status = status;
         this.totalPrice = totalPrice;
         this.note = note;
         this.shippingFee = shippingFee;
+        this.shippingProvider = shippingProvider;
         this.shippingName = shippingName;
         this.shippingPhone = shippingPhone;
         this.shippingAddress = shippingAddress;
@@ -122,5 +125,13 @@ public class Order implements Serializable {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public String getShippingProvider() {
+        return shippingProvider;
+    }
+
+    public void setShippingProvider(String shippingProvider) {
+        this.shippingProvider = shippingProvider;
     }
 }
