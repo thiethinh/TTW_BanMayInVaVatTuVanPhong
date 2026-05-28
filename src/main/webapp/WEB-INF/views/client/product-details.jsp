@@ -24,11 +24,23 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/product-details.css"/>
 
-    <meta property="og:title" content="${p.productName}" />
-    <meta property="og:description" content="${p.descriptionThumbnail}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.requestURI}" />
-    <meta property="og:image" content="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}/${p.thumbnail}" />
+    <c:set var="baseUrl"
+           value="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}" />
+
+    <c:set var="productUrl"
+           value="${baseUrl}/product-detail?productId=${p.id}" />
+
+    <c:set var="productImageUrl"
+           value="${baseUrl}/${p.thumbnail}" />
+
+    <meta property="og:title" content="${fn:escapeXml(p.productName)}" />
+    <meta property="og:description" content="${fn:escapeXml(p.descriptionThumbnail)}" />
+    <meta property="og:type" content="product" />
+    <meta property="og:url" content="${productUrl}" />
+    <meta property="og:image" content="${productImageUrl}" />
+    <meta property="og:image:secure_url" content="${productImageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 </head>
 
 <body data-context="${pageContext.request.contextPath}">
@@ -340,13 +352,19 @@
         addToCart(productId, qty);
     }
 
+    const SHARE_PRODUCT_URL = "${productUrl}";
+    const SHARE_PRODUCT_TITLE = "${fn:escapeXml(p.productName)}";
+    const SHARE_PRODUCT_IMAGE = "${productImageUrl}";
+
     function shareTo(platform) {
-        const productUrl = encodeURIComponent(window.location.href);
+        const productUrl = encodeURIComponent(SHARE_PRODUCT_URL);
+        const title = encodeURIComponent(SHARE_PRODUCT_TITLE);
+        const image = encodeURIComponent(SHARE_PRODUCT_IMAGE);
 
         const links = {
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${productUrl}`,
-            twitter: `https://twitter.com/intent/tweet?url=${productUrl}`,
-            pinterest: `https://pinterest.com/pin/create/button/?url=${productUrl}`
+            twitter: `https://twitter.com/intent/tweet?url=${productUrl}&text=${title}`,
+            pinterest: `https://pinterest.com/pin/create/button/?url=${productUrl}&media=${image}&description=${title}`
         };
 
         window.open(links[platform], '_blank', 'width=700,height=500');

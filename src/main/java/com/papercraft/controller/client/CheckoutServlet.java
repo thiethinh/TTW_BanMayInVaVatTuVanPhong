@@ -60,27 +60,27 @@ public class CheckoutServlet extends HttpServlet {
         Address userAddr = addressDAO.findDefaultAddress(user.getId());
         request.setAttribute("addr", userAddr);
 
-        UserVoucherDAO  userVoucherDAO = new UserVoucherDAO();
-        List<Voucher> vouchers = userVoucherDAO.getVouchersByUserId(user.getId());
-        request.setAttribute("vouchers", vouchers);
-
-        String voucherCode=request.getParameter("voucherCode");
-        if(voucherCode!=null&&!voucherCode.trim().isEmpty()){
-            Voucher voucher=new VoucherDAO().getVoucherByCode(voucherCode.trim());
-            if(voucher==null){
-                request.setAttribute("saveVoucherError", "Mã voucher không tồn tại");
-            }else if(!voucher.isAvailable()){
-                request.setAttribute("saveVoucherError", "Voucher hiện không khả dụng");
-            }else{
-                boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
-                if(!success){
-                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
-                }else{
-                    request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
-                    request.setAttribute("selectedVoucher",voucher);
-                }
-            }
-        }
+//        UserVoucherDAO  userVoucherDAO = new UserVoucherDAO();
+//        List<Voucher> vouchers = userVoucherDAO.getVouchersByUserId(user.getId());
+//        request.setAttribute("vouchers", vouchers);
+//
+//        String voucherCode=request.getParameter("voucherCode");
+//        if(voucherCode!=null&&!voucherCode.trim().isEmpty()){
+//            Voucher voucher=new VoucherDAO().getVoucherByCode(voucherCode.trim());
+//            if(voucher==null){
+//                request.setAttribute("saveVoucherError", "Mã voucher không tồn tại");
+//            }else if(!voucher.isAvailable()){
+//                request.setAttribute("saveVoucherError", "Voucher hiện không khả dụng");
+//            }else{
+//                boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
+//                if(!success){
+//                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
+//                }else{
+//                    request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
+//                    request.setAttribute("selectedVoucher",voucher);
+//                }
+//            }
+//        }
 
 
         List<OrderItem> items = new ArrayList<>();
@@ -115,7 +115,7 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         subTotal = Math.round(subTotal);
-        double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+        double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 0;
         double vat = Math.round(subTotal * 0.05);
         double grandTotal = Math.round(subTotal + vat + shippingFee);
 
@@ -200,15 +200,79 @@ public class CheckoutServlet extends HttpServlet {
         String note = request.getParameter("note");
         String address = request.getParameter("address");
         String city = request.getParameter("city");
+        String districtName = request.getParameter("districtName");
+        String wardName = request.getParameter("wardName");
         String nation = request.getParameter("nation");
         String paymentMethod = request.getParameter("paymentMethod");
+        String shippingProvider = request.getParameter("shippingProvider");
+        String shippingFeeRaw = request.getParameter("shippingFee");
 
-        String fullAddress = address + ", " + city + ", " + nation;
+
+        StringBuilder fullAddressBuilder = new StringBuilder();
+
+        if (address != null && !address.isBlank()) {
+            fullAddressBuilder.append(address.trim());
+        }
+
+        if (wardName != null && !wardName.isBlank()) {
+            fullAddressBuilder.append(", ").append(wardName.trim());
+        }
+
+        if (districtName != null && !districtName.isBlank()) {
+            fullAddressBuilder.append(", ").append(districtName.trim());
+        }
+
+        if (city != null && !city.isBlank()) {
+            fullAddressBuilder.append(", ").append(city.trim());
+        }
+
+        if (nation != null && !nation.isBlank()) {
+            fullAddressBuilder.append(", ").append(nation.trim());
+        }
+
+        String fullAddress = fullAddressBuilder.toString();
+
+
+        //parse phí ship
+        BigDecimal shippingFee;
+
+        try {
+            if (shippingFeeRaw == null || shippingFeeRaw.isBlank()) {
+                request.setAttribute("error", "Vui lòng chọn địa chỉ để hệ thống tính phí vận chuyển.");
+                doGet(request, response);
+                return;
+            }
+
+            shippingFee = new BigDecimal(shippingFeeRaw.trim());
+
+            if (shippingFee.compareTo(BigDecimal.ZERO) < 0) {
+                request.setAttribute("error", "Phí vận chuyển không hợp lệ.");
+                doGet(request, response);
+                return;
+            }
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Phí vận chuyển không hợp lệ.");
+            doGet(request, response);
+            return;
+        }
+
+        if (shippingProvider == null || shippingProvider.isBlank()) {
+            shippingProvider = "GHN";
+        }
+
+
 
         Order order = new Order();
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
         order.setShippingAddress(fullAddress);
+        order.setShippingProvider(shippingProvider);
+        order.setShippingFee(shippingFee);
+
+//        //test
+//        order.setShippingProvider("GHN");
+//        order.setShippingFee(BigDecimal.valueOf(30000));
 
         order.setNote(note ==null ? "": note.trim());
 

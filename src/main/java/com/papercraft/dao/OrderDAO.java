@@ -32,6 +32,7 @@ public class OrderDAO {
                     order.setTotalPrice(rs.getBigDecimal("total_price"));
                     order.setNote(rs.getString("note"));
                     order.setShippingFee(rs.getBigDecimal("shipping_fee"));
+                    order.setShippingProvider(rs.getString("shipping_provider"));
 
                     // Thông tin giao hàng
                     order.setShippingName(rs.getString("shipping_name"));
@@ -143,10 +144,12 @@ public class OrderDAO {
 
     public Order getOrderByID(int orderId) {
         String sql = """
-                SELECT id, user_id,status, total_price,note,shipping_fee,shipping_name,shipping_phone,shipping_address,created_at
-                FROM orders
-                WHERE id =?
-                """;
+        SELECT id, user_id, status, total_price, note,
+               shipping_fee, shipping_provider,
+               shipping_name, shipping_phone, shipping_address, created_at
+        FROM orders
+        WHERE id = ?
+        """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, orderId);
@@ -158,11 +161,12 @@ public class OrderDAO {
                     BigDecimal totalPrice = rs.getBigDecimal("total_price");
                     String note = rs.getString("note");
                     BigDecimal shippingFee = rs.getBigDecimal("shipping_fee");
+                    String shippingProvider = rs.getString("shipping_provider");
                     String shippingPhone = rs.getString("shipping_phone");
                     String shippingName = rs.getString("shipping_name");
                     String shippingAddress = rs.getString("shipping_address");
                     Timestamp createdAt = rs.getTimestamp("created_at");
-                    return new Order(id, userId, status, totalPrice, note, shippingFee, shippingName, shippingPhone, shippingAddress, createdAt);
+                    return new Order(id, userId, status, totalPrice, note, shippingFee,shippingProvider, shippingName, shippingPhone, shippingAddress, createdAt);
                 }
             }
         } catch (SQLException e) {
@@ -248,8 +252,8 @@ public class OrderDAO {
 
     public int insertOrder(Connection conn, Order order) throws SQLException {
         String sql = """
-                        INSERT INTO orders (user_id, status, total_price, note, shipping_fee, shipping_name, shipping_phone, shipping_address)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO orders (user_id, status, total_price, note, shipping_fee,shipping_provider, shipping_name, shipping_phone, shipping_address)
+                        VALUES (?, ?, ?, ? ,?, ?, ?, ?,?)
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
@@ -258,9 +262,10 @@ public class OrderDAO {
             ps.setBigDecimal(3, order.getTotalPrice());
             ps.setString(4, order.getNote());
             ps.setBigDecimal(5, order.getShippingFee());
-            ps.setString(6, order.getShippingName());
-            ps.setString(7, order.getShippingPhone());
-            ps.setString(8, order.getShippingAddress());
+            ps.setString(6, order.getShippingProvider());
+            ps.setString(7, order.getShippingName());
+            ps.setString(8, order.getShippingPhone());
+            ps.setString(9, order.getShippingAddress());
 
             int affectedRows = ps.executeUpdate();
 

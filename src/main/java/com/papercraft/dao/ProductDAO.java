@@ -414,46 +414,46 @@ public class ProductDAO {
         List<Product> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-            """
-                 SELECT 
-                     p.id, 
-                     p.product_name, 
-                     p.category_id, 
-                     p.description_thumbnail, 
-                     p.brand,  
-                     p.origin_price,
-                     p.discount,
-                     p.price, 
-                     i.img_name,
-         
-                     COALESCE(r.avg_rating, 0) AS avg_rating,
-                     COALESCE(s.sold_quantity, 0) AS sold_quantity
-         
-                 FROM product p
-         
-                 JOIN category c ON p.category_id = c.id
-         
-                 LEFT JOIN image i 
-                     ON p.id = i.entity_id
-                     AND i.is_thumbnail = 1
-                     AND i.entity_type = 'Product'
-         
-                 LEFT JOIN (
-                     SELECT product_id, AVG(rating) AS avg_rating
-                     FROM review
-                     GROUP BY product_id
-                 ) r ON r.product_id = p.id
-         
-                 LEFT JOIN (
-                     SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
-                     FROM order_item oi
-                     JOIN orders o ON o.id = oi.order_id
-                     WHERE o.status = 'completed'
-                     GROUP BY oi.product_id
-                 ) s ON s.product_id = p.id
-         
-                 WHERE c.type = ? AND p.is_deleted=0
-             """
+                """
+                     SELECT 
+                         p.id, 
+                         p.product_name, 
+                         p.category_id, 
+                         p.description_thumbnail, 
+                         p.brand,  
+                         p.origin_price,
+                         p.discount,
+                         p.price, 
+                         i.img_name,
+             
+                         COALESCE(r.avg_rating, 0) AS avg_rating,
+                         COALESCE(s.sold_quantity, 0) AS sold_quantity
+             
+                     FROM product p
+             
+                     JOIN category c ON p.category_id = c.id
+             
+                     LEFT JOIN image i 
+                         ON p.id = i.entity_id
+                         AND i.is_thumbnail = 1
+                         AND i.entity_type = 'Product'
+             
+                     LEFT JOIN (
+                         SELECT product_id, AVG(rating) AS avg_rating
+                         FROM review 
+                         GROUP BY product_id
+                     ) r ON r.product_id = p.id
+             
+                     LEFT JOIN (
+                         SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+                         FROM order_item oi
+                         JOIN orders o ON o.id = oi.order_id
+                         WHERE o.status = 'completed'
+                         GROUP BY oi.product_id
+                     ) s ON s.product_id = p.id
+             
+                     WHERE c.type = ? AND p.is_deleted=0
+                 """
         );
 
         List<Object> params = new ArrayList<>();
@@ -526,7 +526,7 @@ public class ProductDAO {
     //======= countProducts =====
     public int countProducts(String keyword) {
         String sql = """
-                SELECT COUNT(*) FROM product WHERE product_name LIKE ? AND p.is_deleted=0
+                SELECT COUNT(*) FROM product p WHERE p.product_name LIKE ? AND p.is_deleted=0
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -712,26 +712,52 @@ public class ProductDAO {
         }
 
         String sql = """
-            SELECT
-                p.id,
-                p.product_name,
-                p.category_id,
-                p.origin_price,
-                p.discount,
-                p.price,
-                p.stock_quantity,
-                i.img_name
-            FROM product p
-            LEFT JOIN image i ON i.entity_id = p.id
-                AND LOWER(i.entity_type) = 'product'
-                AND i.is_thumbnail = 1
-            WHERE p.is_deleted = b'0'
-              AND p.stock_quantity > 0
-            ORDER BY
-                p.discount DESC,
-                p.price ASC
-            LIMIT ?
-            """;
+        SELECT
+            p.id,
+            p.product_name,
+            p.category_id,
+            p.description_thumbnail,
+            p.origin_price,
+            p.discount,
+            p.price,
+            p.stock_quantity,
+            i.img_name,
+
+            COALESCE(r.avg_rating, 0) AS avg_rating,
+            COALESCE(s.sold_quantity, 0) AS sold_quantity
+
+        FROM product p
+
+        LEFT JOIN image i 
+            ON i.entity_id = p.id
+            AND LOWER(i.entity_type) = 'product'
+            AND i.is_thumbnail = 1
+
+        LEFT JOIN (
+            SELECT product_id, AVG(rating) AS avg_rating
+            FROM review
+            GROUP BY product_id
+        ) r ON r.product_id = p.id
+
+        LEFT JOIN (
+            SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+            FROM order_item oi
+            JOIN orders o ON o.id = oi.order_id
+            WHERE o.status = 'completed'
+            GROUP BY oi.product_id
+        ) s ON s.product_id = p.id
+
+        WHERE p.is_deleted = 0
+          AND p.stock_quantity > 0
+
+        ORDER BY
+            p.discount DESC,
+            sold_quantity DESC,
+            avg_rating DESC,
+            p.price ASC
+
+        LIMIT ?
+        """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -745,10 +771,13 @@ public class ProductDAO {
                     p.setId(rs.getInt("id"));
                     p.setProductName(rs.getString("product_name"));
                     p.setCategoryId(rs.getInt("category_id"));
+                    p.setDescriptionThumbnail(rs.getString("description_thumbnail"));
                     p.setOriginPrice(rs.getDouble("origin_price"));
                     p.setDiscount(rs.getDouble("discount"));
                     p.setPrice(rs.getDouble("price"));
                     p.setStockQuantity(rs.getInt("stock_quantity"));
+                    p.setAvgRating(rs.getBigDecimal("avg_rating"));
+                    p.setSoldQuantity(rs.getInt("sold_quantity"));
 
                     String imgName = rs.getString("img_name");
 
@@ -768,15 +797,16 @@ public class ProductDAO {
 
         return result;
     }
-    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng -> sẽ k nằm trong transaction vs order
+
+    //decreaseStockIfEnough ( dùng chung conn chứ không để tự mở riêng từ try -> sẽ k nằm trong transaction vs order
     public boolean decreaseStockIfEnough(Connection conn, int productId, int quantity) throws SQLException {
         String sql = """
-            UPDATE product
-            SET stock_quantity = stock_quantity - ?
-            WHERE id = ?
-              AND stock_quantity >= ?
-              AND is_deleted = b'0'
-            """;
+                    UPDATE product
+                    SET stock_quantity = stock_quantity - ?
+                    WHERE id = ?
+                      AND stock_quantity >= ?
+                      AND is_deleted = 0
+                        """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quantity);

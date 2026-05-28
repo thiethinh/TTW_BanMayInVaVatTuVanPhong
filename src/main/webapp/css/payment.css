@@ -612,3 +612,64 @@ select.is-invalid ~ .invalid-feedback {
     color:#888;
     font-size:14px;
 }
+
+.shipping-method {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.shipping-method h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.shipping-provider-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #eff6ff;
+
+    margin-left: 20px;
+    padding: 10px 0 10px 20px;
+    background-color: aliceblue;
+    border-radius: 10px;
+}
+
+.shipping-provider-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.shipping-provider-left i {
+    font-size: 22px;
+    color: #165ff2;
+}
+
+.shipping-provider-left strong {
+    display: block;
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.shipping-provider-left p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.shipping-provider-badge {
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #165ff2;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}

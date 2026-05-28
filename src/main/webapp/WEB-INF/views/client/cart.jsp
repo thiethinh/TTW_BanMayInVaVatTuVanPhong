@@ -43,7 +43,7 @@
 <c:if test="${not empty items}">
     <main class="cart-fill-main">
         <div class="cart-banner">
-            <marquee scrollamount="8">🎉 Đơn hàng từ 5.000.000đ được FREESHIP</marquee>
+            <marquee scrollamount="8">💡 Phí vận chuyển sẽ được cập nhật sau khi bạn xác nhập địa chỉ </marquee>
         </div>
 
         <div class="container">
@@ -170,7 +170,7 @@
                         <span id="bill-shippingFee">
                             <c:choose>
                                 <c:when test="${shippingFee == 0}">
-                                    <strong style="color: #165FF2;">Miễn phí</strong>
+                                    <strong style="color: #165FF2;">Đang cập nhật</strong>
                                 </c:when>
                                 <c:otherwise>
                                     <fmt:formatNumber value="${shippingFee}" type="number" groupingUsed="true"

@@ -167,7 +167,7 @@ function updateBillUI(data) {
     if (vatEl) vatEl.textContent = fmt(data.vat);
     if (grandTotalEl) grandTotalEl.textContent = fmt(data.grandTotal);
     if (shippingEl) {
-        shippingEl.innerHTML = data.shippingFee === 0 ? '<strong style="color:#165FF2 ">Miễn phí</strong>' : fmt(data.shippingFee);
+        shippingEl.innerHTML = data.shippingFee === 0 ? 'Đang cập nhật' : 'Đang cập nhật';
     }
     updateCartBadge(data.cartCount)
 }

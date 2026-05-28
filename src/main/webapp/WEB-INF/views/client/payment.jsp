@@ -34,8 +34,17 @@
 
     <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm" novalidate>
 
-<%--        // để doPost biết user đang thanh toán sp nào--%>
-        <input type="hidden" name="selectedIds" value="${selectedIds}">
+        <%-- để doPost biết user đang thanh toán sp nào --%>
+        <input type="hidden" name="selectedIds" id="selectedIdsInput" value="${selectedIds}">
+
+        <%-- Các value để cập nhật bill --%>
+        <input type="hidden" id="subTotalValue" value="${subTotal}">
+        <input type="hidden" id="vatValue" value="${vat}">
+        <input type="hidden" id="discountValue" value="${discountAmount}">
+
+        <%-- Dlieu vận chuyển gửi về CheckoutServlet --%>
+<%--        <input type="hidden" name="shippingFee" id="shippingFeeInput" value="${shippingFee}">--%>
+            <input type="hidden" name="shippingFee" id="shippingFeeInput" value="">
 
         <div class="block-paymentDetails-finalBill">
 
@@ -71,11 +80,12 @@
 
                 <div class="block-addressCity-postCode">
                     <div class="block-addressCity">
-                        <label for="addressCity">Tỉnh / Thành phố <span>*</span></label>
-                        <input id="addressCity" name="city" type="text"
-                               value="${addr.city}"
-                               placeholder="TP. Hồ Chí Minh" required>
-                        <div class="invalid-feedback">Vui lòng nhập tỉnh/thành phố!</div>
+                        <label for="provinceId">Tỉnh / Thành phố <span>*</span></label>
+                        <select id="provinceId" name="provinceId" required>
+                            <option value="">Chọn tỉnh/thành phố</option>
+                        </select>
+                        <input type="hidden" id="provinceName" name="city">
+                        <div class="invalid-feedback">Vui lòng chọn tỉnh/thành phố!</div>
                     </div>
 
                     <div class="block-postCode">
@@ -83,6 +93,26 @@
                         <input id="postCode" name="postCode" type="text"
                                value="${addr.postcode}"
                                placeholder="70000">
+                    </div>
+                </div>
+
+                <div class="block-addressCity-postCode">
+                    <div class="block-addressCity">
+                        <label for="districtId">Quận / Huyện <span>*</span></label>
+                        <select id="districtId" name="districtId" required>
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                        <input type="hidden" id="districtName" name="districtName">
+                        <div class="invalid-feedback">Vui lòng chọn quận/huyện!</div>
+                    </div>
+
+                    <div class="block-addressCity">
+                        <label for="wardCode">Phường / Xã <span>*</span></label>
+                        <select id="wardCode" name="wardCode" required>
+                            <option value="">Chọn phường/xã</option>
+                        </select>
+                        <input type="hidden" id="wardName" name="wardName">
+                        <div class="invalid-feedback">Vui lòng chọn phường/xã!</div>
                     </div>
                 </div>
 
@@ -142,14 +172,18 @@
                     <tr>
                         <th class="shiping">Vận chuyển:</th>
                         <th class="shiping" style="text-align: right;">
-                            <c:choose>
-                                <c:when test="${shippingFee == 0}">
-                                    <p style="color: green;">Miễn phí</p>
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:formatNumber value="${shippingFee}" pattern="#,###"/> ₫
-                                </c:otherwise>
-                            </c:choose>
+                            <span id="shippingFeeText">
+                                <c:choose>
+                                    <c:when test="${shippingFee == 0}">
+                                        Đang cập nhật
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <fmt:formatNumber value="${shippingFee}" pattern="#,###"/> ₫
+                                    </c:otherwise>
+
+                                </c:choose>
+                            </span>
                         </th>
                     </tr>
                     <tr>
@@ -179,13 +213,41 @@
                     <tr id="total">
                         <th>Tổng Đơn Hàng:</th>
                         <th style="color:#d70018;font-size:18px;text-align:right;">
-                            <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
+
+                            <span id="grandTotalText">
+                                <fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫
+                            </span>
+
                         </th>
                     </tr>
+
                     </tfoot>
                 </table>
 
+                <%--                //shipping Provider--%>
+                <div class="shipping-method">
+                    <h3>Vận chuyển:</h3>
+
+                    <div class="shipping-provider-box" >
+                        <div class="shipping-provider-left">
+                            <i class="fa-solid fa-truck-fast"></i>
+
+                            <div>
+                                <strong>Giao Hàng Nhanh (GHN)</strong>
+                                <p id="shippingStatusText">
+                                    Phí vận chuyển sẽ được tính theo địa chỉ nhận hàng.
+                                </p>
+                            </div>
+                        </div>
+
+                        <span class="shipping-provider-badge">Mặc định</span>
+                    </div>
+
+                    <input type="hidden" name="shippingProvider" id="shippingProviderInput" value="GHN">
+                </div>
+
                 <div class="pay-method">
+                    <h3>Phương thức thanh toán:</h3>
 
                     <div class="method cod-method" style="margin-bottom: 10px;">
                         <input type="radio" name="paymentMethod" id="cod" value="COD" checked>
@@ -235,8 +297,9 @@
                         </button>
                     </div>
                     <c:if test="${not empty saveVoucherSuccess  or not empty saveVoucherError}">
-                        <span id="voucherMessage" style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty saveVoucherSuccess ? '#16a34a' : '#dc2626'};">
-                             ${not empty saveVoucherSuccess  ? saveVoucherSuccess  : saveVoucherError}
+                        <span id="voucherMessage"
+                              style="display:block;margin-bottom:10px;font-size:13px;font-weight:500;color:${not empty saveVoucherSuccess ? '#16a34a' : '#dc2626'};">
+                                ${not empty saveVoucherSuccess  ? saveVoucherSuccess  : saveVoucherError}
                         </span>
                     </c:if>
 
@@ -298,7 +361,7 @@
 <jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
 
 <script>
-    const contextPath='${pageContext.request.contextPath}';
+    const contextPath = '${pageContext.request.contextPath}';
 </script>
 <script src="${pageContext.request.contextPath}/js/payment.js"></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>

@@ -142,4 +142,30 @@
     cursor: pointer;
     font-weight: 600;
 }
+/* Suggested products  */
+.suggestion-section {
+    margin-top: 40px;
+}
+
+.suggestion-section h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.suggestion-subtitle {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+.suggestion-section .product-container {
+    margin-top: 25px;
+}
+
+.suggestion-section .product-card {
+    min-height: 100%;
+}
+
+.suggestion-section .product-price-box {
+    margin-top: auto !important;
+}
 
