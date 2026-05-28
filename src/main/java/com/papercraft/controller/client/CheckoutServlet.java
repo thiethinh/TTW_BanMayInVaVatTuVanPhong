@@ -200,10 +200,38 @@ public class CheckoutServlet extends HttpServlet {
         String note = request.getParameter("note");
         String address = request.getParameter("address");
         String city = request.getParameter("city");
+        String districtName = request.getParameter("districtName");
+        String wardName = request.getParameter("wardName");
         String nation = request.getParameter("nation");
         String paymentMethod = request.getParameter("paymentMethod");
         String shippingProvider = request.getParameter("shippingProvider");
         String shippingFeeRaw = request.getParameter("shippingFee");
+
+
+        StringBuilder fullAddressBuilder = new StringBuilder();
+
+        if (address != null && !address.isBlank()) {
+            fullAddressBuilder.append(address.trim());
+        }
+
+        if (wardName != null && !wardName.isBlank()) {
+            fullAddressBuilder.append(", ").append(wardName.trim());
+        }
+
+        if (districtName != null && !districtName.isBlank()) {
+            fullAddressBuilder.append(", ").append(districtName.trim());
+        }
+
+        if (city != null && !city.isBlank()) {
+            fullAddressBuilder.append(", ").append(city.trim());
+        }
+
+        if (nation != null && !nation.isBlank()) {
+            fullAddressBuilder.append(", ").append(nation.trim());
+        }
+
+        String fullAddress = fullAddressBuilder.toString();
+
 
         //parse phí ship
         BigDecimal shippingFee = BigDecimal.ZERO;
@@ -221,7 +249,6 @@ public class CheckoutServlet extends HttpServlet {
         }
 
 
-        String fullAddress = address + ", " + city + ", " + nation;
 
         Order order = new Order();
         order.setShippingName(fullname);

@@ -79,11 +79,12 @@
 
                 <div class="block-addressCity-postCode">
                     <div class="block-addressCity">
-                        <label for="addressCity">Tỉnh / Thành phố <span>*</span></label>
-                        <input id="addressCity" name="city" type="text"
-                               value="${addr.city}"
-                               placeholder="TP. Hồ Chí Minh" required>
-                        <div class="invalid-feedback">Vui lòng nhập tỉnh/thành phố!</div>
+                        <label for="provinceId">Tỉnh / Thành phố <span>*</span></label>
+                        <select id="provinceId" name="provinceId" required>
+                            <option value="">Chọn tỉnh/thành phố</option>
+                        </select>
+                        <input type="hidden" id="provinceName" name="city">
+                        <div class="invalid-feedback">Vui lòng chọn tỉnh/thành phố!</div>
                     </div>
 
                     <div class="block-postCode">
@@ -91,6 +92,26 @@
                         <input id="postCode" name="postCode" type="text"
                                value="${addr.postcode}"
                                placeholder="70000">
+                    </div>
+                </div>
+
+                <div class="block-addressCity-postCode">
+                    <div class="block-addressCity">
+                        <label for="districtId">Quận / Huyện <span>*</span></label>
+                        <select id="districtId" name="districtId" required>
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                        <input type="hidden" id="districtName" name="districtName">
+                        <div class="invalid-feedback">Vui lòng chọn quận/huyện!</div>
+                    </div>
+
+                    <div class="block-addressCity">
+                        <label for="wardCode">Phường / Xã <span>*</span></label>
+                        <select id="wardCode" name="wardCode" required>
+                            <option value="">Chọn phường/xã</option>
+                        </select>
+                        <input type="hidden" id="wardName" name="wardName">
+                        <div class="invalid-feedback">Vui lòng chọn phường/xã!</div>
                     </div>
                 </div>
 
