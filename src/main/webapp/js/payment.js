@@ -407,3 +407,25 @@ async function calculateGHNFee() {
         }
     }
 }
+//chặn đặt hàng khi chưa tính được pghis GHN
+const checkoutForm = document.getElementById("checkoutForm");
+
+if (checkoutForm) {
+    checkoutForm.addEventListener("submit", function (event) {
+        const shippingFeeInput = document.getElementById("shippingFeeInput");
+        const wardCode = document.getElementById("wardCode");
+        const districtId = document.getElementById("districtId");
+
+        if (!districtId?.value || !wardCode?.value) {
+            event.preventDefault();
+            alert("Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã.");
+            return;
+        }
+
+        if (!shippingFeeInput || shippingFeeInput.value === "") {
+            event.preventDefault();
+            alert("Vui lòng chờ hệ thống tính phí vận chuyển.");
+            return;
+        }
+    });
+}

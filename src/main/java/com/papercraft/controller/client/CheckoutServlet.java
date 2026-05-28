@@ -234,14 +234,27 @@ public class CheckoutServlet extends HttpServlet {
 
 
         //parse phí ship
-        BigDecimal shippingFee = BigDecimal.ZERO;
+        BigDecimal shippingFee;
 
         try {
-            if (shippingFeeRaw != null && !shippingFeeRaw.isBlank()) {
-                shippingFee = new BigDecimal(shippingFeeRaw.trim());
+            if (shippingFeeRaw == null || shippingFeeRaw.isBlank()) {
+                request.setAttribute("error", "Vui lòng chọn địa chỉ để hệ thống tính phí vận chuyển.");
+                doGet(request, response);
+                return;
             }
+
+            shippingFee = new BigDecimal(shippingFeeRaw.trim());
+
+            if (shippingFee.compareTo(BigDecimal.ZERO) < 0) {
+                request.setAttribute("error", "Phí vận chuyển không hợp lệ.");
+                doGet(request, response);
+                return;
+            }
+
         } catch (NumberFormatException e) {
-            shippingFee = BigDecimal.ZERO;
+            request.setAttribute("error", "Phí vận chuyển không hợp lệ.");
+            doGet(request, response);
+            return;
         }
 
         if (shippingProvider == null || shippingProvider.isBlank()) {

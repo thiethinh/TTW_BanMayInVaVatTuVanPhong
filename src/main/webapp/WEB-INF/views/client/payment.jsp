@@ -43,7 +43,8 @@
         <input type="hidden" id="discountValue" value="${discountAmount}">
 
         <%-- Dlieu vận chuyển gửi về CheckoutServlet --%>
-        <input type="hidden" name="shippingFee" id="shippingFeeInput" value="${shippingFee}">
+<%--        <input type="hidden" name="shippingFee" id="shippingFeeInput" value="${shippingFee}">--%>
+            <input type="hidden" name="shippingFee" id="shippingFeeInput" value="">
 
         <div class="block-paymentDetails-finalBill">
 
