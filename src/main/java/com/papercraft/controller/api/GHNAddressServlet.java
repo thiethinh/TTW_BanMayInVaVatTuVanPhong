@@ -62,7 +62,16 @@ public class GHNAddressServlet extends HttpServlet {
             e.printStackTrace();
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"code\":500,\"message\":\"Cannot call GHN API\"}");
+
+            String safeMessage = e.getMessage() == null ? "Unknown error" : e.getMessage()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r");
+
+            response.getWriter().write(
+                    "{\"code\":500,\"message\":\"Cannot call GHN API\",\"error\":\"" + safeMessage + "\"}"
+            );
         }
     }
 }

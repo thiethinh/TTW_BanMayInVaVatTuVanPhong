@@ -179,3 +179,172 @@ document.addEventListener("DOMContentLoaded", function () {
         updateBillUI(Number(document.getElementById("shippingFeeInput")?.value || 0));
     }
 });
+
+const provinceSelect = document.getElementById("provinceId");
+const districtSelect = document.getElementById("districtId");
+const wardSelect = document.getElementById("wardCode");
+
+const provinceNameInput = document.getElementById("provinceName");
+const districtNameInput = document.getElementById("districtName");
+const wardNameInput = document.getElementById("wardName");
+
+async function fetchGHNAddress(type, params = {}) {
+    const query = new URLSearchParams({ type, ...params });
+    const url = `${contextPath}/api/ghn/address?${query.toString()}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error("Không gọi được API địa chỉ GHN");
+    }
+
+    return response.json();
+}
+
+function resetSelect(select, placeholder) {
+    if (!select) return;
+
+    select.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = placeholder;
+    select.appendChild(option);
+}
+
+function setHiddenName(select, hiddenInput) {
+    if (!select || !hiddenInput) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (!selectedOption || !selectedOption.value) {
+        hiddenInput.value = "";
+        return;
+    }
+
+    hiddenInput.value = selectedOption.textContent;
+}
+
+async function loadProvinces() {
+    if (!provinceSelect) return;
+
+    resetSelect(provinceSelect, "Đang tải tỉnh/thành phố...");
+
+    try {
+        const result = await fetchGHNAddress("province");
+
+        resetSelect(provinceSelect, "Chọn tỉnh/thành phố");
+
+        if (!result.data || !Array.isArray(result.data)) {
+            return;
+        }
+
+        result.data.forEach(province => {
+            const option = document.createElement("option");
+            option.value = province.ProvinceID;
+            option.textContent = province.ProvinceName;
+            provinceSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error(error);
+        resetSelect(provinceSelect, "Không tải được tỉnh/thành phố");
+    }
+}
+
+async function loadDistricts(provinceId) {
+    if (!districtSelect) return;
+
+    resetSelect(districtSelect, "Đang tải quận/huyện...");
+    resetSelect(wardSelect, "Chọn phường/xã");
+
+    districtNameInput.value = "";
+    wardNameInput.value = "";
+
+    try {
+        const result = await fetchGHNAddress("district", { provinceId });
+
+        resetSelect(districtSelect, "Chọn quận/huyện");
+
+        if (!result.data || !Array.isArray(result.data)) {
+            return;
+        }
+
+        result.data.forEach(district => {
+            const option = document.createElement("option");
+            option.value = district.DistrictID;
+            option.textContent = district.DistrictName;
+            districtSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error(error);
+        resetSelect(districtSelect, "Không tải được quận/huyện");
+    }
+}
+
+async function loadWards(districtId) {
+    if (!wardSelect) return;
+
+    resetSelect(wardSelect, "Đang tải phường/xã...");
+    wardNameInput.value = "";
+
+    try {
+        const result = await fetchGHNAddress("ward", { districtId });
+
+        resetSelect(wardSelect, "Chọn phường/xã");
+
+        if (!result.data || !Array.isArray(result.data)) {
+            return;
+        }
+
+        result.data.forEach(ward => {
+            const option = document.createElement("option");
+            option.value = ward.WardCode;
+            option.textContent = ward.WardName;
+            wardSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error(error);
+        resetSelect(wardSelect, "Không tải được phường/xã");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadProvinces();
+
+    if (provinceSelect) {
+        provinceSelect.addEventListener("change", function () {
+            setHiddenName(provinceSelect, provinceNameInput);
+
+            resetSelect(districtSelect, "Chọn quận/huyện");
+            resetSelect(wardSelect, "Chọn phường/xã");
+
+            districtNameInput.value = "";
+            wardNameInput.value = "";
+
+            if (this.value) {
+                loadDistricts(this.value);
+            }
+        });
+    }
+
+    if (districtSelect) {
+        districtSelect.addEventListener("change", function () {
+            setHiddenName(districtSelect, districtNameInput);
+
+            resetSelect(wardSelect, "Chọn phường/xã");
+            wardNameInput.value = "";
+
+            if (this.value) {
+                loadWards(this.value);
+            }
+        });
+    }
+
+    if (wardSelect) {
+        wardSelect.addEventListener("change", function () {
+            setHiddenName(wardSelect, wardNameInput);
+        });
+    }
+});

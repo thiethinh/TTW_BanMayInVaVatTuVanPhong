@@ -3,7 +3,7 @@ package com.papercraft.config;
 public class GHNConfig {
 
     public static final String BASE_URL =
-            "https://dev-online-gateway.ghn.vn/shiip/public-api";
+            "https://online-gateway.ghn.vn/shiip/public-api";
 
     public static final String API_TOKEN =
             getEnvOrDefault("GHN_API_TOKEN", "ce95f091-598f-11f1-b69e-d24b77050b6a");
