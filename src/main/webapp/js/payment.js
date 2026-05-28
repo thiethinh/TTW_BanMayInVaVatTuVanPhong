@@ -368,9 +368,12 @@ async function calculateGHNFee() {
             shippingStatusText.style.color = "#666";
         }
 
+        const selectedIds = document.getElementById("selectedIdsInput")?.value || "";
+
         const query = new URLSearchParams({
             districtId: districtId,
-            wardCode: wardCode
+            wardCode: wardCode,
+            selectedIds: selectedIds
         });
 
         const response = await fetch(`${contextPath}/api/ghn/fee?${query.toString()}`);

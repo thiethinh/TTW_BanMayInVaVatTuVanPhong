@@ -35,7 +35,7 @@
     <form action="${pageContext.request.contextPath}/checkout" method="POST" id="checkoutForm" novalidate>
 
         <%-- để doPost biết user đang thanh toán sp nào --%>
-        <input type="hidden" name="selectedIds" value="${selectedIds}">
+        <input type="hidden" name="selectedIds" id="selectedIdsInput" value="${selectedIds}">
 
         <%-- Các value để cập nhật bill --%>
         <input type="hidden" id="subTotalValue" value="${subTotal}">

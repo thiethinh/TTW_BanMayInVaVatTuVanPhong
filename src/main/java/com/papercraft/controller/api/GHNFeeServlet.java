@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @WebServlet("/api/ghn/fee")
 public class GHNFeeServlet extends HttpServlet {
@@ -26,6 +28,8 @@ public class GHNFeeServlet extends HttpServlet {
         try {
             String districtIdRaw = request.getParameter("districtId");
             String wardCode = request.getParameter("wardCode");
+            String selectedIdsRaw= request.getParameter("selectedIds");
+            Set<Integer> selectedIds= parseSelectedIdSet(selectedIdsRaw);
 
             if (districtIdRaw == null || districtIdRaw.isBlank()
                     || wardCode == null || wardCode.isBlank()) {
@@ -41,8 +45,7 @@ public class GHNFeeServlet extends HttpServlet {
 
             if (cart == null || cart.list().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"code\":400,\"message\":\"Cart is empty\"}");
-                return;
+                response.getWriter().write("{\"code\":400,\"message\":\"Giỏ hàng trong session đang rỗng. Vui lòng thêm sản phẩm và vào checkout lại.\"}");                return;
             }
 
             int totalQuantity = 0;
@@ -52,15 +55,17 @@ public class GHNFeeServlet extends HttpServlet {
                 if (product == null || product.getQuantity() == null || product.getQuantity() <= 0) {
                     continue;
                 }
-
+                if (!selectedIds.isEmpty() && !selectedIds.contains(product.getId())){
+                    continue;
+                }
                 totalQuantity += product.getQuantity();
                 subTotal += product.getPrice() * product.getQuantity();
+
             }
 
             if (totalQuantity <= 0) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"code\":400,\"message\":\"Cart quantity is invalid\"}");
-                return;
+                response.getWriter().write("{\"code\":400,\"message\":\"Không tìm thấy sản phẩm được chọn để tính phí vận chuyển.\"}");                return;
             }
 
 
@@ -104,5 +109,25 @@ public class GHNFeeServlet extends HttpServlet {
                     "{\"code\":500,\"message\":\"Cannot calculate GHN fee\",\"error\":\"" + safeMessage + "\"}"
             );
         }
+    }
+
+    private Set<Integer> parseSelectedIdSet(String selectedIdsRaw) {
+        Set<Integer> result = new HashSet<>();
+
+        if (selectedIdsRaw == null || selectedIdsRaw.trim().isEmpty()) {
+            return result;
+        }
+
+        String[] parts = selectedIdsRaw.split(",");
+
+        for (String part : parts) {
+            String trimmed = part.trim();
+
+            if (trimmed.matches("\\d+")) {
+                result.add(Integer.parseInt(trimmed));
+            }
+        }
+
+        return result;
     }
 }
