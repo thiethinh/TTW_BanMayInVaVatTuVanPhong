@@ -175,7 +175,7 @@
                             <span id="shippingFeeText">
                                 <c:choose>
                                     <c:when test="${shippingFee == 0}">
-                                        Miễn phí
+                                        Đang cập nhật
                                     </c:when>
 
                                     <c:otherwise>

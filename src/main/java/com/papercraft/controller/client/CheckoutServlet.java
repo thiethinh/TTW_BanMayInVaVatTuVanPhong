@@ -115,7 +115,7 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         subTotal = Math.round(subTotal);
-        double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+        double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 0;
         double vat = Math.round(subTotal * 0.05);
         double grandTotal = Math.round(subTotal + vat + shippingFee);
 

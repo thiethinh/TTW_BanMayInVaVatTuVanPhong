@@ -159,7 +159,7 @@ function updateBillUI(newShippingFee) {
 
     if (shippingFeeText) {
         shippingFeeText.textContent = shippingFee <= 0
-            ? "Miễn phí"
+            ? "Đang cập nhật"
             : formatCurrencyVND(shippingFee);
     }
 
@@ -171,7 +171,7 @@ function updateBillUI(newShippingFee) {
 document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("DOMContentLoaded", function () {
         // test: ghn trả về 30.000
-        updateBillUI(30000);
+        //   updateBillUI(30000);
     });
 
     // Test: chọn GHN => set phí ship test
