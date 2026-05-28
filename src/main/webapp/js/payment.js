@@ -345,6 +345,65 @@ document.addEventListener("DOMContentLoaded", function () {
     if (wardSelect) {
         wardSelect.addEventListener("change", function () {
             setHiddenName(wardSelect, wardNameInput);
+
+            if (this.value) {
+                calculateGHNFee();
+            }
         });
     }
 });
+
+async function calculateGHNFee() {
+    const districtId = document.getElementById("districtId")?.value;
+    const wardCode = document.getElementById("wardCode")?.value;
+    const shippingStatusText = document.getElementById("shippingStatusText");
+
+    if (!districtId || !wardCode) {
+        return;
+    }
+
+    try {
+        if (shippingStatusText) {
+            shippingStatusText.textContent = "Đang tính phí vận chuyển GHN...";
+            shippingStatusText.style.color = "#666";
+        }
+
+        const query = new URLSearchParams({
+            districtId: districtId,
+            wardCode: wardCode
+        });
+
+        const response = await fetch(`${contextPath}/api/ghn/fee?${query.toString()}`);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        const result = await response.json();
+
+        if (result.code !== 200 || !result.data) {
+            throw new Error(result.message || "GHN không trả về phí vận chuyển");
+        }
+
+
+        const fee = Number(result.data.total || result.data.service_fee || 0);
+
+        updateBillUI(fee);
+
+        if (shippingStatusText) {
+            shippingStatusText.textContent = "Đã cập nhật phí vận chuyển GHN.";
+            shippingStatusText.style.color = "#16a34a";
+        }
+
+    } catch (error) {
+        console.error("GHN fee error:", error);
+
+        updateBillUI(0);
+
+        if (shippingStatusText) {
+            shippingStatusText.textContent = "Không tính được phí GHN. Vui lòng chọn lại địa chỉ.";
+            shippingStatusText.style.color = "#dc2626";
+        }
+    }
+}
