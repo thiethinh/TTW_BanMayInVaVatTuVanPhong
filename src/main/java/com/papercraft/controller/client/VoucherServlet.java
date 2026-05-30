@@ -34,7 +34,7 @@ public class VoucherServlet extends HttpServlet {
                 }else{
                     boolean success= dao.addUserVoucher(user.getId(), voucher.getId());
                     if(!success){
-                        request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
+                        request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi  hoặc đã sử dụng");
                     }else{
                         request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
                         request.setAttribute("selectedVoucher",voucher);

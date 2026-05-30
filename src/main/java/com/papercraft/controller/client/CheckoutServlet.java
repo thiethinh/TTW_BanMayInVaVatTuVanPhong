@@ -74,7 +74,7 @@ public class CheckoutServlet extends HttpServlet {
             }else{
                 boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
                 if(!success){
-                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
+                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi hoặc đã sử dụng");
                 }else{
                     request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
                     request.setAttribute("selectedVoucher",voucher);
@@ -138,8 +138,7 @@ public class CheckoutServlet extends HttpServlet {
                         discountAmount = selectedVoucher.calculateDiscount(BigDecimal.valueOf(grandTotal));
                         grandTotal = selectedVoucher.applyDiscount(BigDecimal.valueOf(grandTotal)).toBigInteger().doubleValue();
                         request.setAttribute("successVoucher", "Áp dụng voucher thành công");
-                        request.setAttribute("selectedVoucher", selectedVoucher);
-                    }
+                        request.setAttribute("selectedVoucher", selectedVoucher);}
                 }
             } catch (NumberFormatException e) {
                 request.setAttribute("errorVoucher", "Voucher không hợp lệ"
@@ -206,6 +205,12 @@ public class CheckoutServlet extends HttpServlet {
         String paymentMethod = request.getParameter("paymentMethod");
         String shippingProvider = request.getParameter("shippingProvider");
         String shippingFeeRaw = request.getParameter("shippingFee");
+
+        String voucherIdRaw = request.getParameter("voucherId");
+        if(voucherIdRaw != null && !voucherIdRaw.isBlank()){
+            int voucherId = Integer.parseInt(voucherIdRaw);
+            session.setAttribute("voucherId", voucherId);
+        }
 
 
         StringBuilder fullAddressBuilder = new StringBuilder();
