@@ -4,9 +4,7 @@ import com.papercraft.model.Notification;
 import com.papercraft.model.enums.NotificationType;
 import com.papercraft.utils.DBConnect;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,16 +46,21 @@ public class NotificationDAO {
         return list;
     }
 
-    public int countUnreadNotification(int userId) {
+
+    public int countUnseenNotification(int userId) {
         int count = 0;
         String sql = """
-                SELECT COUNT(*) 
-                FROM notifications 
-                WHERE user_id = ? AND is_read = 0
+            SELECT COUNT(*)
+            FROM notifications
+            WHERE user_id = ?
+              AND is_seen = 0
             """;
+
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt(1);
@@ -67,5 +70,77 @@ public class NotificationDAO {
             e.printStackTrace();
         }
         return count;
+    }
+
+    public void markRead(int notificationId) {
+        String sql = """
+            UPDATE notifications
+            SET is_read = 1,
+                is_seen = 1
+            WHERE id = ?
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, notificationId);
+            ps.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void markAllSeen(int userId) {
+        String sql = """
+            UPDATE notifications
+            SET is_seen = 1
+            WHERE user_id = ?
+            AND is_seen = 0
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean insertNotification(Notification notification) {
+        String sql = """
+            INSERT INTO notifications (
+                user_id, content, type, reference_id, is_seen, is_read, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, notification.getUserId());
+            ps.setString(2, notification.getContent());
+            ps.setString(3, notification.getType() != null ? notification.getType().name() : null);
+
+            if (notification.getReferenceId() != null) {
+                ps.setInt(4, notification.getReferenceId());
+            } else {
+                ps.setNull(4, Types.INTEGER);
+            }
+
+            ps.setBoolean(5, notification.isSeen());
+            ps.setBoolean(6, notification.isRead());
+
+            if (notification.getCreatedAt() != null) {
+                ps.setTimestamp(7, notification.getCreatedAt());
+            } else {
+                ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            }
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
