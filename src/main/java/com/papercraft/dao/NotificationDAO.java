@@ -110,10 +110,23 @@ public class NotificationDAO {
 
     public boolean insertNotification(Notification notification) {
         String sql = """
-            INSERT INTO notifications (
-                user_id, content, type, reference_id, is_seen, is_read, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """;
+        INSERT INTO notifications (
+            user_id,
+            content,
+            type,
+            reference_id,
+            is_seen,
+            is_read,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        AS new_row
+        ON DUPLICATE KEY UPDATE
+            content = new_row.content,
+            is_seen = new_row.is_seen,
+            is_read = new_row.is_read,
+            created_at = new_row.created_at
+        """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -130,17 +143,14 @@ public class NotificationDAO {
 
             ps.setBoolean(5, notification.isSeen());
             ps.setBoolean(6, notification.isRead());
-
-            if (notification.getCreatedAt() != null) {
-                ps.setTimestamp(7, notification.getCreatedAt());
-            } else {
-                ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
-            }
-
+            ps.setTimestamp(7, notification.getCreatedAt() != null ? notification.getCreatedAt() : new Timestamp(System.currentTimeMillis()));
             return ps.executeUpdate() > 0;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

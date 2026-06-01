@@ -18,7 +18,7 @@ import java.util.List;
 
 @WebServlet(name = "NotificationServlet", urlPatterns = {"/notification"})
 public class NotificationServlet extends HttpServlet {
-    private NotificationDAO notificationDAO = new NotificationDAO();
+    private final NotificationDAO notificationDAO = new NotificationDAO();
     private String contextPath;
 
     @Override
@@ -71,6 +71,7 @@ public class NotificationServlet extends HttpServlet {
             item.addProperty("id", n.getId());
             item.addProperty("content", n.getContent());
             item.addProperty("type", n.getType() != null ? n.getType().name() : "");
+            item.addProperty("title", n.getType() != null ? n.getType().getTitle() : "");
             item.addProperty("isRead", n.isRead());
             item.addProperty("isSeen", n.isSeen());
             item.addProperty("relativeTime", n.getRelativeTime());
@@ -110,16 +111,18 @@ public class NotificationServlet extends HttpServlet {
     }
 
     private String buildNotificationUrl(Notification notification) {
-        if(contextPath== null) return "";
+        if (contextPath == null) return "";
         NotificationType type = notification.getType();
-
         if (type == null) {
-            return "#";
+            return contextPath;
         }
         if (type.requiresReferenceId()) {
-            return "/" + type.getRoutePattern() + notification.getReferenceId();
+            Integer refId = notification.getReferenceId();
+            if (refId == null) {
+                return contextPath;
+            }
+            return contextPath+ "/" +String.format(type.getRoutePattern(), notification.getReferenceId());
         }
-
-        return "/" + type.getRoutePattern();
+        return contextPath+"/" + type.getRoutePattern();
     }
 }

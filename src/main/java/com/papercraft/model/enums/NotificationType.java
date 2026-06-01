@@ -1,34 +1,30 @@
 package com.papercraft.model.enums;
 
 public enum NotificationType {
-    // ORDER
-    ORDER_CREATED("Đơn hàng đã được tạo", "order/"),
-    ORDER_CONFIRMED("Đơn hàng đã được xác nhận", "order/"),
-    ORDER_PACKING("Đơn hàng đang được chuẩn bị", "order/"),
-    ORDER_SHIPPING("Đơn hàng đang được giao", "order/"),
-    ORDER_DELIVERED("Đơn hàng đã giao thành công", "order/"),
-    ORDER_CANCELLED("Đơn hàng đã bị hủy", "order/"),
+    ORDER_PENDING("Đơn hàng đang chờ", "Đơn hàng #%d đang chờ xử lý.", "order-view?orderId=%d"),
+    ORDER_SHIPPED("Đơn hàng đang được giao", "Đơn hàng #%d đang được giao.", "order-view?orderId=%d"),
+    ORDER_COMPLETED("Đơn hàng đã giao thành công", "Đơn hàng #%d đã được giao thành công.", "order-view?orderId=%d"),
+    ORDER_CANCELLED("Đơn hàng đã bị hủy", "Đơn hàng #%d đã bị hủy.", "order-view?orderId=%d"),
 
-    // BLOG
-    BLOG_SUBMITTED("Blog đã được gửi", "blog/"),
-    BLOG_APPROVED("Blog đã được duyệt", "blog/"),
-    BLOG_REJECTED("Blog bị từ chối", "blog/"),
+    BLOG_SUBMITTED("Blog đã được gửi", "Blog của bạn đã được gửi và đang chờ duyệt.", "blog"),
+    BLOG_APPROVED("Blog đã được duyệt", "Blog #%d đã được duyệt và hiển thị công khai.", "blog-post?id=%d"),
+    BLOG_HIDDEN("Blog bị ẩn", "Blog của bạn đã bị ẩn.", "blog"),
+    BLOG_DELETED("Blog bị xóa", "Blog của bạn đã bị xóa.", "blog"),
 
-    // CONTACT
-    CONTACT_SUBMITTED("Liên hệ đã được gửi", "contact/"),
-    CONTACT_REPLIED("Liên hệ đã được phản hồi", "contact/"),
+    CONTACT_SUBMITTED("Liên hệ đã được gửi", "Yêu cầu liên hệ của bạn đã được gửi thành công.", "contact"),
+    CONTACT_REPLIED("Liên hệ đã được phản hồi", "Yêu cầu liên hệ của bạn đã được phản hồi.Vui lòng kiểm tra email!", "contact"),
 
-    // ACCOUNT
-    PASSWORD_CHANGED("Mật khẩu đã được thay đổi", "profile/"),
+    PASSWORD_CHANGED("Mật khẩu đã được thay đổi", "Mật khẩu tài khoản của bạn đã được thay đổi thành công.", "change-password"),
 
-    // PROMOTION
-    PROMOTION("Khuyến mãi mới", "voucher/");
+    VOUCHER("Khuyến mãi mới", "Có chương trình khuyến mãi mới dành cho bạn.", "voucher");
 
     private final String title;
+    private final String contentTemplate;
     private final String routePattern;
 
-    NotificationType(String title, String routePattern) {
+    NotificationType(String title, String contentTemplate, String routePattern) {
         this.title = title;
+        this.contentTemplate = contentTemplate;
         this.routePattern = routePattern;
     }
 
@@ -40,9 +36,11 @@ public enum NotificationType {
         return routePattern;
     }
 
+    public String getContentTemplate() {return contentTemplate;}
+
+
     public boolean requiresReferenceId() {
-        return routePattern.contains("order/") ||
-                routePattern.contains("blog/") ||
-                routePattern.contains("contact/");
+        return routePattern.contains("%d");
     }
+
 }

@@ -1,13 +1,8 @@
 package com.papercraft.controller.admin;
 
-import com.papercraft.dao.OrderDAO;
-import com.papercraft.dao.OrderItemDAO;
-import com.papercraft.dao.PaymentDAO;
-import com.papercraft.dao.UserDAO;
-import com.papercraft.model.Order;
-import com.papercraft.model.OrderItem;
-import com.papercraft.model.Payment;
-import com.papercraft.model.User;
+import com.papercraft.dao.*;
+import com.papercraft.model.*;
+import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -22,6 +17,8 @@ public class AdminOrderViewServlet extends HttpServlet {
         String orderID = request.getParameter("orderId");
         String verifyPayment= request.getParameter("verifyPayment");
         String transactionCode= request.getParameter("transactionCode");
+        HttpSession session = request.getSession();
+        User userSession =(User) session.getAttribute("acc");
 
         String accept = request.getParameter("accept");
         String cancel = request.getParameter("cancel");
@@ -32,6 +29,19 @@ public class AdminOrderViewServlet extends HttpServlet {
 
         boolean isAccept = false;
         boolean isCancel = false;
+
+        NotificationType typeNoti = null;
+        if (accept != null) {
+            typeNoti = NotificationType.ORDER_SHIPPED;
+        } else if (cancel != null) {
+            typeNoti = NotificationType.ORDER_CANCELLED;
+        }
+
+        NotificationDAO notificationDAO = new NotificationDAO();
+        if (typeNoti != null) {
+            Notification noti = new Notification(userSession.getId(), typeNoti, id);
+            notificationDAO.insertNotification(noti);
+        }
 
         if (accept != null) {
             Order currentOrder = orderDAO.getOrderByID(id);
@@ -49,6 +59,8 @@ public class AdminOrderViewServlet extends HttpServlet {
                 isCancel = true;
             }
         }
+
+
         // Xuwr lys VerifyPayment
         boolean isVeryfyPayment= false;
         boolean verifiedPayment = false;

@@ -21,11 +21,11 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(Integer userId, NotificationType type, String content, Integer referenceId) {
+    public Notification(Integer userId, NotificationType type, Integer referenceId) {
         this.userId = userId;
         this.type = type;
-        this.content = content;
         this.referenceId = referenceId;
+        this.content = generateContent();
         this.isSeen = false;
         this.isRead = false;
         this.createdAt = new Timestamp(System.currentTimeMillis());
@@ -76,10 +76,6 @@ public class Notification {
         this.url = url;
     }
 
-
-
-
-
     public boolean isSeen() {
         return isSeen;
     }
@@ -109,51 +105,12 @@ public class Notification {
         return type == null ? "" : type.getTitle();
     }
 
-    // Sinh URL từ type + referenceId
+    // tạo url
     public String getUrl() {
         if (type == null) return "#";
         if (!type.requiresReferenceId()) return type.getRoutePattern();
         if (referenceId == null) return "#";
         return String.format(type.getRoutePattern(), referenceId);
-    }
-
-    // Mở popup chuông
-    public void markAsSeen() {
-        this.isSeen = true;
-    }
-
-    // Click vào thông báo
-    public void markAsRead() {
-        this.isSeen = true;
-        this.isRead = true;
-    }
-
-    public boolean isUnread() {
-        return !isRead;
-    }
-
-    public boolean isUnseen() {
-        return !isSeen;
-    }
-
-    public boolean hasReference() {
-        return referenceId != null;
-    }
-
-    public boolean hasContent() {
-        return content != null && !content.isBlank();
-    }
-
-    public boolean isOrderNotification() {
-        return type != null && type.name().startsWith("ORDER_");
-    }
-
-    public boolean isBlogNotification() {
-        return type != null && type.name().startsWith("BLOG_");
-    }
-
-    public boolean isContactNotification() {
-        return type != null && type.name().startsWith("CONTACT_");
     }
 
     // Hiển thị thời gian kiểu Facebook
@@ -177,5 +134,16 @@ public class Notification {
 
         long years = months / 12;
         return years + " năm trước";
+    }
+    private String generateContent() {
+        if (type == null) {
+            return "";
+        }
+        if (type.requiresReferenceId()) {
+            content = type.getContentTemplate().replace("%d", String.valueOf(referenceId));
+        }else{
+            content = type.getContentTemplate();
+        }
+        return content;
     }
 }

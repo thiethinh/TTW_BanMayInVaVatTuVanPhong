@@ -63,7 +63,7 @@
                     <option value="shipped" ${param.status == 'shipped' ? 'selected' : ''}>Đã Gửi</option>
                     <option value="completed" ${param.status == 'completed' ? 'selected' : ''}>Hoàn Thành</option>
                     <option value="canceled" ${param.status == 'canceled' ? 'selected' : ''}>Đã Hủy</option>
-                    <option value="hidden" ${param.status == 'hidden' ? 'selected' : ''}>Đã Ẩn</option>
+                    <%-- <option value="hidden" ${param.status == 'hidden' ? 'selected' : ''}>Đã Ẩn</option>--%>
                 </select>
             </div>
 
@@ -105,7 +105,6 @@
                                         </option>
                                         <option value="canceled" ${o.status == 'canceled' ? 'selected' : ''}>Đã Hủy
                                         </option>
-                                        <option value="hidden" ${o.status == 'hidden' ? 'selected' : ''}>Đã Ẩn</option>
                                     </select>
                                 </td>
                                 <td>
@@ -118,34 +117,6 @@
                     </table>
                 </c:otherwise>
             </c:choose>
-
-
-            <%--            <div class="footer">--%>
-            <%--                <nav>--%>
-            <%--                    <ul class="nav-change-page">--%>
-            <%--                        &lt;%&ndash; Nút Trang trước &ndash;%&gt;--%>
-            <%--                        <c:if test="${currentPage > 1}">--%>
-            <%--                            <li>--%>
-            <%--                                <a href="?status=${param.status}&page=${currentPage - 1}"><span>«</span> Trang trước</a>--%>
-            <%--                            </li>--%>
-            <%--                        </c:if>--%>
-
-            <%--                        &lt;%&ndash; Hiển thị danh sách số trang &ndash;%&gt;--%>
-            <%--                        <c:forEach begin="1" end="${totalPages}" var="i">--%>
-            <%--                            <li class="${currentPage == i ? 'active' : ''}">--%>
-            <%--                                <a href="?status=${param.status}&page=${i}">${i}</a>--%>
-            <%--                            </li>--%>
-            <%--                        </c:forEach>--%>
-
-            <%--                        &lt;%&ndash; Nút Trang tiếp theo &ndash;%&gt;--%>
-            <%--                        <c:if test="${currentPage < totalPages}">--%>
-            <%--                            <li>--%>
-            <%--                                <a href="?status=${param.status}&page=${currentPage + 1}">Trang tiếp theo <span>»</span></a>--%>
-            <%--                            </li>--%>
-            <%--                        </c:if>--%>
-            <%--                    </ul>--%>
-            <%--                </nav>--%>
-            <%--            </div>--%>
 
         </section>
         <div class="pagination"></div>
@@ -179,7 +150,8 @@
                     "admin-order-manage?action=search-date"
                     + "&year=" + year
                     + "&month=" + month
-                    + "&day=" + day;        });
+                    + "&day=" + day;
+        });
 
 
         const monthInput = document.getElementById("month");

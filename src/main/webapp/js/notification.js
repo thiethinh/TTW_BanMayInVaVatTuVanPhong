@@ -62,9 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 item.className = `notification-item ${!notification.isRead ? "unread" : ""}`;
 
                 item.innerHTML = `
-          <div class="notification-content">${notification.content}</div>
-          <div class="notification-time">${notification.relativeTime}</div>
-        `;
+                  <div class="notification-title">${notification.title}</div>
+                  <div class="notification-content">${notification.content}</div>
+                  <div class="notification-time">${notification.relativeTime}</div>
+                `;
 
                 item.addEventListener("click", async () => {
                     try {
