@@ -1,7 +1,11 @@
 package com.papercraft.controller.admin;
 
 import com.papercraft.dao.BlogDao;
+import com.papercraft.dao.NotificationDAO;
 import com.papercraft.model.Blog;
+import com.papercraft.model.Notification;
+import com.papercraft.model.User;
+import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +22,7 @@ public class AdminBlogServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("acc");
 
         BlogDao blogDao = new BlogDao();
 
@@ -34,16 +39,26 @@ public class AdminBlogServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
                 boolean success = false;
+                NotificationDAO notificationDAO = new NotificationDAO();
+                NotificationType type = null;
 
                 if ("approve".equals(action)) {
                     success = blogDao.actionBlog(id, 1);
                     session.setAttribute("msg", success ? "Duyệt thành công!" : "Lỗi duyệt bài.");
+                    type=NotificationType.BLOG_APPROVED;
                 } else if ("hidden".equals(action)) {
                     success = blogDao.actionBlog(id, 0);
                     session.setAttribute("msg", success ? "Ẩn thành công!" : "Lỗi ẩn bài.");
+                    type=NotificationType.BLOG_HIDDEN;
                 } else if ("delete".equals(action)) {
                     success = blogDao.deleteBlog(id);
                     session.setAttribute("msg", success ? "Xóa thành công!" : "Lỗi xóa bài.");
+                    type=NotificationType.BLOG_DELETED;
+                }
+
+                if(type!= null){
+                    Notification noti = new Notification(user.getId(),type,id);
+                    notificationDAO.insertNotification(noti);
                 }
 
                 String redirectUrl = "admin-blog?view=" + viewType;

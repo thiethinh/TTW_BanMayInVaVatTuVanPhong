@@ -1,7 +1,10 @@
 package com.papercraft.controller.client;
 
+import com.papercraft.dao.NotificationDAO;
 import com.papercraft.dao.UserDAO;
+import com.papercraft.model.Notification;
 import com.papercraft.model.User;
+import com.papercraft.model.enums.NotificationType;
 import com.papercraft.utils.MD5;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -59,6 +62,10 @@ public class ChangePasswordServlet extends HttpServlet {
             UserDAO userDAO = new UserDAO();
             String newPassHash = MD5.getMD5(newPassword);
             boolean isChanged = userDAO.changePassword(user.getId(), newPassHash);
+            if(isChanged){
+                Notification noti = new Notification(user.getId(),NotificationType.PASSWORD_CHANGED,null);
+                new NotificationDAO().insertNotification(noti);
+            }
 
             if (isChanged) {
                 user.setPasswordHash(newPassHash);

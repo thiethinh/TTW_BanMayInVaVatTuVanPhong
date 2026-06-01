@@ -2,8 +2,12 @@ package com.papercraft.controller.admin;
 
 import com.google.gson.Gson;
 import com.papercraft.dao.ContactDAO;
+import com.papercraft.dao.NotificationDAO;
 import com.papercraft.dto.ContactDTO;
 import com.papercraft.model.Contact;
+import com.papercraft.model.Notification;
+import com.papercraft.model.User;
+import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -71,6 +75,13 @@ public class AdminContact extends HttpServlet {
                 String redirectUrl = "admin-contacts?keyword=" + URLEncoder.encode(keyword, "UTF-8");
                 if (replied != -1) {
                     redirectUrl += "&replied=" + replied;
+                }
+                if(!currentStatus){
+                    HttpSession session = request.getSession();
+                    User user = (User) session.getAttribute("acc");
+                    NotificationDAO notificationDAO = new NotificationDAO();
+                    Notification noti = new Notification(user.getId(), NotificationType.CONTACT_REPLIED,id);
+                    notificationDAO.insertNotification(noti);
                 }
                 response.sendRedirect(redirectUrl);
                 return;

@@ -65,12 +65,9 @@ public class UserVoucherDAO {
 
     public boolean addUserVoucher(int userId, int voucherId){
         String sql = """
-        INSERT INTO user_vouchers (
-            user_id,
-            voucher_id
-        )
-        VALUES (?, ?)
-    """;
+            INSERT INTO user_vouchers (user_id,voucher_id)
+            VALUES (?, ?);
+        """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -85,5 +82,26 @@ public class UserVoucherDAO {
         }
         return false;
     }
+
+    public boolean setUsedVoucher(int userId, int voucherId){
+        String sql = """
+            UPDATE user_vouchers
+            SET is_used = 1,used_at = CURRENT_TIMESTAMP
+            WHERE user_id = ? AND voucher_id = ? AND is_used = 0;
+         """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, voucherId);
+
+            return ps.executeUpdate()>0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
 }

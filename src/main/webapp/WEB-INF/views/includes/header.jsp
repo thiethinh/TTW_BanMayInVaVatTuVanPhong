@@ -33,10 +33,28 @@
             <div class="header-right-side">
                 <div class="user-action">
 
+                    <div class="notification-wrapper">
+                        <button id="notificationBtn" class="notification-btn" type="button">
+                            <i class="fa-solid fa-bell"></i>
+                            <span id="notificationBadge" class="notification-badge" style="display: none;"></span>
+                        </button>
+
+                        <div id="notificationPopup" class="notification-popup">
+                            <div class="notification-header">
+                                <h4>Thông báo</h4>
+                            </div>
+
+                            <div id="notificationList" class="notification-list">
+                                <div class="notification-empty">
+                                    Chưa có thông báo nào
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <%-- ================= CART ================= --%>
 
-                        <c:set var="cartCount"
-                               value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
+                        <c:set var="cartCount" value="${not empty sessionScope.cart ? sessionScope.cart.totalQuantity : 0}"/>
 
                         <a href="${pageContext.request.contextPath}/cart" id="nav-cart" class="cart-btn">
                             <i class="fa-solid fa-cart-shopping"></i>
@@ -129,5 +147,6 @@
     //     }));
     // }
 </script>
+<script src="${pageContext.request.contextPath}/js/notification.js"></script>
 <%--//debug cart--%>
 <input type="hidden" id="globalContextPath" value="${pageContext.request.contextPath}">

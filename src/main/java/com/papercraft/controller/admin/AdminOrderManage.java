@@ -1,9 +1,13 @@
 package com.papercraft.controller.admin;
 
+import com.papercraft.dao.NotificationDAO;
 import com.papercraft.dao.OrderDAO;
 import com.papercraft.dao.ProductDAO;
+import com.papercraft.model.Notification;
 import com.papercraft.model.Order;
 import com.papercraft.model.Product;
+import com.papercraft.model.User;
+import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -16,39 +20,22 @@ import java.util.List;
 public class AdminOrderManage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("acc");
         String action = request.getParameter("action");
         String status = request.getParameter("status");
+
 
         action=(action==null)?"":action;
         status = (status == null || status.isEmpty()) ? "" : status;
         List<Order> orders = new ArrayList<>();
         OrderDAO orderDAO = new OrderDAO();
 
-//        int pageSize = 15;
-//        int currentPage = 1;
-//        try {
-//            String pageParam = request.getParameter("page");
-//            if (pageParam != null) {
-//                currentPage = Integer.parseInt(pageParam);
-//                if (currentPage < 1) currentPage = 1;
-//            }else{
-//                currentPage = 1;
-//            }
-//        } catch (NumberFormatException e) {
-//            currentPage = 1;
-//        }
-//
-//        int offset = (currentPage-1) *pageSize;
-//
-//        int totalOrders = orderDAO.getTotalCount(status);
-//
-//        int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
-//
-//        List<Order> orders = orderDAO.getOrderByState(status, pageSize, offset);
 
         if ("filter-status".equals(action)) {
             orders = orderDAO.getOrderByState(status, Integer.MAX_VALUE, 0);
         } else if ("change-status".equals(action)) {
+            NotificationDAO notificationDAO = new NotificationDAO();
             String idParam = request.getParameter("id");
             String newStatus = request.getParameter("status-order");
             if (idParam != null && newStatus != null) {
@@ -58,6 +45,17 @@ public class AdminOrderManage extends HttpServlet {
                     Order order = orderDAO.getOrderByID(orderId);
                     if (order != null && isValidStatusChange(order.getStatus(), newStatus)){
                         orderDAO.updateOrderStatus(orderId, newStatus);
+
+                        //tao thong bao order
+                        NotificationType typeNoti = switch (newStatus) {
+                            case "pending" -> NotificationType.ORDER_PENDING;
+                            case "shipped" -> NotificationType.ORDER_SHIPPED;
+                            case "completed" -> NotificationType.ORDER_COMPLETED;
+                            case "canceled" -> NotificationType.ORDER_CANCELLED;
+                            default -> null;
+                        };
+                        Notification noti = new Notification(user.getId(), typeNoti,orderId);
+                        notificationDAO.insertNotification(noti);
 
                     }
 

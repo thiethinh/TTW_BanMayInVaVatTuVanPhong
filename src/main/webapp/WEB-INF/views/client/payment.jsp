@@ -25,7 +25,6 @@
     <div class="title">
         <h1>Thanh Toán</h1>
     </div>
-
     <c:if test="${not empty error}">
         <div style="background-color: #f8d7da; color: #721c24; padding: 15px; margin: 0 auto 20px; max-width: 1200px; border: 1px solid #f5c6cb; border-radius: 5px; text-align: center;">
             <i class="fa-solid fa-triangle-exclamation"></i> ${error}
