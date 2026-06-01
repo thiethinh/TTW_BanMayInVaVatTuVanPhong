@@ -252,7 +252,7 @@ public class OrderDAO {
 
     public int insertOrder(Connection conn, Order order) throws SQLException {
         String sql = """
-                        INSERT INTO orders (user_id, status, total_price, note, shipping_fee,shipping_provider, shipping_name, shipping_phone, shipping_address)
+                        INSERT INTO orders (user_id, status, total_price, note, shipping_fee, shipping_provider, shipping_name, shipping_phone, shipping_address)
                         VALUES (?, ?, ?, ? ,?, ?, ?, ?,?)
                 """;
 

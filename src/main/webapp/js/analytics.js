@@ -139,7 +139,7 @@ export function initializeAnalytics(contextPath) {
                             <td>${item.currentStock}</td>
                             <td>${item.totalImported}</td>
                             <td>${item.totalSold}</td>
-                            <td>${item.dailySalesVelocity}</td>
+                            <td>${item.dailySalesVelocity.toFixed(1)}</td>
                             <td><small style="font-weight: 600; color: ${status.color}">${consumptionRate.toFixed(1)}%</small></td>
                             <td><strong>${item.recommendedImportQty}</strong></td>
                             <td><span class="${status.class}">${status.text}</span></td>
