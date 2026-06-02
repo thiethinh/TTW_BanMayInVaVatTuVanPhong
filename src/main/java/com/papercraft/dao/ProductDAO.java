@@ -244,16 +244,33 @@ public class ProductDAO {
         List<Product> list = new ArrayList<>();
 
         String sql = """
-                SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name, p.discount, p.origin_price
-                                FROM product p
-                                JOIN category c ON p.category_id = c.id
-                                LEFT JOIN image i ON i.entity_id = p.id
-                                AND i.is_thumbnail = 1
-                                AND i.entity_type = 'Product'
-                                WHERE c.type = ? AND p.is_deleted=0
-                                ORDER BY p.discount DESC
-                                LIMIT 10;
-                """;
+            SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,
+                   p.origin_price, p.discount, p.price, i.img_name,
+                   COALESCE(r.avg_rating, 0) AS avg_rating,
+                   COALESCE(s.sold_quantity, 0) AS sold_quantity
+            FROM product p
+            JOIN category c ON p.category_id = c.id
+                
+            LEFT JOIN image i ON p.id = i.entity_id AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
+                
+            LEFT JOIN (
+                SELECT product_id, AVG(rating) AS avg_rating 
+                FROM review 
+                GROUP BY product_id
+            ) r ON r.product_id = p.id
+                
+            LEFT JOIN (
+                SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+                FROM order_item oi
+                JOIN orders o ON o.id = oi.order_id
+                WHERE o.status = 'completed'
+                GROUP BY oi.product_id
+            ) s ON s.product_id = p.id
+            
+            WHERE c.type = ? AND p.is_deleted = 0
+            ORDER BY p.discount DESC
+            LIMIT 10
+            """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -270,6 +287,9 @@ public class ProductDAO {
                     p.setDiscount(rs.getDouble("discount"));
                     p.setOriginPrice(rs.getDouble("origin_price"));
                     p.setPrice(rs.getDouble("price"));
+
+                    p.setAvgRating(rs.getBigDecimal("avg_rating"));
+                    p.setSoldQuantity(rs.getInt("sold_quantity"));
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {

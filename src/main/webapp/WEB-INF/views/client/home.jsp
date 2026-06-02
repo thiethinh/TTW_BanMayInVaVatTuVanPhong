@@ -105,6 +105,16 @@
                             </c:if>
                         </div>
 
+                        <div class="general-sell-info">
+                            <div class="rating">
+                                ⭐ <span><fmt:formatNumber value="${p.avgRating}" maxFractionDigits="1"/></span>
+                            </div>
+
+                            <div class="sold">
+                                Đã bán: <span>${p.soldQuantity}</span>
+                            </div>
+                        </div>
+
                         <div class="action">
                             <button class="add-cart relative-btn" type="button" onclick="addToCart(${p.id})"><span><i
                                     class='bx bx-cart'></i></span>
@@ -187,6 +197,16 @@
                                 <fmt:formatNumber value="${p.originPrice}" pattern="#,###"/> ₫
                             </span>
                             </c:if>
+                        </div>
+
+                        <div class="general-sell-info">
+                            <div class="rating">
+                                ⭐ <span><fmt:formatNumber value="${p.avgRating}" maxFractionDigits="1"/></span>
+                            </div>
+
+                            <div class="sold">
+                                Đã bán: <span>${p.soldQuantity}</span>
+                            </div>
                         </div>
 
                         <div class="action">
