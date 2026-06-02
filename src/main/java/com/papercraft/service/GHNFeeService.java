@@ -12,15 +12,7 @@ import java.nio.charset.StandardCharsets;
 public class GHNFeeService {
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    public String calculateFee(
-            int toDistrictId,
-            String toWardCode,
-            int weight,
-            int length,
-            int width,
-            int height,
-            int insuranceValue
-    ) throws IOException, InterruptedException {
+    public String calculateFee(int toDistrictId, String toWardCode, int weight, int length, int width, int height, int insuranceValue) throws IOException, InterruptedException {
 
         String url = GHNConfig.BASE_URL + "/v2/shipping-order/fee";
 
@@ -45,13 +37,7 @@ public class GHNFeeService {
                 insuranceValue
         );
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .header("token", GHNConfig.API_TOKEN)
-                .header("ShopId", String.valueOf(GHNConfig.SHOP_ID))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").header("token", GHNConfig.API_TOKEN).header("ShopId", String.valueOf(GHNConfig.SHOP_ID)).POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8)).build();
 
         return send(request);
     }
@@ -60,8 +46,7 @@ public class GHNFeeService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new IOException("GHN Fee API error. HTTP "
-                    + response.statusCode() + ": " + response.body());
+            throw new IOException("GHN Fee API error. HTTP " + response.statusCode() + ": " + response.body());
         }
 
         return response.body();
@@ -72,8 +57,6 @@ public class GHNFeeService {
             return "";
         }
 
-        return value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

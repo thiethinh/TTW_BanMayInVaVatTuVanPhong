@@ -8,6 +8,7 @@ import com.papercraft.model.Order;
 import com.papercraft.model.OrderItem;
 import com.papercraft.model.Payment;
 import com.papercraft.model.User;
+import com.papercraft.service.OrderService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -76,18 +77,19 @@ public class OrderViewServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             Order order = orderDAO.getOrderByID(orderId);
 
-            if (order != null && order.getUserId() == user.getId() && "pending".equals(order.getStatus())) {
-                boolean isCanceled = orderDAO.updateOrderStatus(orderId, "canceled");
+            if (order != null && order.getUserId() == user.getId() && "pending".equalsIgnoreCase(order.getStatus())) {
+                OrderService orderService = new OrderService();
+
+                boolean isCanceled = orderService.cancelOrderAndRestoreStock(orderId, user.getId());
 
                 if (isCanceled) {
-                    session.setAttribute("successMsg", "Đã hủy đơn hàng thành công!");
+                    session.setAttribute("successMsg", "Đã hủy đơn hàng thành công! Số lượng sản phẩm đã được hoàn lại kho.");
                 } else {
                     session.setAttribute("errorMsg", "Hủy đơn hàng thất bại, vui lòng thử lại!");
                 }
             } else {
                 session.setAttribute("errorMsg", "Không thể hủy đơn hàng");
             }
-
             response.sendRedirect(request.getContextPath() + "/order-view?orderId=" + orderId);
         }
     }

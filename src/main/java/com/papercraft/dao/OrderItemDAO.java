@@ -95,4 +95,43 @@ public class OrderItemDAO {
             throw new RuntimeException(e);
         }
     }
+
+    public List<OrderItem> getItemByOrderId(Connection conn, int orderId) throws SQLException {
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                oi.id AS order_item_id,
+                oi.order_id,
+                oi.product_id,
+                oi.quantity,
+                oi.price
+            FROM order_item oi
+            WHERE oi.order_id = ?
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    OrderItem oi = new OrderItem();
+
+                    oi.setId(rs.getInt("order_item_id"));
+                    oi.setOrderId(rs.getInt("order_id"));
+                    oi.setProductId(rs.getInt("product_id"));
+                    oi.setQuantity(rs.getInt("quantity"));
+                    oi.setPrice(rs.getBigDecimal("price"));
+
+                    BigDecimal lineTotal = rs.getBigDecimal("price")
+                            .multiply(BigDecimal.valueOf(rs.getInt("quantity")));
+                    oi.setTotal(lineTotal);
+
+                    orderItems.add(oi);
+                }
+            }
+        }
+
+        return orderItems;
+    }
 }

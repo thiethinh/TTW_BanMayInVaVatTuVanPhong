@@ -27,11 +27,6 @@ public class CartServlet extends HttpServlet {
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
 
-//        //== check login mới được thêm vào gior hàng( chặn từ server) ===
-//        if (session.getAttribute("acc") == null && action == null) {
-//            response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
-//            return;
-//        }
 
 
         Cart cart = (Cart) session.getAttribute("cart");
@@ -118,9 +113,9 @@ public class CartServlet extends HttpServlet {
 
                 //Tính lại bill
                 double subTotal = Math.round(cart.total());
-                double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+                double shippingFee = 0;
                 double vat = Math.round(subTotal * 0.05);
-                double grandTotal = Math.round(subTotal + vat + shippingFee);
+                double grandTotal = Math.round(subTotal + vat);
 
                 response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().print(String.format(
@@ -160,9 +155,9 @@ public class CartServlet extends HttpServlet {
                     sendJson(response, false, error, cart.getTotalQuantity());
                 } else {
                     double subTotal = Math.round(cart.total());
-                    double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+                    double shippingFee = 0;
                     double vat = Math.round(subTotal * 0.05);
-                    double grandTotal = Math.round(subTotal + vat + shippingFee);
+                    double grandTotal = Math.round(subTotal + vat);
 
                     //Capap nhật giá của item vừa update
                     double itemTotal = p.getPrice() * quantity;
@@ -187,9 +182,9 @@ public class CartServlet extends HttpServlet {
 
         //=== Bill ====
         double subTotal = Math.round(cart.total());
-        double shippingFee = (subTotal > 5000000 || subTotal == 0) ? 0 : 30000;
+        double shippingFee = 0;
         double vat = Math.round(subTotal * 0.05);
-        double grandTotal = Math.round(subTotal + vat + shippingFee);
+        double grandTotal = Math.round(subTotal + vat);
 
 
         //set sang JSP
@@ -229,14 +224,10 @@ public class CartServlet extends HttpServlet {
             }
         }
         subTotal = Math.round(subTotal);
+
         double shippingFee = 0;
-
-        if (subTotal > 0 && subTotal <= 5_000_000) {
-            shippingFee = 30_000;
-        }
-
         double vat = Math.round(subTotal * 0.05);
-        double grandTotal = Math.round(subTotal + shippingFee + vat);
+        double grandTotal = Math.round(subTotal + vat);
 
         return new double[]{subTotal, shippingFee, vat, grandTotal};
     }
