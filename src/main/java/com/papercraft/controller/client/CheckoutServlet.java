@@ -1,5 +1,6 @@
 package com.papercraft.controller.client;
 
+import com.papercraft.config.MomoConfig;
 import com.papercraft.config.VNPAYConfig;
 import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.CartDAO;
@@ -14,8 +15,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -298,20 +304,20 @@ public class CheckoutServlet extends HttpServlet {
             // Lưu orderId vừa đặt
             session.setAttribute("lastOrderId", orderId);
 
-            if ("VNPAY".equals(paymentMethod)) {
-                double calculatedSubTotal = selectedCart.total();
-                double calculatedVat = Math.round(calculatedSubTotal * 0.05);
-                double calculatedGrandTotal = Math.round(calculatedSubTotal + calculatedVat + shippingFee.doubleValue());
+            double calculatedSubTotal = selectedCart.total();
+            double calculatedVat = Math.round(calculatedSubTotal * 0.05);
+            double calculatedGrandTotal = Math.round(calculatedSubTotal + calculatedVat + shippingFee.doubleValue());
 
-                if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
-                    VoucherDAO voucherDAO = new VoucherDAO();
-                    Voucher v = voucherDAO.getVoucherById(Integer.parseInt(voucherIdRaw));
-                    if (v != null) {
-                        calculatedGrandTotal = v.applyDiscount(BigDecimal.valueOf(calculatedGrandTotal)).doubleValue();
-                    }
+            if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
+                VoucherDAO voucherDAO = new VoucherDAO();
+                Voucher v = voucherDAO.getVoucherById(Integer.parseInt(voucherIdRaw));
+                if (v != null) {
+                    calculatedGrandTotal = v.applyDiscount(BigDecimal.valueOf(calculatedGrandTotal)).doubleValue();
                 }
-                long amount = (long) calculatedGrandTotal * 100;
+            }
 
+            if ("VNPAY".equals(paymentMethod)) {
+                long amount = (long) calculatedGrandTotal * 100;
                 Map<String, String> vnp_Params = new HashMap<>();
                 vnp_Params.put("vnp_Version", "2.1.0");
                 vnp_Params.put("vnp_Command", "pay");
@@ -319,7 +325,7 @@ public class CheckoutServlet extends HttpServlet {
                 vnp_Params.put("vnp_Amount", String.valueOf(amount));
                 vnp_Params.put("vnp_CurrCode", "VND");
                 vnp_Params.put("vnp_TxnRef", String.valueOf(orderId));
-                vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang" + orderId);
+                vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang " + orderId);
                 vnp_Params.put("vnp_OrderType", "other");
                 vnp_Params.put("vnp_Locale", "vn");
                 vnp_Params.put("vnp_ReturnUrl", VNPAYConfig.getReturnUrl(request));
@@ -365,6 +371,82 @@ public class CheckoutServlet extends HttpServlet {
 
                 String paymentUrl = VNPAYConfig.vnp_Url + "?" + queryUrl;
                 response.sendRedirect(paymentUrl);
+            } else if ("MOMO".equals(paymentMethod)) {
+                String amount = String.valueOf((long) calculatedGrandTotal);
+                String momoOrderId = orderId + "_" + System.currentTimeMillis();
+                String requestId = String.valueOf(System.currentTimeMillis());
+                String orderInfo = "Thanh toan don hang " + orderId;
+                String returnUrl = MomoConfig.getReturnUrl(request);
+                String ipnUrl = MomoConfig.getIpnUrl(request);
+                String requestType = "captureWallet";
+                String extraData = "";
+
+                String rawHash = "accessKey=" + MomoConfig.accessKey +
+                        "&amount=" + amount +
+                        "&extraData=" + extraData +
+                        "&ipnUrl=" + ipnUrl +
+                        "&orderId=" + momoOrderId +
+                        "&orderInfo=" + orderInfo +
+                        "&partnerCode=" + MomoConfig.partnerCode +
+                        "&redirectUrl=" + returnUrl +
+                        "&requestId=" + requestId +
+                        "&requestType=" + requestType;
+
+                String signature = MomoConfig.hcmacSHA256(MomoConfig.secretKey, rawHash);
+
+                String jsonRequest = "{" +
+                        "\"partnerCode\":\"" + MomoConfig.partnerCode + "\"," +
+                        "\"partnerName\":\"PaperCraft\"," +
+                        "\"storeId\":\"MomoTestStore\"," +
+                        "\"requestId\":\"" + requestId + "\"," +
+                        "\"amount\":" + amount + "," +
+                        "\"orderId\":\"" + momoOrderId + "\"," +
+                        "\"orderInfo\":\"" + orderInfo + "\"," +
+                        "\"redirectUrl\":\"" + returnUrl + "\"," +
+                        "\"ipnUrl\":\"" + ipnUrl + "\"," +
+                        "\"lang\":\"vi\"," +
+                        "\"requestType\":\"" + requestType + "\"," +
+                        "\"autoCapture\":true," +
+                        "\"extraData\":\"" + extraData + "\"," +
+                        "\"signature\":\"" + signature + "\"" +
+                        "}";
+
+                // Gọi API momo
+                URL url = new URL(MomoConfig.momo_Url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                conn.setDoOutput(true);
+
+                // Đọc dữ liệu trả về từ momo
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonRequest.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+                StringBuilder responseStr = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        responseStr.append(responseLine.trim());
+                    }
+                }
+
+                String resultJson = responseStr.toString();
+                String payUrl = "";
+                int payUrlIndex = resultJson.indexOf("\"payUrl\":\"");
+                if (payUrlIndex != -1) {
+                    int start = payUrlIndex + 10;
+                    int end = resultJson.indexOf("\"", start);
+                    payUrl = resultJson.substring(start, end);
+                }
+
+                if (!payUrl.isEmpty()) {
+                    response.sendRedirect(payUrl);
+                } else {
+                    System.out.println("MoMo API Error Response: " + resultJson); // debug
+                    request.getSession().setAttribute("error", "Lỗi tạo giao dịch MoMo. Hệ thống đang bảo trì!");
+                    response.sendRedirect(request.getContextPath() + "/cart");
+                }
             } else {
                 response.sendRedirect(request.getContextPath() + "/order-success");
             }

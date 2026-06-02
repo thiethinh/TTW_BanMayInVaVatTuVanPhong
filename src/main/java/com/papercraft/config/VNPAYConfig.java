@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 public class VNPAYConfig {
     public static final String vnp_TmnCode = "4AP6RXHS";
@@ -21,7 +20,7 @@ public class VNPAYConfig {
         StringBuilder url = new StringBuilder();
         url.append(scheme).append("://").append(serverName);
 
-        if (serverPort != 80) {
+        if (serverPort != 80 && serverPort != 443) {
             url.append(":").append(serverPort);
         }
         url.append(contextPath).append("/vnpay-return");
@@ -54,19 +53,9 @@ public class VNPAYConfig {
 
     public static String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-FORWARDED-FOR");
-        if (ip ==null) {
+        if (ip == null) {
             ip = request.getRemoteAddr();
         }
         return ip;
-    }
-
-    public static String getRandomNumber(int length) {
-        Random random = new Random();
-        String chars = "0123456789";
-        StringBuffer sb = new StringBuffer(length);
-        for (int i = 0; i < length; i++) {
-            sb.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return sb.toString();
     }
 }
