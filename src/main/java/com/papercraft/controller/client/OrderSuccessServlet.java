@@ -1,7 +1,9 @@
 package com.papercraft.controller.client;
 
 import com.papercraft.dao.ProductDAO;
+import com.papercraft.dao.UserVoucherDAO;
 import com.papercraft.model.Product;
+import com.papercraft.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,6 +27,8 @@ public class OrderSuccessServlet extends HttpServlet {
         // Chặn user truy cập trực tiếp /order-success
         Boolean orderSuccess = (Boolean) session.getAttribute("orderSuccess");
         Integer lastOrderId = (Integer) session.getAttribute("lastOrderId");
+        Integer voucherId = (Integer)  session.getAttribute("voucherId");
+        User user = (User) session.getAttribute("acc");
 
         // Nếu user vào trực tiếp /order-success mà không qua checkout thì chuyển về /home
         if (orderSuccess == null || !orderSuccess || lastOrderId == null || lastOrderId <= 0) {
@@ -39,6 +43,13 @@ public class OrderSuccessServlet extends HttpServlet {
         if (suggestedProducts == null) {
             suggestedProducts = new ArrayList<>();
         }
+
+        if(voucherId != null && voucherId!= 0){
+            UserVoucherDAO userVoucherDAO = new UserVoucherDAO();
+            userVoucherDAO.setUsedVoucher(user.getId(), voucherId);
+        }
+
+
 
         // Gửi data sang JSP
         request.setAttribute("orderId", lastOrderId);

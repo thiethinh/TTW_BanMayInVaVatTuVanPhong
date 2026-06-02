@@ -2,8 +2,11 @@ package com.papercraft.controller.client;
 
 import com.google.gson.JsonObject;
 import com.papercraft.dao.ContactDAO;
+import com.papercraft.dao.NotificationDAO;
 import com.papercraft.model.Contact;
+import com.papercraft.model.Notification;
 import com.papercraft.model.User;
+import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -79,6 +82,11 @@ public class ContactServlet extends HttpServlet {
 
         ContactDAO dao= new ContactDAO();
         boolean isuccess= dao.insertContact(contact);
+        if(isuccess&& user!=null){
+            NotificationDAO notificationDAO = new NotificationDAO();
+            Notification noti = new Notification(user.getId(), NotificationType.CONTACT_SUBMITTED,null);
+            notificationDAO.insertNotification(noti);
+        }
 
         json.addProperty("success", isuccess);
         json.addProperty("message",isuccess?"Gửi liên hệ thành công! chúng tôi sẽ phản hồi sớm" : "Có lỗi xảy ra. Vui lòng thử lại!");

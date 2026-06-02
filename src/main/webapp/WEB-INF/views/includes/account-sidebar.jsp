@@ -23,6 +23,14 @@
         </li>
 
         <li>
+            <a href="${pageContext.request.contextPath}/voucher"
+               class="${fn:contains(uri, 'voucher') ? 'active' : ''}">
+                <i class="fa-solid fa-ticket"></i>
+                Ưu đãi voucher
+            </a>
+        </li>
+
+        <li>
             <a href="${pageContext.request.contextPath}/change-password"
                class="${fn:contains(uri, 'password') ? 'active' : ''}">
                 <i class="fa-solid fa-key"></i>

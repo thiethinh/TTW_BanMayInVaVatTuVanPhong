@@ -140,7 +140,7 @@
                                             class="btn-accept"
                                             type="button"
                                             onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=shipped&orderId=${order.id}'">
-                                        Duyệt đơn / Giao hàng
+                                        Duyệt đơn
                                     </button>
 
                                     <button
@@ -237,7 +237,7 @@
 
                         <p>Mã giao dịch:
                             <span style="${empty payment.transactionCode ? 'color:red' : 'color:green'}">
-                                ${not empty payment.transactionCode ? payment.transactionCode : 'Chưa có'}
+                                ${not empty payment.transactionCode ? payment.transactionCode : 'Không có'}
                             </span>
                         </p>
 

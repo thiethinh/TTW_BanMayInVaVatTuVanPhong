@@ -105,7 +105,7 @@
                 <li>
                     <a href="${pageContext.request.contextPath}/admin-voucher"
                        class="${fn:contains(uri, 'admin-voucher') ? 'active' : ''}">
-                        <i class="fa-solid fa-images"></i> Quản Lí Voucher
+                        <i class="fa-solid fa-ticket"></i> Quản Lí Voucher
                     </a>
                 </li>
             </c:if>

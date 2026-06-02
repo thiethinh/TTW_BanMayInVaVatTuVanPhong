@@ -74,13 +74,14 @@ public class CheckoutServlet extends HttpServlet {
             } else {
                 boolean success = userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
                 if (!success) {
-                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi");
+                    request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi hoặc đã sử dụng");
                 } else {
                     request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
                     request.setAttribute("selectedVoucher", voucher);
                 }
             }
         }
+
 
         List<OrderItem> items = new ArrayList<>();
         double subTotal = 0;
@@ -203,6 +204,12 @@ public class CheckoutServlet extends HttpServlet {
         String shippingProvider = request.getParameter("shippingProvider");
         String shippingFeeRaw = request.getParameter("shippingFee");
 
+        String voucherIdRaw = request.getParameter("voucherId");
+        if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
+            int voucherId = Integer.parseInt(voucherIdRaw);
+            session.setAttribute("voucherId", voucherId);
+        }
+
 
         StringBuilder fullAddressBuilder = new StringBuilder();
 
@@ -287,7 +294,11 @@ public class CheckoutServlet extends HttpServlet {
             }
 
             session.setAttribute("cart", cart);
+
+            // Cho phép vào trang /orderSuccess
             session.setAttribute("orderSuccess", true);
+
+            // Lưu orderId vừa đặt
             session.setAttribute("lastOrderId", orderId);
 
             if ("VNPAY".equals(paymentMethod)) {
