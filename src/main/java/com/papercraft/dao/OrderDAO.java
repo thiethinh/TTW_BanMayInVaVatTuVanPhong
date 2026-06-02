@@ -403,4 +403,19 @@ public class OrderDAO {
 
         return orders;
     }
+// logic khi cancel đơn hàng => +stock quantity
+    public boolean updateOrderStatusFromPendingToCanceled(Connection conn, int orderId) throws SQLException {
+        String sql = """
+            UPDATE orders
+            SET status = 'canceled'
+            WHERE id = ?
+              AND status = 'pending'
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+
+            return ps.executeUpdate() > 0;
+        }
+    }
 }
