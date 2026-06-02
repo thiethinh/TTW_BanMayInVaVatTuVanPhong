@@ -146,7 +146,6 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-
         request.setAttribute("items", items);
         request.setAttribute("subTotal", subTotal);
         request.setAttribute("vat", vat);
@@ -191,7 +190,6 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-
         String fullname = request.getParameter("fullname");
         String phone = request.getParameter("phone");
         String note = request.getParameter("note");
@@ -209,7 +207,6 @@ public class CheckoutServlet extends HttpServlet {
             int voucherId = Integer.parseInt(voucherIdRaw);
             session.setAttribute("voucherId", voucherId);
         }
-
 
         StringBuilder fullAddressBuilder = new StringBuilder();
 
@@ -302,7 +299,18 @@ public class CheckoutServlet extends HttpServlet {
             session.setAttribute("lastOrderId", orderId);
 
             if ("VNPAY".equals(paymentMethod)) {
-                long amount = order.getTotalPrice().longValue() * 100;
+                double calculatedSubTotal = selectedCart.total();
+                double calculatedVat = Math.round(calculatedSubTotal * 0.05);
+                double calculatedGrandTotal = Math.round(calculatedSubTotal + calculatedVat + shippingFee.doubleValue());
+
+                if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
+                    VoucherDAO voucherDAO = new VoucherDAO();
+                    Voucher v = voucherDAO.getVoucherById(Integer.parseInt(voucherIdRaw));
+                    if (v != null) {
+                        calculatedGrandTotal = v.applyDiscount(BigDecimal.valueOf(calculatedGrandTotal)).doubleValue();
+                    }
+                }
+                long amount = (long) calculatedGrandTotal * 100;
 
                 Map<String, String> vnp_Params = new HashMap<>();
                 vnp_Params.put("vnp_Version", "2.1.0");
@@ -311,14 +319,14 @@ public class CheckoutServlet extends HttpServlet {
                 vnp_Params.put("vnp_Amount", String.valueOf(amount));
                 vnp_Params.put("vnp_CurrCode", "VND");
                 vnp_Params.put("vnp_TxnRef", String.valueOf(orderId));
-                vnp_Params.put("vnp_OrderInfo", "Thanh toán đơn hàng" + orderId);
+                vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang" + orderId);
                 vnp_Params.put("vnp_OrderType", "other");
                 vnp_Params.put("vnp_Locale", "vn");
                 vnp_Params.put("vnp_ReturnUrl", VNPAYConfig.getReturnUrl(request));
                 vnp_Params.put("vnp_IpAddr", VNPAYConfig.getIpAddress(request));
 
                 Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
                 String vnp_CreateDate = formatter.format(calendar.getTime());
                 vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 

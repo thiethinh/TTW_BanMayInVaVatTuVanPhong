@@ -24,6 +24,8 @@ public class VNPAYConfig {
         if (serverPort != 80) {
             url.append(":").append(serverPort);
         }
+        url.append(contextPath).append("/vnpay-return");
+
         return url.toString();
     }
 

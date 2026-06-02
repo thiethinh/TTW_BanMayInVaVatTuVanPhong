@@ -223,7 +223,7 @@
                     </tfoot>
                 </table>
 
-                <%--                //shipping Provider--%>
+                <%--shipping Provider--%>
                 <div class="shipping-method">
                     <h3>Vận chuyển:</h3>
 

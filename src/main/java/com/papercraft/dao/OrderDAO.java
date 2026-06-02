@@ -240,8 +240,6 @@ public class OrderDAO {
                 }
 
             }
-
-
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {

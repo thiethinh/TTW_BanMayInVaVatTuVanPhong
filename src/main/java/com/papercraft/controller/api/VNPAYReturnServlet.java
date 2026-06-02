@@ -1,6 +1,7 @@
 package com.papercraft.controller.api;
 
 import com.papercraft.config.VNPAYConfig;
+import com.papercraft.dao.OrderDAO;
 import com.papercraft.dao.PaymentDAO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -44,6 +45,13 @@ public class VNPAYReturnServlet extends HttpServlet {
 
                 response.sendRedirect(request.getContextPath() + "/order-success");
             } else {
+                String orderIdStr = request.getParameter("vnp_TxnRef");
+                if (orderIdStr != null && !orderIdStr.isEmpty()) {
+                    int orderId = Integer.parseInt(orderIdStr);
+
+                    OrderDAO orderDAO = new OrderDAO();
+                    orderDAO.updateOrderStatus(orderId, "canceled");
+                }
                 request.getSession().setAttribute("error", "Giao dịch VNPAY đã bị hủy hoặc không thành công");
                 response.sendRedirect(request.getContextPath() + "/cart");
             }
