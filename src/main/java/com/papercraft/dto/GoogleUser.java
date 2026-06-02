@@ -1,4 +1,4 @@
-package com.papercraft.model;
+package com.papercraft.dto;
 
 public class GoogleUser {
     private String id;

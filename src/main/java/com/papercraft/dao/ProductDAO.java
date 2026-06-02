@@ -1,5 +1,6 @@
 package com.papercraft.dao;
 
+import com.papercraft.config.CloudinaryConfig;
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class ProductDAO {
-    private static final String ROOT_PATH = "images/upload/";
+    public static final String IMAGE_BASE_URL = CloudinaryConfig.IMAGE_BASE_URL;
 
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
@@ -39,7 +40,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -84,7 +85,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -131,7 +132,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL+ rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -164,7 +165,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
 
-                        images.add("images/upload/" + imgName.trim());
+                        images.add(IMAGE_BASE_URL + imgName.trim());
                     }
                 }
             }
@@ -293,7 +294,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + imgName);
+                        p.setThumbnail(IMAGE_BASE_URL+ imgName);
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -356,7 +357,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail(ROOT_PATH + imgName.trim());
+                        p.setThumbnail(IMAGE_BASE_URL + imgName.trim());
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -528,7 +529,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
 
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp"); // Ảnh mặc định
                     }
@@ -636,7 +637,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        product.setThumbnail("images/upload/" + imgName.trim());
+                        product.setThumbnail(IMAGE_BASE_URL+ imgName.trim());
                     } else {
                         product.setThumbnail("logo.webp");
                     }
@@ -684,7 +685,7 @@ public class ProductDAO {
                     p.setType(rs.getString("type"));
 
                     String imgName = rs.getString("img_name");
-                    p.setThumbnail((imgName != null && !imgName.isEmpty()) ? "images/upload/" + imgName.trim() : "images/logo.webp");
+                    p.setThumbnail((imgName != null && !imgName.isEmpty()) ? IMAGE_BASE_URL + imgName.trim() : "images/logo.webp");
 
                     list.add(p);
                 }
@@ -802,7 +803,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
 
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + imgName.trim());
+                        p.setThumbnail(IMAGE_BASE_URL + imgName.trim());
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }

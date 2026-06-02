@@ -27,12 +27,18 @@
 
         <div class="hero-slider swiper">
             <div class="swiper-wrapper">
-                <div class="swiper-slide"
-                     style="background-image: url('${pageContext.request.contextPath}/images/introduce-img.webp');"></div>
-                <div class="swiper-slide"
-                     style="background-image: url('${pageContext.request.contextPath}/images/benefit-img.webp');"></div>
-                <div class="swiper-slide"
-                     style="background-image: url('${pageContext.request.contextPath}/images/login-bg.webp');"></div>
+                <c:choose>
+                    <c:when test="${not empty banners}">
+                        <c:forEach items="${banners}" var="banner">
+                            <div class="swiper-slide" style="background-image: url('${banner}');"></div>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="swiper-slide" style="background-image: url('${pageContext.request.contextPath}/images/introduce-img.webp');"></div>
+                        <div class="swiper-slide" style="background-image: url('${pageContext.request.contextPath}/images/benefit-img.webp');"></div>
+                        <div class="swiper-slide" style="background-image: url('${pageContext.request.contextPath}/images/login-bg.webp');"></div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div class="swiper-pagination"></div>
         </div>
@@ -66,7 +72,7 @@
                         -<fmt:formatNumber value="${p.discount * 100}" maxFractionDigits="0"/>%
                     </span>
                             </c:if>
-                            <img src="${pageContext.request.contextPath}/${p.thumbnail}" height="300" width="300"
+                            <img src="${p.thumbnail}" height="300" width="300"
                                  loading="lazy" alt="${p.productName}"/>
                         </a>
 
@@ -160,7 +166,7 @@
                         -<fmt:formatNumber value="${p.discount * 100}" maxFractionDigits="0"/>%
                     </span>
                             </c:if>
-                            <img src="${pageContext.request.contextPath}/${p.thumbnail}" height="300" width="300"
+                            <img src="${p.thumbnail}" height="300" width="300"
                                  loading="lazy" alt="${p.productName}"/>
                         </a>
 

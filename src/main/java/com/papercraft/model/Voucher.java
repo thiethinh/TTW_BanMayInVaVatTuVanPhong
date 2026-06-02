@@ -1,11 +1,12 @@
 package com.papercraft.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-public class Voucher {
+public class Voucher implements Serializable {
     private int id;
     private String code;
     private String name;
