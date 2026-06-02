@@ -198,6 +198,7 @@ public class CartServlet extends HttpServlet {
             Product fresh = dao.getProductById(item.getId());
             if (fresh != null) {
                 item.setStockQuantity(fresh.getStockQuantity());
+                item.setThumbnail(fresh.getThumbnail());
             }
         }
         request.setAttribute("items", items);

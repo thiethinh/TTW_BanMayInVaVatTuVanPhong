@@ -22,16 +22,7 @@ public class HomeServlet extends HttpServlet {
         BannerDAO bannerDAO= new BannerDAO();
 
         List<String> banners = bannerDAO.getActiveUrlBannerImage();
-        for( String url : banners){
-            System.out.println("Danh sach banner url"+url);
-
-        }
-
         List<Product> featuredPrinter = dao.getFeaturedProductsByType("Printer");
-        for( Product  p : featuredPrinter){
-            System.out.println("Danh sach printer url: "+p.getThumbnail());
-
-        }
         List<Product> featuredStationery = dao.getFeaturedProductsByType("Stationery");
 
 

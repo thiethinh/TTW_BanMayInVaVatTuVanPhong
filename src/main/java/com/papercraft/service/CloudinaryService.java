@@ -23,8 +23,8 @@ public class CloudinaryService {
         return CLOUDINARY;
     }
 
-    public static String upload(File file) throws IOException {
-        String publicId = removeExtension(file.getName());
+    public static String upload(File file,String originalFileName) throws IOException {
+        String publicId = removeExtension(originalFileName).replaceAll("\\s+", "_");
 
         Map<?, ?> result = CLOUDINARY.uploader().upload(file, ObjectUtils.asMap(
                 "public_id", publicId,
@@ -34,7 +34,7 @@ public class CloudinaryService {
                 "resource_type", "image"
         ));
 
-        return result.get("public_id").toString();
+        return originalFileName;
     }
 
     private static String removeExtension(String fileName) {
