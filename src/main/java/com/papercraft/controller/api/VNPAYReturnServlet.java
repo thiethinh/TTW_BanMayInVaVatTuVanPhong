@@ -3,6 +3,7 @@ package com.papercraft.controller.api;
 import com.papercraft.config.VNPAYConfig;
 import com.papercraft.dao.OrderDAO;
 import com.papercraft.dao.PaymentDAO;
+import com.papercraft.service.OrderService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,21 +37,26 @@ public class VNPAYReturnServlet extends HttpServlet {
         String signValue = hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-                String orderIdStr = request.getParameter("vnp_TxnRef");
-                String transactionNo = request.getParameter("vnp_TransactionNo");
-                int orderId = Integer.parseInt(orderIdStr);
+                try {
+                    String orderIdStr = request.getParameter("vnp_TxnRef");
+                    String transactionNo = request.getParameter("vnp_TransactionNo");
+                    int orderId = Integer.parseInt(orderIdStr);
 
-                PaymentDAO paymentDAO = new PaymentDAO();
-                paymentDAO.verifyPaymentSuccess(orderId, transactionNo);
+                    PaymentDAO paymentDAO = new PaymentDAO();
+                    paymentDAO.verifyPaymentSuccess(orderId, transactionNo);
 
-                response.sendRedirect(request.getContextPath() + "/order-success");
+                    response.sendRedirect(request.getContextPath() + "/order-success");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.getSession().setAttribute("error", "Thanh toán thành công tại VNPAY nhưng hệ thống gặp sự cố cập nhật. Vui lòng liên hệ Admin kèm mã VNPAY: " + request.getParameter("vnp_TransactionNo"));
+                    response.sendRedirect(request.getContextPath() + "/cart");
+                }
             } else {
                 String orderIdStr = request.getParameter("vnp_TxnRef");
                 if (orderIdStr != null && !orderIdStr.isEmpty()) {
                     int orderId = Integer.parseInt(orderIdStr);
-
-                    OrderDAO orderDAO = new OrderDAO();
-                    orderDAO.updateOrderStatus(orderId, "canceled");
+                    OrderService orderService = new OrderService();
+                    orderService.cancelOrderAndReleaseStock(orderId);
                 }
                 request.getSession().setAttribute("error", "Giao dịch VNPAY đã bị hủy hoặc không thành công");
                 response.sendRedirect(request.getContextPath() + "/cart");
