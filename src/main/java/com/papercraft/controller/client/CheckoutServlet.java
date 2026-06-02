@@ -1,5 +1,7 @@
 package com.papercraft.controller.client;
 
+import com.papercraft.config.MomoConfig;
+import com.papercraft.config.VNPAYConfig;
 import com.papercraft.dao.AddressDAO;
 import com.papercraft.dao.CartDAO;
 import com.papercraft.dao.UserVoucherDAO;
@@ -13,23 +15,27 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         HttpSession session = request.getSession();
 
-        //Kiểm tra Login
+        // Kiểm tra Login
         if (session.getAttribute("acc") == null) {
             response.sendRedirect(request.getContextPath() + "/login?redirect=/checkout");
             return;
@@ -49,10 +55,10 @@ public class CheckoutServlet extends HttpServlet {
 
 
         String selectedIdsRaw = request.getParameter("selectedIds");
-        Set<Integer> selectedIds= parseSelectedIdSet(selectedIdsRaw);
+        Set<Integer> selectedIds = parseSelectedIdSet(selectedIdsRaw);
 
-        if (selectedIds.isEmpty()){
-            response.sendRedirect(request.getContextPath()+ "/cart");
+        if (selectedIds.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
@@ -60,24 +66,24 @@ public class CheckoutServlet extends HttpServlet {
         Address userAddr = addressDAO.findDefaultAddress(user.getId());
         request.setAttribute("addr", userAddr);
 
-        UserVoucherDAO  userVoucherDAO = new UserVoucherDAO();
+        UserVoucherDAO userVoucherDAO = new UserVoucherDAO();
         List<Voucher> vouchers = userVoucherDAO.getVouchersByUserId(user.getId());
         request.setAttribute("vouchers", vouchers);
 
-        String voucherCode=request.getParameter("voucherCode");
-        if(voucherCode!=null&&!voucherCode.trim().isEmpty()){
-            Voucher voucher=new VoucherDAO().getVoucherByCode(voucherCode.trim());
-            if(voucher==null){
+        String voucherCode = request.getParameter("voucherCode");
+        if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+            Voucher voucher = new VoucherDAO().getVoucherByCode(voucherCode.trim());
+            if (voucher == null) {
                 request.setAttribute("saveVoucherError", "Mã voucher không tồn tại");
-            }else if(!voucher.isAvailable()){
+            } else if (!voucher.isAvailable()) {
                 request.setAttribute("saveVoucherError", "Voucher hiện không khả dụng");
-            }else{
-                boolean success= userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
-                if(!success){
+            } else {
+                boolean success = userVoucherDAO.addUserVoucher(user.getId(), voucher.getId());
+                if (!success) {
                     request.setAttribute("saveVoucherError", "Bạn đã lưu voucher này rồi hoặc đã sử dụng");
-                }else{
+                } else {
                     request.setAttribute("saveVoucherSuccess", "Áp dụng voucher thành công");
-                    request.setAttribute("selectedVoucher",voucher);
+                    request.setAttribute("selectedVoucher", voucher);
                 }
             }
         }
@@ -89,7 +95,7 @@ public class CheckoutServlet extends HttpServlet {
         for (Product p : cart.list()) {
 
             //nếu sp khng được tick
-            if (!selectedIds.contains(p.getId())){
+            if (!selectedIds.contains(p.getId())) {
                 continue;
             }
 
@@ -109,7 +115,7 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         //nếu selectedId gửi lên không khớp sp trong cart => không cho checkout(về cart )
-        if (items.isEmpty()){
+        if (items.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
@@ -138,15 +144,13 @@ public class CheckoutServlet extends HttpServlet {
                         discountAmount = selectedVoucher.calculateDiscount(BigDecimal.valueOf(grandTotal));
                         grandTotal = selectedVoucher.applyDiscount(BigDecimal.valueOf(grandTotal)).toBigInteger().doubleValue();
                         request.setAttribute("successVoucher", "Áp dụng voucher thành công");
-                        request.setAttribute("selectedVoucher", selectedVoucher);}
+                        request.setAttribute("selectedVoucher", selectedVoucher);
+                    }
                 }
             } catch (NumberFormatException e) {
-                request.setAttribute("errorVoucher", "Voucher không hợp lệ"
-                );
+                request.setAttribute("errorVoucher", "Voucher không hợp lệ");
             }
         }
-
-
 
         request.setAttribute("items", items);
         request.setAttribute("subTotal", subTotal);
@@ -155,14 +159,13 @@ public class CheckoutServlet extends HttpServlet {
         request.setAttribute("discountAmount", discountAmount);
         request.setAttribute("grandTotal", grandTotal);
 
-        request.setAttribute("selectedIds",selectedIdsRaw);
+        request.setAttribute("selectedIds", selectedIdsRaw);
 
         request.getRequestDispatcher("/WEB-INF/views/client/payment.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
@@ -170,29 +173,28 @@ public class CheckoutServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
         Cart cart = (Cart) session.getAttribute("cart");
 
-        String selectedIdsRaw= request.getParameter("selectedIds");
-        Set<Integer> selectedIds= parseSelectedIdSet(selectedIdsRaw);
+        String selectedIdsRaw = request.getParameter("selectedIds");
+        Set<Integer> selectedIds = parseSelectedIdSet(selectedIdsRaw);
 
         if (user == null || cart == null || cart.list().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
-        if (selectedIds.isEmpty()){
-            response.sendRedirect(request.getContextPath()+ "/cart");
-            return;
-        }
-        Cart selectedCart= new Cart();
-        for (Product p: cart.list()){
-            if (selectedIds.contains(p.getId())){
-                selectedCart.put(p);
-            }
-        }
-        if (selectedCart.list().isEmpty()){
+        if (selectedIds.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
-
+        Cart selectedCart = new Cart();
+        for (Product p : cart.list()) {
+            if (selectedIds.contains(p.getId())) {
+                selectedCart.put(p);
+            }
+        }
+        if (selectedCart.list().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        }
 
         String fullname = request.getParameter("fullname");
         String phone = request.getParameter("phone");
@@ -207,11 +209,10 @@ public class CheckoutServlet extends HttpServlet {
         String shippingFeeRaw = request.getParameter("shippingFee");
 
         String voucherIdRaw = request.getParameter("voucherId");
-        if(voucherIdRaw != null && !voucherIdRaw.isBlank()){
+        if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
             int voucherId = Integer.parseInt(voucherIdRaw);
             session.setAttribute("voucherId", voucherId);
         }
-
 
         StringBuilder fullAddressBuilder = new StringBuilder();
 
@@ -267,7 +268,6 @@ public class CheckoutServlet extends HttpServlet {
         }
 
 
-
         Order order = new Order();
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
@@ -279,9 +279,9 @@ public class CheckoutServlet extends HttpServlet {
 //        order.setShippingProvider("GHN");
 //        order.setShippingFee(BigDecimal.valueOf(30000));
 
-        order.setNote(note ==null ? "": note.trim());
+        order.setNote(note == null ? "" : note.trim());
 
-        if (paymentMethod ==null || paymentMethod.isBlank()){
+        if (paymentMethod == null || paymentMethod.isBlank()) {
             paymentMethod = "COD";
         }
 
@@ -304,7 +304,152 @@ public class CheckoutServlet extends HttpServlet {
             // Lưu orderId vừa đặt
             session.setAttribute("lastOrderId", orderId);
 
-            response.sendRedirect(request.getContextPath() + "/order-success");
+            double calculatedSubTotal = selectedCart.total();
+            double calculatedVat = Math.round(calculatedSubTotal * 0.05);
+            double calculatedGrandTotal = Math.round(calculatedSubTotal + calculatedVat + shippingFee.doubleValue());
+
+            if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
+                VoucherDAO voucherDAO = new VoucherDAO();
+                Voucher v = voucherDAO.getVoucherById(Integer.parseInt(voucherIdRaw));
+                if (v != null) {
+                    calculatedGrandTotal = v.applyDiscount(BigDecimal.valueOf(calculatedGrandTotal)).doubleValue();
+                }
+            }
+
+            if ("VNPAY".equals(paymentMethod)) {
+                long amount = (long) calculatedGrandTotal * 100;
+                Map<String, String> vnp_Params = new HashMap<>();
+                vnp_Params.put("vnp_Version", "2.1.0");
+                vnp_Params.put("vnp_Command", "pay");
+                vnp_Params.put("vnp_TmnCode", VNPAYConfig.vnp_TmnCode);
+                vnp_Params.put("vnp_Amount", String.valueOf(amount));
+                vnp_Params.put("vnp_CurrCode", "VND");
+                vnp_Params.put("vnp_TxnRef", String.valueOf(orderId));
+                vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang " + orderId);
+                vnp_Params.put("vnp_OrderType", "other");
+                vnp_Params.put("vnp_Locale", "vn");
+                vnp_Params.put("vnp_ReturnUrl", VNPAYConfig.getReturnUrl(request));
+                vnp_Params.put("vnp_IpAddr", VNPAYConfig.getIpAddress(request));
+
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+                String vnp_CreateDate = formatter.format(calendar.getTime());
+                vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+                calendar.add(Calendar.MINUTE, 15);
+                String vnp_ExpireDate = formatter.format(calendar.getTime());
+                vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+                List fieldNames = new ArrayList(vnp_Params.keySet());
+                Collections.sort(fieldNames);
+
+                StringBuilder hashData = new StringBuilder();
+                StringBuilder query = new StringBuilder();
+                Iterator itr = fieldNames.iterator();
+                while (itr.hasNext()) {
+                    String fieldName = (String) itr.next();
+                    String fieldValue = vnp_Params.get(fieldName);
+                    if (fieldName != null && !fieldName.isEmpty()) {
+                        hashData.append(fieldName);
+                        hashData.append('=');
+                        hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+
+                        query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                        query.append('=');
+                        query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+
+                        if (itr.hasNext()) {
+                            query.append('&');
+                            hashData.append('&');
+                        }
+                    }
+                }
+
+                String queryUrl = query.toString();
+                String vnp_SecureHash = VNPAYConfig.hmacSHA512(VNPAYConfig.vnp_HashSecret, hashData.toString());
+                queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+
+                String paymentUrl = VNPAYConfig.vnp_Url + "?" + queryUrl;
+                response.sendRedirect(paymentUrl);
+            } else if ("MOMO".equals(paymentMethod)) {
+                String amount = String.valueOf((long) calculatedGrandTotal);
+                String momoOrderId = orderId + "_" + System.currentTimeMillis();
+                String requestId = String.valueOf(System.currentTimeMillis());
+                String orderInfo = "Thanh toan don hang " + orderId;
+                String returnUrl = MomoConfig.getReturnUrl(request);
+                String ipnUrl = MomoConfig.getIpnUrl(request);
+                String requestType = "captureWallet";
+                String extraData = "";
+
+                String rawHash = "accessKey=" + MomoConfig.accessKey +
+                        "&amount=" + amount +
+                        "&extraData=" + extraData +
+                        "&ipnUrl=" + ipnUrl +
+                        "&orderId=" + momoOrderId +
+                        "&orderInfo=" + orderInfo +
+                        "&partnerCode=" + MomoConfig.partnerCode +
+                        "&redirectUrl=" + returnUrl +
+                        "&requestId=" + requestId +
+                        "&requestType=" + requestType;
+
+                String signature = MomoConfig.hcmacSHA256(MomoConfig.secretKey, rawHash);
+
+                String jsonRequest = "{" +
+                        "\"partnerCode\":\"" + MomoConfig.partnerCode + "\"," +
+                        "\"partnerName\":\"PaperCraft\"," +
+                        "\"storeId\":\"MomoTestStore\"," +
+                        "\"requestId\":\"" + requestId + "\"," +
+                        "\"amount\":" + amount + "," +
+                        "\"orderId\":\"" + momoOrderId + "\"," +
+                        "\"orderInfo\":\"" + orderInfo + "\"," +
+                        "\"redirectUrl\":\"" + returnUrl + "\"," +
+                        "\"ipnUrl\":\"" + ipnUrl + "\"," +
+                        "\"lang\":\"vi\"," +
+                        "\"requestType\":\"" + requestType + "\"," +
+                        "\"autoCapture\":true," +
+                        "\"extraData\":\"" + extraData + "\"," +
+                        "\"signature\":\"" + signature + "\"" +
+                        "}";
+
+                // Gọi API momo
+                URL url = new URL(MomoConfig.momo_Url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                conn.setDoOutput(true);
+
+                // Đọc dữ liệu trả về từ momo
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonRequest.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+                StringBuilder responseStr = new StringBuilder();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        responseStr.append(responseLine.trim());
+                    }
+                }
+
+                String resultJson = responseStr.toString();
+                String payUrl = "";
+                int payUrlIndex = resultJson.indexOf("\"payUrl\":\"");
+                if (payUrlIndex != -1) {
+                    int start = payUrlIndex + 10;
+                    int end = resultJson.indexOf("\"", start);
+                    payUrl = resultJson.substring(start, end);
+                }
+
+                if (!payUrl.isEmpty()) {
+                    response.sendRedirect(payUrl);
+                } else {
+                    System.out.println("MoMo API Error Response: " + resultJson); // debug
+                    request.getSession().setAttribute("error", "Lỗi tạo giao dịch MoMo. Hệ thống đang bảo trì!");
+                    response.sendRedirect(request.getContextPath() + "/cart");
+                }
+            } else {
+                response.sendRedirect(request.getContextPath() + "/order-success");
+            }
         } else {
             request.setAttribute("error", "Đặt hàng thất bại. Có thể một số sản phẩm không còn đủ tồn kho, vui lòng kiểm tra lại giỏ hàng.");
             doGet(request, response);
@@ -312,19 +457,19 @@ public class CheckoutServlet extends HttpServlet {
     }
 
     //parseSelectedIdSet
-    private Set<Integer> parseSelectedIdSet(String selectedIdsRaw){
+    private Set<Integer> parseSelectedIdSet(String selectedIdsRaw) {
         Set<Integer> result = new HashSet<>();
 
         //check đàu vào rỗng
-        boolean isEmpty= selectedIdsRaw == null || selectedIdsRaw.trim().isEmpty();
-        if (isEmpty){
+        boolean isEmpty = selectedIdsRaw == null || selectedIdsRaw.trim().isEmpty();
+        if (isEmpty) {
             return result;
         }
         //tách chuỗi thành mảng theo ","
-        String[] parts= selectedIdsRaw.split(",");
-        for (String part : parts){
+        String[] parts = selectedIdsRaw.split(",");
+        for (String part : parts) {
             String trimmed = part.trim();
-            if (trimmed.matches("\\d+")){
+            if (trimmed.matches("\\d+")) {
                 result.add(Integer.parseInt(trimmed));
             }
         }

@@ -223,7 +223,7 @@
                     </tfoot>
                 </table>
 
-                <%--                //shipping Provider--%>
+                <%--shipping Provider--%>
                 <div class="shipping-method">
                     <h3>Vận chuyển:</h3>
 
@@ -255,17 +255,8 @@
                     </div>
 
                     <div class="method bank-method">
-                        <input type="radio" name="paymentMethod" id="bankCard" value="BANK">
-                        <label for="bankCard" style="font-weight: bold; margin-left: 5px;">Chuyển khoản Ngân
-                            hàng</label>
-
-                        <button type="button" class="toggle-btn"><i class="fa-solid fa-plus"></i></button>
-
-                        <div class="hidden-content" style="display: none; margin-top: 10px;">
-                            <p>Vui lòng chuyển khoản đến STK sau:</p>
-                            <p><b>Vietcombank - 0123456789 - PAPER CRAFT</b></p>
-                            <p>Nội dung: <b>SDT_DAT_HANG</b></p>
-                        </div>
+                        <input type="radio" name="paymentMethod" id="VNPAY" value="VNPAY">
+                        <label for="VNPAY" style="font-weight: bold; margin-left: 5px;">Thanh toán bằng VNPAY</label>
                     </div>
 
                     <div class="method momo-method">

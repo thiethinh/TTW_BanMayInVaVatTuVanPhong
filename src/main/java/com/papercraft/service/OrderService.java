@@ -9,6 +9,8 @@ import com.papercraft.utils.DBConnect;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +148,89 @@ public class OrderService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    // Rollback khi đơn hàng bị hủy hoặc lỗi
+    public boolean cancelOrderAndReleaseStock(int orderId) {
+        Connection conn = null;
+        PreparedStatement psUpdateOrder = null;
+        PreparedStatement psGetItems = null;
+        PreparedStatement psUpdateStock = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnect.getConnection();
+            conn.setAutoCommit(false);
+
+            String updateOrderSql = "UPDATE orders SET status = 'canceled' WHERE id = ?";
+            psUpdateOrder = conn.prepareStatement(updateOrderSql);
+            psUpdateOrder.setInt(1, orderId);
+            int orderUpdated = psUpdateOrder.executeUpdate();
+
+            if (orderUpdated == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            String getItemsSql = "SELECT product_id, quantity FROM order_item WHERE order_id = ?";
+            psGetItems = conn.prepareStatement(getItemsSql);
+            psGetItems.setInt(1, orderId);
+            rs = psGetItems.executeQuery();
+
+            List<OrderItem> itemsToRestore = new ArrayList<>();
+            while (rs.next()) {
+                OrderItem item = new OrderItem();
+                item.setProductId(rs.getInt("product_id"));
+                item.setQuantity(rs.getInt("quantity"));
+                itemsToRestore.add(item);
+            }
+
+            String updateStockSql = "UPDATE product SET stock_quantity = stock_quantity + ? WHERE id = ?";
+            psUpdateStock = conn.prepareStatement(updateStockSql);
+            for (OrderItem item : itemsToRestore) {
+                psUpdateStock.setInt(1, item.getQuantity());
+                psUpdateStock.setInt(2, item.getProductId());
+                psUpdateStock.addBatch();
+            }
+            psUpdateStock.executeBatch();
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (psUpdateOrder != null) psUpdateOrder.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (psGetItems != null) psGetItems.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (psUpdateStock != null) psUpdateStock.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (Exception e) {
             }
         }
     }
