@@ -62,6 +62,14 @@ tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
 
+// dùng copy driver-mysql vào tomcat
+//tasks.register('copyMysqlDriverToTomcat', Copy) {
+//    from configurations.runtimeClasspath.filter {
+//        it.name.contains('mysql-connector-j')
+//    }
+//    into 'C:/Tomcat/lib'
+//}
+
 test {
     useJUnitPlatform()
 }

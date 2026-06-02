@@ -838,5 +838,21 @@ public class ProductDAO {
             return rows > 0;
         }
     }
+    // logic restock khi cancel
+    public boolean increaseStock(Connection conn, int productId, int quantity) throws SQLException {
+        String sql = """
+            UPDATE product
+            SET stock_quantity = stock_quantity + ?
+            WHERE id = ?
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        }
+    }
 }
 

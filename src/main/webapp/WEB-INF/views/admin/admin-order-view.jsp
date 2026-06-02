@@ -32,7 +32,7 @@
             <!-- -------------UP--------- -->
             <section class="up">
                 <div class="back">
-                    <a id="icon-back" href=..admin/admin-order-manage"><i
+                    <a id="icon-back" href="javascript:history.back()"><i
                             class="fa-solid fa-arrow-left"></i></a>
                     <h1> Chi Tiết Đơn Hàng</h1>
                 </div>

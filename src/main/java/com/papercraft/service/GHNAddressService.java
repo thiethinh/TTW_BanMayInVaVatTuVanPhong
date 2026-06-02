@@ -16,12 +16,7 @@ public class GHNAddressService {
     public String getProvinces() throws IOException, InterruptedException {
         String url = GHNConfig.BASE_URL + "/master-data/province";
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .header("Token", GHNConfig.API_TOKEN)
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").header("Token", GHNConfig.API_TOKEN).GET().build();
 
         return send(request);
     }
@@ -36,7 +31,6 @@ public class GHNAddressService {
                 .header("Token", GHNConfig.API_TOKEN)
                 .GET()
                 .build();
-
         return send(request);
     }
 
