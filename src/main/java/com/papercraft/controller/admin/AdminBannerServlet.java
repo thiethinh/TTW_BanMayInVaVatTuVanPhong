@@ -55,9 +55,6 @@ public class AdminBannerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        System.out.println(action);
-
-
         if ("update".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             String title = request.getParameter("title");
@@ -139,10 +136,6 @@ public class AdminBannerServlet extends HttpServlet {
         }
 
         List<Banner> banners = bannerDAO.getAllBanner(keyword);
-        for( Banner b : banners){
-            System.out.println(b.getImagePath());
-        }
-
         request.setAttribute("banners", banners);
         request.setAttribute("keyword", keyword);
 

@@ -32,7 +32,7 @@
             </a>
         </header>
 
-        <form action="${pageContext.request.contextPath}/AddProductServlet" method="post" enctype="multipart/form-data"
+        <form action="${pageContext.request.contextPath}/admin-product-add" method="post" enctype="multipart/form-data"
               class="admin-form-container">
             <div class="admin-form-card">
                 <h2 class="form-card-title">Thông Tin Sản Phẩm</h2>

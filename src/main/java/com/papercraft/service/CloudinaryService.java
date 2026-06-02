@@ -37,6 +37,16 @@ public class CloudinaryService {
         return originalFileName;
     }
 
+    public static boolean delete(String fileName) throws IOException {
+        if (fileName == null || fileName.isBlank()) {
+            return false;
+        }
+
+        String publicId = removeExtension(fileName);
+        Map<?, ?> result = CLOUDINARY.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "image"));
+        return "ok".equals(result.get("result"));
+    }
+
     private static String removeExtension(String fileName) {
         int lastDot = fileName.lastIndexOf('.');
         if (lastDot > 0) {

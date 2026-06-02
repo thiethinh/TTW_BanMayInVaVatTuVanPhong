@@ -181,8 +181,8 @@ public class ProductDAO {
     public boolean insertProduct(Product product) throws Exception {
 
         String sql = "INSERT INTO product (category_id, product_name, description_thumbnail, product_description, product_detail, " +
-                "brand, price, origin_price, discount, stock_quantity) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "brand, origin_price, discount, stock_quantity) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (
                 Connection conn = DBConnect.getConnection();
@@ -195,10 +195,9 @@ public class ProductDAO {
             ps.setString(4, product.getProductDescription());
             ps.setString(5, product.getProductDetail());
             ps.setString(6, product.getBrand());
-            ps.setDouble(7, product.getPrice());
-            ps.setDouble(8, product.getOriginPrice());
-            ps.setDouble(9, product.getDiscount());
-            ps.setInt(10, product.getStockQuantity());
+            ps.setDouble(7, product.getOriginPrice());
+            ps.setDouble(8, product.getDiscount());
+            ps.setInt(9, product.getStockQuantity());
 
             int rowsAffected = ps.executeUpdate();
 
