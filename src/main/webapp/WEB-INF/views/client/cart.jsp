@@ -24,6 +24,13 @@
 <jsp:include page="../includes/header.jsp"/>
 
 <!-- =================MAIN===================== -->
+<c:if test="${not empty sessionScope.error}">
+    <div style="background-color: indianred; color: red; padding: 12px 20px; margin: 15px 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>${sessionScope.error}</span>
+    </div>
+    <c:remove var="error" scope="session"/>
+</c:if>
 
 <!-- ============CART EMPTY================ -->
 <c:if test="${empty items}">
@@ -43,7 +50,7 @@
 <c:if test="${not empty items}">
     <main class="cart-fill-main">
         <div class="cart-banner">
-            <marquee scrollamount="8">💡 Phí vận chuyển sẽ được cập nhật sau khi bạn xác nhập địa chỉ </marquee>
+            <marquee scrollamount="8">💡 Phí vận chuyển sẽ được cập nhật sau khi bạn xác nhập địa chỉ</marquee>
         </div>
 
         <div class="container">
