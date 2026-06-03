@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="block-address">
-                    <label for="address">Địa chỉ nhận hàng <span>*</span></label>
+                    <label for="address">Số nhà, tên đường <span>*</span></label>
                     <input id="address" name="address" type="text"
                            value="${addr.detailAddress}"
                            placeholder="Số nhà, tên đường..." required>
@@ -80,10 +80,11 @@
                 <div class="block-addressCity-postCode">
                     <div class="block-addressCity">
                         <label for="provinceId">Tỉnh / Thành phố <span>*</span></label>
-                        <select id="provinceId" name="provinceId" required>
+                        <select id="provinceId" name="provinceId" required
+                                data-selected-id="${addr.provinceId}">
                             <option value="">Chọn tỉnh/thành phố</option>
                         </select>
-                        <input type="hidden" id="provinceName" name="city">
+                        <input type="hidden" id="provinceName" name="city" value="${addr.provinceName}">
                         <div class="invalid-feedback">Vui lòng chọn tỉnh/thành phố!</div>
                     </div>
 
@@ -98,19 +99,21 @@
                 <div class="block-addressCity-postCode">
                     <div class="block-addressCity">
                         <label for="districtId">Quận / Huyện <span>*</span></label>
-                        <select id="districtId" name="districtId" required>
+                        <select id="districtId" name="districtId" required
+                                data-selected-id="${addr.districtId}">
                             <option value="">Chọn quận/huyện</option>
                         </select>
-                        <input type="hidden" id="districtName" name="districtName">
+                        <input type="hidden" id="districtName" name="districtName" value="${addr.districtName}">
                         <div class="invalid-feedback">Vui lòng chọn quận/huyện!</div>
                     </div>
 
                     <div class="block-addressCity">
                         <label for="wardCode">Phường / Xã <span>*</span></label>
-                        <select id="wardCode" name="wardCode" required>
+                        <select id="wardCode" name="wardCode" required
+                                data-selected-id="${addr.wardCode}">
                             <option value="">Chọn phường/xã</option>
                         </select>
-                        <input type="hidden" id="wardName" name="wardName">
+                        <input type="hidden" id="wardName" name="wardName" value="${addr.wardName}">
                         <div class="invalid-feedback">Vui lòng chọn phường/xã!</div>
                     </div>
                 </div>

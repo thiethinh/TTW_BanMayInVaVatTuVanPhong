@@ -165,13 +165,31 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="addr-city">Tỉnh / Thành phố</label>
-                            <select id="addr-city" name="city">
+                            <label for="addr-province-id">Tỉnh / Thành phố</label>
+                            <select id="addr-province-id" name="provinceId" required
+                                    data-selected-id="${address.provinceId}">
                                 <option value="">-- Chọn Tỉnh/Thành --</option>
-                                <option value="hcm" ${address.city == 'hcm' ? 'selected' : ''}>TP. Hồ Chí Minh</option>
-                                <option value="hn" ${address.city == 'hn' ? 'selected' : ''}>Hà Nội</option>
-                                <option value="dn" ${address.city == 'dn' ? 'selected' : ''}>Đà Nẵng</option>
                             </select>
+                            <input type="hidden" id="addr-province-name" name="provinceName" value="${address.provinceName}">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="addr-district-id">Quận / Huyện</label>
+                                <select id="addr-district-id" name="districtId" required
+                                        data-selected-id="${address.districtId}">
+                                    <option value="">-- Chọn Quận/Huyện --</option>
+                                </select>
+                                <input type="hidden" id="addr-district-name" name="districtName" value="${address.districtName}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="addr-ward-code">Phường / Xã</label>
+                                <select id="addr-ward-code" name="wardCode" required
+                                        data-selected-id="${address.wardCode}">
+                                    <option value="">-- Chọn Phường/Xã --</option>
+                                </select>
+                                <input type="hidden" id="addr-ward-name" name="wardName" value="${address.wardName}">
+                            </div>
                         </div>
                     </div>
 
@@ -182,9 +200,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="addr-detail">Địa chỉ chi tiết</label>
+                        <label for="addr-detail">Số nhà, tên đường</label>
                         <input type="text" id="addr-detail" name="address" value="${address.detailAddress}"
-                               placeholder="Số nhà, tên đường, phường/xã, quận/huyện...">
+                               placeholder="Ví dụ: 12 Mai Chí Thọ, Chung cư A, Tầng 3...">
                     </div>
 
                     <button type="submit" class="btn btn-primary">Lưu Địa Chỉ Mới</button>
@@ -196,6 +214,10 @@
 
 <jsp:include page="../includes/footer.jsp"/>
 
+<script>
+    const contextPath = '${pageContext.request.contextPath}';
+</script>
+<script src="${pageContext.request.contextPath}/js/account-address.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js" defer></script>
 <script type="module" src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>

@@ -168,17 +168,6 @@ function updateBillUI(newShippingFee) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("DOMContentLoaded", function () {
-        // test: ghn trả về 30.000
-        //   updateBillUI(30000);
-    });
-
-    // Test: chọn GHN => set phí ship test
-    if (ghnRadio && ghnRadio.checked) {
-        updateBillUI(Number(document.getElementById("shippingFeeInput")?.value || 0));
-    }
-});
 
 const provinceSelect = document.getElementById("provinceId");
 const districtSelect = document.getElementById("districtId");
@@ -227,6 +216,8 @@ function setHiddenName(select, hiddenInput) {
 async function loadProvinces() {
     if (!provinceSelect) return;
 
+    const selectedProvinceId = provinceSelect.dataset.selectedId || "";
+
     resetSelect(provinceSelect, "Đang tải tỉnh/thành phố...");
 
     try {
@@ -242,8 +233,19 @@ async function loadProvinces() {
             const option = document.createElement("option");
             option.value = province.ProvinceID;
             option.textContent = province.ProvinceName;
+
+            if (String(province.ProvinceID) === String(selectedProvinceId)) {
+                option.selected = true;
+            }
+
             provinceSelect.appendChild(option);
         });
+
+        setHiddenName(provinceSelect, provinceNameInput);
+
+        if (selectedProvinceId) {
+            await loadDistricts(selectedProvinceId, true);
+        }
 
     } catch (error) {
         console.error(error);
@@ -251,8 +253,10 @@ async function loadProvinces() {
     }
 }
 
-async function loadDistricts(provinceId) {
+async function loadDistricts(provinceId, autoSelect = false) {
     if (!districtSelect) return;
+
+    const selectedDistrictId = autoSelect ? (districtSelect.dataset.selectedId || "") : "";
 
     resetSelect(districtSelect, "Đang tải quận/huyện...");
     resetSelect(wardSelect, "Chọn phường/xã");
@@ -273,8 +277,19 @@ async function loadDistricts(provinceId) {
             const option = document.createElement("option");
             option.value = district.DistrictID;
             option.textContent = district.DistrictName;
+
+            if (String(district.DistrictID) === String(selectedDistrictId)) {
+                option.selected = true;
+            }
+
             districtSelect.appendChild(option);
         });
+
+        setHiddenName(districtSelect, districtNameInput);
+
+        if (selectedDistrictId) {
+            await loadWards(selectedDistrictId, true);
+        }
 
     } catch (error) {
         console.error(error);
@@ -282,15 +297,16 @@ async function loadDistricts(provinceId) {
     }
 }
 
-async function loadWards(districtId) {
+
+async function loadWards(districtId, autoSelect = false) {
     if (!wardSelect) return;
 
+    const selectedWardCode = autoSelect ? (wardSelect.dataset.selectedId || "") : "";
     resetSelect(wardSelect, "Đang tải phường/xã...");
     wardNameInput.value = "";
 
     try {
         const result = await fetchGHNAddress("ward", { districtId });
-
         resetSelect(wardSelect, "Chọn phường/xã");
 
         if (!result.data || !Array.isArray(result.data)) {
@@ -301,8 +317,19 @@ async function loadWards(districtId) {
             const option = document.createElement("option");
             option.value = ward.WardCode;
             option.textContent = ward.WardName;
+
+            if (String(ward.WardCode) === String(selectedWardCode)) {
+                option.selected = true;
+            }
             wardSelect.appendChild(option);
         });
+
+        setHiddenName(wardSelect, wardNameInput);
+
+        // tự tính phí GHN khi vào checkout(đã có addressDefault )
+        if (selectedWardCode) {
+            calculateGHNFee();
+        }
 
     } catch (error) {
         console.error(error);
@@ -319,7 +346,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             resetSelect(districtSelect, "Chọn quận/huyện");
             resetSelect(wardSelect, "Chọn phường/xã");
-
             districtNameInput.value = "";
             wardNameInput.value = "";
 
@@ -332,7 +358,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (districtSelect) {
         districtSelect.addEventListener("change", function () {
             setHiddenName(districtSelect, districtNameInput);
-
             resetSelect(wardSelect, "Chọn phường/xã");
             wardNameInput.value = "";
 
