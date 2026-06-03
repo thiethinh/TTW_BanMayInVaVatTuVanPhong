@@ -11,25 +11,43 @@ public class AddressDAO {
     // insertAddress
     public boolean insertAddress(Address address) {
         // ID auto increament
-        String sql = "INSERT INTO address (user_id, fname, lname, nation, " +
-                "city,detail_address, postcode, email, phone, is_default) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = """
+        INSERT INTO address (user_id, fname, lname, nation,city, province_id, province_name,district_id, district_name,ward_code, ward_name,detail_address, postcode, email, phone, is_default)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
         try (
                 Connection conn = DBConnect.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); //Lấy ID Sau khi thêm
         ) {
-            // 1. Gán giá trị tham số cho PreparedStatement
             ps.setInt(1, address.getUserId());
             ps.setString(2, address.getFname());
             ps.setString(3, address.getLname());
             ps.setString(4, address.getNation());
             ps.setString(5, address.getCity());
-            ps.setString(6, address.getDetailAddress());
-            ps.setString(7, address.getPostcode());
-            ps.setString(8, address.getEmail());
-            ps.setString(9, address.getPhone());
-            ps.setBoolean(10, address.getDefault());
+
+            if (address.getProvinceId() == null) {
+                ps.setNull(6, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(6, address.getProvinceId());
+            }
+
+            ps.setString(7, address.getProvinceName());
+
+            if (address.getDistrictId() == null) {
+                ps.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(8, address.getDistrictId());
+            }
+
+            ps.setString(9, address.getDistrictName());
+            ps.setString(10, address.getWardCode());
+            ps.setString(11, address.getWardName());
+            ps.setString(12, address.getDetailAddress());
+            ps.setString(13, address.getPostcode());
+            ps.setString(14, address.getEmail());
+            ps.setString(15, address.getPhone());
+            ps.setBoolean(16, address.getDefault());
 
 
             int rowsAffected = ps.executeUpdate();
@@ -80,6 +98,12 @@ public class AddressDAO {
                     addr.setEmail(rs.getString("email"));
                     addr.setPhone(rs.getString("phone"));
                     addr.setDefault(rs.getBoolean("is_default"));
+                    addr.setProvinceId((Integer) rs.getObject("province_id"));
+                    addr.setProvinceName(rs.getString("province_name"));
+                    addr.setDistrictId((Integer) rs.getObject("district_id"));
+                    addr.setDistrictName(rs.getString("district_name"));
+                    addr.setWardCode(rs.getString("ward_code"));
+                    addr.setWardName(rs.getString("ward_name"));
 
                     return addr;
                 }
@@ -95,9 +119,9 @@ public class AddressDAO {
 
     public boolean updateAddress(Address address, int userId) {
         String sql = """
-                UPDATE address
-                set fname =? , lname =?, nation= ? , city =?, detail_address =?, postcode =?, phone =?
-                where user_id =?;
+                UPDATE address 
+                SET fname = ?, lname = ?, nation = ?, city = ?, province_id = ?, province_name = ?, district_id = ?, district_name = ?, ward_code = ?, ward_name = ?, detail_address = ?, postcode = ?, phone = ?
+                WHERE user_id = ?
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -106,10 +130,28 @@ public class AddressDAO {
             ps.setString(2, address.getLname());
             ps.setString(3, address.getNation());
             ps.setString(4, address.getCity());
-            ps.setString(5, address.getDetailAddress());
-            ps.setString(6, address.getPostcode());
-            ps.setString(7, address.getPhone());
-            ps.setInt(8, userId);
+
+            if (address.getProvinceId() == null) {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(5, address.getProvinceId());
+            }
+
+            ps.setString(6, address.getProvinceName());
+
+            if (address.getDistrictId() == null) {
+                ps.setNull(7, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(7, address.getDistrictId());
+            }
+
+            ps.setString(8, address.getDistrictName());
+            ps.setString(9, address.getWardCode());
+            ps.setString(10, address.getWardName());
+            ps.setString(11, address.getDetailAddress());
+            ps.setString(12, address.getPostcode());
+            ps.setString(13, address.getPhone());
+            ps.setInt(14, userId);
 
 
             return ps.executeUpdate() > 0;
@@ -124,9 +166,9 @@ public class AddressDAO {
     public Address getAddresById(Integer id) {
         Address addr = new Address();
         String sql = """
-                SELECT lname, fname,nation,city,detail_address,postcode,phone
+                SELECT lname, fname, nation, city,province_id, province_name,district_id, district_name,ward_code, ward_name,detail_address, postcode, phone
                 FROM address
-                WHERE user_id =?;
+                WHERE user_id = ?
                 """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

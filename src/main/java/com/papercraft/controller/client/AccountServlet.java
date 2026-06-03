@@ -37,8 +37,16 @@ public class AccountServlet extends HttpServlet {
         String city = request.getParameter("city");
         String poseCode = request.getParameter("post-code");
         String detailAddress = request.getParameter("address");
+        String provinceIdRaw = request.getParameter("provinceId");
+        String provinceName = request.getParameter("provinceName");
+        String districtIdRaw = request.getParameter("districtId");
+        String districtName = request.getParameter("districtName");
+        String wardCode = request.getParameter("wardCode");
+        String wardName = request.getParameter("wardName");
 
-        if (lnameAdrr != null && fnameAdrr != null && phoneAdrr != null && nation != null && city != null && poseCode != null && detailAddress != null) {
+        if (lnameAdrr != null && fnameAdrr != null && phoneAdrr != null && nation != null && provinceIdRaw != null
+                && provinceName != null && districtIdRaw != null && districtName != null && wardCode != null
+                && wardName != null && poseCode != null && detailAddress != null) {
             if (address != null) {
                 address.setFname(fnameAdrr);
                 address.setLname(lnameAdrr);

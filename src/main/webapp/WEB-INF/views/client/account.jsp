@@ -139,30 +139,30 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="addr-nation">Quốc Gia</label>
-                            <select id="addr-nation" name="nation" required>
-                                <option value="">--Chọn Quốc Gia--</option>
-                                <option value="VN" ${address.nation == 'VN' ? 'selected' : ''}>Việt Nam</option>
-                                <option value="US" ${address.nation == 'US' ? 'selected' : ''}>Hoa Kỳ</option>
-                                <option value="UK" ${address.nation == 'UK' ? 'selected' : ''}>Vương quốc Anh</option>
-                                <option value="JP" ${address.nation == 'JP' ? 'selected' : ''}>Nhật Bản</option>
-                                <option value="KR" ${address.nation == 'KR' ? 'selected' : ''}>Hàn Quốc</option>
-                                <option value="CN" ${address.nation == 'CN' ? 'selected' : ''}>Trung Quốc</option>
-                                <option value="FR" ${address.nation == 'FR' ? 'selected' : ''}>Pháp</option>
-                                <option value="DE" ${address.nation == 'DE' ? 'selected' : ''}>Đức</option>
-                                <option value="RU" ${address.nation == 'RU' ? 'selected' : ''}>Nga</option>
-                                <option value="IN" ${address.nation == 'IN' ? 'selected' : ''}>Ấn Độ</option>
-                                <option value="CA" ${address.nation == 'CA' ? 'selected' : ''}>Canada</option>
-                                <option value="AU" ${address.nation == 'AU' ? 'selected' : ''}>Úc</option>
-                                <option value="BR" ${address.nation == 'BR' ? 'selected' : ''}>Brazil</option>
-                                <option value="TH" ${address.nation == 'TH' ? 'selected' : ''}>Thái Lan</option>
-                                <option value="MY" ${address.nation == 'MY' ? 'selected' : ''}>Malaysia</option>
-                                <option value="SG" ${address.nation == 'SG' ? 'selected' : ''}>Singapore</option>
-                                <option value="ID" ${address.nation == 'ID' ? 'selected' : ''}>Indonesia</option>
-                                <option value="PH" ${address.nation == 'PH' ? 'selected' : ''}>Philippines</option>
-                                <option value="IT" ${address.nation == 'IT' ? 'selected' : ''}>Ý</option>
-                                <option value="ES" ${address.nation == 'ES' ? 'selected' : ''}>Tây Ban Nha</option>
-                            </select>
+<%--                            <label for="addr-nation">Quốc Gia</label>--%>
+<%--                            <select id="addr-nation" name="nation" required>--%>
+<%--                                <option value="">--Chọn Quốc Gia--</option>--%>
+<%--                                <option value="VN" ${address.nation == 'VN' ? 'selected' : ''}>Việt Nam</option>--%>
+<%--                                <option value="US" ${address.nation == 'US' ? 'selected' : ''}>Hoa Kỳ</option>--%>
+<%--                                <option value="UK" ${address.nation == 'UK' ? 'selected' : ''}>Vương quốc Anh</option>--%>
+<%--                                <option value="JP" ${address.nation == 'JP' ? 'selected' : ''}>Nhật Bản</option>--%>
+<%--                                <option value="KR" ${address.nation == 'KR' ? 'selected' : ''}>Hàn Quốc</option>--%>
+<%--                                <option value="CN" ${address.nation == 'CN' ? 'selected' : ''}>Trung Quốc</option>--%>
+<%--                                <option value="FR" ${address.nation == 'FR' ? 'selected' : ''}>Pháp</option>--%>
+<%--                                <option value="DE" ${address.nation == 'DE' ? 'selected' : ''}>Đức</option>--%>
+<%--                                <option value="RU" ${address.nation == 'RU' ? 'selected' : ''}>Nga</option>--%>
+<%--                                <option value="IN" ${address.nation == 'IN' ? 'selected' : ''}>Ấn Độ</option>--%>
+<%--                                <option value="CA" ${address.nation == 'CA' ? 'selected' : ''}>Canada</option>--%>
+<%--                                <option value="AU" ${address.nation == 'AU' ? 'selected' : ''}>Úc</option>--%>
+<%--                                <option value="BR" ${address.nation == 'BR' ? 'selected' : ''}>Brazil</option>--%>
+<%--                                <option value="TH" ${address.nation == 'TH' ? 'selected' : ''}>Thái Lan</option>--%>
+<%--                                <option value="MY" ${address.nation == 'MY' ? 'selected' : ''}>Malaysia</option>--%>
+<%--                                <option value="SG" ${address.nation == 'SG' ? 'selected' : ''}>Singapore</option>--%>
+<%--                                <option value="ID" ${address.nation == 'ID' ? 'selected' : ''}>Indonesia</option>--%>
+<%--                                <option value="PH" ${address.nation == 'PH' ? 'selected' : ''}>Philippines</option>--%>
+<%--                                <option value="IT" ${address.nation == 'IT' ? 'selected' : ''}>Ý</option>--%>
+<%--                                <option value="ES" ${address.nation == 'ES' ? 'selected' : ''}>Tây Ban Nha</option>--%>
+<%--                            </select>--%>
                         </div>
                         <div class="form-group">
                             <label for="addr-province-id">Tỉnh / Thành phố</label>
