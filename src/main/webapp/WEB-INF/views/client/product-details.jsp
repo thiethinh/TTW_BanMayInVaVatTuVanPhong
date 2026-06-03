@@ -31,7 +31,7 @@
            value="${baseUrl}/product-detail?productId=${p.id}" />
 
     <c:set var="productImageUrl"
-           value="${baseUrl}/${p.thumbnail}" />
+           value="${p.thumbnail}" />
 
     <meta property="og:title" content="${fn:escapeXml(p.productName)}" />
     <meta property="og:description" content="${fn:escapeXml(p.descriptionThumbnail)}" />
@@ -52,21 +52,21 @@
         <nav class="block-select-img">
             <div class="img-select">
                 <button class="bt-img-0 selected" type="button"
-                        onclick="changeMainImage('${pageContext.request.contextPath}/${p.thumbnail}', this)">
-                    <img src="${pageContext.request.contextPath}/${p.thumbnail}" alt="Main Thumb"/>
+                        onclick="changeMainImage('${p.thumbnail}', this)">
+                    <img src="${p.thumbnail}" alt="Main Thumb"/>
                 </button>
 
                 <c:forEach var="imgName" items="${listImages}" varStatus="loop" begin="1">
                     <button class="bt-img-0" type="button"
-                            onclick="changeMainImage('${pageContext.request.contextPath}/${imgName}', this)">
-                        <img src="${pageContext.request.contextPath}/${imgName}" alt="Gallery ${loop.index}"/>
+                            onclick="changeMainImage('${imgName}', this)">
+                        <img src="${imgName}" alt="Gallery ${loop.index}"/>
                     </button>
                 </c:forEach>
             </div>
         </nav>
 
         <div class="img-main">
-            <img id="main-image-display" src="${pageContext.request.contextPath}/${p.thumbnail}" alt="${p.productName}"/>
+            <img id="main-image-display" src="${p.thumbnail}" alt="${p.productName}"/>
         </div>
 
         <div class="info-product">

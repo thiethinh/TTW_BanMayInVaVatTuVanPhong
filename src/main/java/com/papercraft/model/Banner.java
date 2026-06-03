@@ -3,17 +3,16 @@ package com.papercraft.model;
 import java.sql.Timestamp;
 
 public class Banner {
-    private final String BASE_PATH="images/";
     private int id;
     private String title;
-    private String imgName="";
+    private String imgName;
     private boolean isActive;
     private int sortOrder;
     private Timestamp createdAt;
-    private String imagePath="";
+    private String imagePath;
 
     public Banner() {
-        this.imagePath=BASE_PATH+imgName;
+        this.imagePath ="";
     }
 
 
@@ -69,7 +68,7 @@ public class Banner {
         return imagePath;
     }
 
-    public void setImagePath(String imageName) {
-        this.imagePath = BASE_PATH+imageName;
+    public void setImagePath(String imagePath) {
+        this.imagePath=imagePath;
     }
 }

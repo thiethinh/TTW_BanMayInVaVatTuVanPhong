@@ -1,5 +1,6 @@
 package com.papercraft.dao;
 
+import com.papercraft.config.CloudinaryConfig;
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class ProductDAO {
-    private static final String ROOT_PATH = "images/upload/";
+    public static final String IMAGE_BASE_URL = CloudinaryConfig.IMAGE_BASE_URL;
 
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
@@ -39,7 +40,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -84,7 +85,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -131,7 +132,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL+ rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -164,7 +165,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
 
-                        images.add("images/upload/" + imgName.trim());
+                        images.add(IMAGE_BASE_URL + imgName.trim());
                     }
                 }
             }
@@ -180,8 +181,8 @@ public class ProductDAO {
     public boolean insertProduct(Product product) throws Exception {
 
         String sql = "INSERT INTO product (category_id, product_name, description_thumbnail, product_description, product_detail, " +
-                "brand, price, origin_price, discount, stock_quantity) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "brand, origin_price, discount, stock_quantity) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (
                 Connection conn = DBConnect.getConnection();
@@ -194,10 +195,9 @@ public class ProductDAO {
             ps.setString(4, product.getProductDescription());
             ps.setString(5, product.getProductDetail());
             ps.setString(6, product.getBrand());
-            ps.setDouble(7, product.getPrice());
-            ps.setDouble(8, product.getOriginPrice());
-            ps.setDouble(9, product.getDiscount());
-            ps.setInt(10, product.getStockQuantity());
+            ps.setDouble(7, product.getOriginPrice());
+            ps.setDouble(8, product.getDiscount());
+            ps.setInt(9, product.getStockQuantity());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -244,16 +244,33 @@ public class ProductDAO {
         List<Product> list = new ArrayList<>();
 
         String sql = """
-                SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand, p.price, i.img_name, p.discount, p.origin_price
-                                FROM product p
-                                JOIN category c ON p.category_id = c.id
-                                LEFT JOIN image i ON i.entity_id = p.id
-                                AND i.is_thumbnail = 1
-                                AND i.entity_type = 'Product'
-                                WHERE c.type = ? AND p.is_deleted=0
-                                ORDER BY p.discount DESC
-                                LIMIT 10;
-                """;
+            SELECT p.id, p.product_name, p.category_id, p.description_thumbnail, p.brand,
+                   p.origin_price, p.discount, p.price, i.img_name,
+                   COALESCE(r.avg_rating, 0) AS avg_rating,
+                   COALESCE(s.sold_quantity, 0) AS sold_quantity
+            FROM product p
+            JOIN category c ON p.category_id = c.id
+                
+            LEFT JOIN image i ON p.id = i.entity_id AND i.is_thumbnail = 1 AND i.entity_type = 'Product'
+                
+            LEFT JOIN (
+                SELECT product_id, AVG(rating) AS avg_rating 
+                FROM review 
+                GROUP BY product_id
+            ) r ON r.product_id = p.id
+                
+            LEFT JOIN (
+                SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+                FROM order_item oi
+                JOIN orders o ON o.id = oi.order_id
+                WHERE o.status = 'completed'
+                GROUP BY oi.product_id
+            ) s ON s.product_id = p.id
+            
+            WHERE c.type = ? AND p.is_deleted = 0
+            ORDER BY p.discount DESC
+            LIMIT 10
+            """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -271,9 +288,12 @@ public class ProductDAO {
                     p.setOriginPrice(rs.getDouble("origin_price"));
                     p.setPrice(rs.getDouble("price"));
 
+                    p.setAvgRating(rs.getBigDecimal("avg_rating"));
+                    p.setSoldQuantity(rs.getInt("sold_quantity"));
+
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + imgName);
+                        p.setThumbnail(IMAGE_BASE_URL+ imgName);
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -336,7 +356,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail(ROOT_PATH + imgName.trim());
+                        p.setThumbnail(IMAGE_BASE_URL + imgName.trim());
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
@@ -508,7 +528,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
 
-                        p.setThumbnail("images/upload/" + rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp"); // Ảnh mặc định
                     }
@@ -616,7 +636,7 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        product.setThumbnail("images/upload/" + imgName.trim());
+                        product.setThumbnail(IMAGE_BASE_URL+ imgName.trim());
                     } else {
                         product.setThumbnail("logo.webp");
                     }
@@ -664,7 +684,7 @@ public class ProductDAO {
                     p.setType(rs.getString("type"));
 
                     String imgName = rs.getString("img_name");
-                    p.setThumbnail((imgName != null && !imgName.isEmpty()) ? "images/upload/" + imgName.trim() : "images/logo.webp");
+                    p.setThumbnail((imgName != null && !imgName.isEmpty()) ? IMAGE_BASE_URL + imgName.trim() : "images/logo.webp");
 
                     list.add(p);
                 }
@@ -782,7 +802,7 @@ public class ProductDAO {
                     String imgName = rs.getString("img_name");
 
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail("images/upload/" + imgName.trim());
+                        p.setThumbnail(IMAGE_BASE_URL + imgName.trim());
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }

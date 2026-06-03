@@ -2,6 +2,7 @@ package com.papercraft.controller.admin;
 
 import com.papercraft.dao.ImageDAO;
 import com.papercraft.dao.ProductDAO;
+import com.papercraft.service.CloudinaryService;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Product;
 import jakarta.servlet.ServletException;
@@ -112,21 +113,27 @@ public class AdminProductEdit extends HttpServlet {
             // Update thông tin text
             boolean isUpdated = dao.updateProduct(updated);
 
-            //    ẢNH
-            String uploadDirPath = getServletContext().getRealPath("/images/upload");
-            File uploadDir = new File(uploadDirPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+//            //    ẢNH
+//            String uploadDirPath = getServletContext().getRealPath("/images/upload");
+//            File uploadDir = new File(uploadDirPath);
+//            if (!uploadDir.exists()) uploadDir.mkdirs();
 
             conn = DBConnect.getConnection();
             ImageDAO imageDAO = new ImageDAO();
 
             //  THUMBNAIL
             Part thumbPart = request.getPart("image");
-            if (thumbPart != null && thumbPart.getSize() > 0 && thumbPart.getSubmittedFileName() != null && !thumbPart.getSubmittedFileName().isEmpty()) {
-                String savedThumbName = savePartToUploadFolder(thumbPart, uploadDirPath);
 
-                 //update thumbname
-                updateThumbnailDirectly(conn, id, savedThumbName);
+            if (thumbPart != null && thumbPart.getSize() > 0 && thumbPart.getSubmittedFileName() != null && !thumbPart.getSubmittedFileName().isBlank()) {
+                String fileName = Paths.get(thumbPart.getSubmittedFileName()).getFileName().toString();
+                File tempFile = File.createTempFile("product_thumb_", ".tmp");
+                try {
+                    thumbPart.write(tempFile.getAbsolutePath());
+                    CloudinaryService.upload(tempFile, fileName);
+                    updateThumbnailDirectly(conn, id, fileName);
+                } finally {
+                    tempFile.delete();
+                }
             }
 
             // GALLERY
@@ -143,7 +150,16 @@ public class AdminProductEdit extends HttpServlet {
                 List<String> savedGalleryNames = new ArrayList<>();
                 for (Part p : galleryParts) {
                     if (p != null && p.getSize() > 0) {
-                        savedGalleryNames.add(savePartToUploadFolder(p, uploadDirPath));
+                        String fileName = Paths.get(p.getSubmittedFileName()).getFileName().toString();
+                        File tempFile = File.createTempFile("gallery_", ".tmp");
+
+                        try {
+                            p.write(tempFile.getAbsolutePath());
+                            CloudinaryService.upload(tempFile, fileName);
+                            savedGalleryNames.add(fileName);
+                        } finally {
+                            tempFile.delete();
+                        }
                     }
                 }
 
@@ -188,13 +204,6 @@ public class AdminProductEdit extends HttpServlet {
         return list;
     }
 
-    private static String savePartToUploadFolder(Part part, String uploadDirPath) throws Exception {
-        String submitted = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-        String fileName = System.currentTimeMillis() + "_" + submitted;
-        String fullPath = uploadDirPath + File.separator + fileName;
-        part.write(fullPath);
-        return fileName;
-    }
 
     private void updateThumbnailDirectly(Connection conn, int productId, String imgName) throws Exception {
         // Reset tất cả về 0

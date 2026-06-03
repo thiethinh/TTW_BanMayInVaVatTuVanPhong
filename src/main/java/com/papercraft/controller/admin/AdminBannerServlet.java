@@ -2,6 +2,7 @@ package com.papercraft.controller.admin;
 
 import com.papercraft.dao.BannerDAO;
 import com.papercraft.model.Banner;
+import com.papercraft.service.CloudinaryService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,7 +33,6 @@ public class AdminBannerServlet extends HttpServlet {
                     return;
 
                 case "delete":
-
                     deleteBanner(request, response);
                     return;
                 case "get-active":
@@ -55,10 +55,7 @@ public class AdminBannerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        System.out.println(action);
-
-
-        if("update".equals(action)){
+        if ("update".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
             String title = request.getParameter("title");
             int sortOrder = Integer.parseInt(request.getParameter("sortOrder"));
@@ -67,65 +64,63 @@ public class AdminBannerServlet extends HttpServlet {
 
             Part imagePart = request.getPart("image");
             String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-
-            String uploadPath = getServletContext().getRealPath("/images/upload");
-
-            File uploadDir = new File(uploadPath);
-
-            if(!uploadDir.exists()){
-                uploadDir.mkdirs();
-            }
-
             String imageName = oldImage;
 
-            // có upload ảnh mới
-            if(fileName != null && !fileName.isEmpty()){
-                imageName = System.currentTimeMillis() + fileName;
-                imagePart.write(uploadPath + File.separator + imageName);
+            // Có upload ảnh mới
+            if (fileName != null && !fileName.isBlank()) {
+                File tempFile = File.createTempFile("banner_", ".tmp");
+                try {
+                    imagePart.write(tempFile.getAbsolutePath());
+                    CloudinaryService.upload(tempFile, fileName);
+                    imageName = fileName;
+                } finally {
+                    if (tempFile.exists()) {
+                        tempFile.delete();
+                    }
+                }
             }
 
             Banner b = new Banner();
             b.setId(id);
             b.setTitle(title);
             b.setImgName(imageName);
-            b.setImagePath(imageName);
             b.setActive(active);
             b.setSortOrder(sortOrder);
 
             BannerDAO dao = new BannerDAO();
             dao.updateBanner(b);
+
             response.sendRedirect("admin-banner");
-        }else if("insert".equals(action)){
+        }else if ("insert".equals(action)) {
             BannerDAO dao = new BannerDAO();
 
             String title = request.getParameter("title");
             int sortOrder = Integer.parseInt(request.getParameter("sortOrder"));
             boolean active = request.getParameter("active") != null;
+
             Part imagePart = request.getPart("image");
             String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-            String projectPath = System.getProperty("user.dir");
 
-            String uploadPath = projectPath + "/src/main/webapp/images/upload";
-            File uploadDir = new File(uploadPath);
-
-            if(!uploadDir.exists()){
-                uploadDir.mkdirs();
+            if (fileName == null || fileName.isBlank()) {
+                throw new RuntimeException("Vui lòng chọn ảnh");
             }
 
-            String imageName = System.currentTimeMillis() + fileName;
-            imagePart.write(uploadPath + File.separator + imageName);
-            System.out.println(uploadPath + File.separator + imageName);
+            File tempFile = File.createTempFile("banner_", ".tmp");
+            try {
+                imagePart.write(tempFile.getAbsolutePath());
+                CloudinaryService.upload(tempFile, fileName);
+            } finally {
+                if (tempFile.exists()) {
+                    tempFile.delete();
+                }
+            }
+            Banner banner = new Banner();
+            banner.setTitle(title);
+            banner.setImgName(fileName);
+            banner.setActive(active);
+            banner.setSortOrder(sortOrder);
 
-
-            Banner b = new Banner();
-
-            b.setTitle(title);
-            b.setImgName(imageName);
-            b.setImagePath("images/upload/" + imageName);
-            b.setActive(active);
-            b.setSortOrder(sortOrder);
-
-            dao.insertBanner(b);
+            dao.insertBanner(banner);
             response.sendRedirect("admin-banner");
         }
 
@@ -141,10 +136,6 @@ public class AdminBannerServlet extends HttpServlet {
         }
 
         List<Banner> banners = bannerDAO.getAllBanner(keyword);
-        for( Banner b : banners){
-            System.out.println(b.getImagePath());
-        }
-
         request.setAttribute("banners", banners);
         request.setAttribute("keyword", keyword);
 

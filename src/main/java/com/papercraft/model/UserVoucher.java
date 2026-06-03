@@ -1,8 +1,9 @@
 package com.papercraft.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class UserVoucher {
+public class UserVoucher implements Serializable {
 
     private int id;
 
