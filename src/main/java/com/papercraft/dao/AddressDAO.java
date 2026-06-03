@@ -163,35 +163,49 @@ public class AddressDAO {
         return false;
     }
 
-    public Address getAddresById(Integer id) {
-        Address addr = new Address();
+    public Address getAddresById(Integer userId) {
         String sql = """
-                SELECT lname, fname, nation, city,province_id, province_name,district_id, district_name,ward_code, ward_name,detail_address, postcode, phone
-                FROM address
-                WHERE user_id = ?
-                """;
+            SELECT id,user_id,lname,fname,nation,city,province_id,province_name,district_id,district_name,ward_code,ward_name,detail_address,postcode,email,phone,is_default
+            FROM address
+            WHERE user_id = ? AND is_default = 1
+            """;
+
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+
+            ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-
+                    Address addr = new Address();
+                    addr.setId(rs.getInt("id"));
+                    addr.setUserId(rs.getInt("user_id"));
                     addr.setFname(Objects.requireNonNullElse(rs.getString("fname"), ""));
                     addr.setLname(Objects.requireNonNullElse(rs.getString("lname"), ""));
                     addr.setNation(Objects.requireNonNullElse(rs.getString("nation"), ""));
                     addr.setCity(Objects.requireNonNullElse(rs.getString("city"), ""));
                     addr.setDetailAddress(Objects.requireNonNullElse(rs.getString("detail_address"), ""));
                     addr.setPostcode(Objects.requireNonNullElse(rs.getString("postcode"), ""));
+                    addr.setEmail(Objects.requireNonNullElse(rs.getString("email"), ""));
                     addr.setPhone(Objects.requireNonNullElse(rs.getString("phone"), ""));
+                    addr.setDefault(rs.getBoolean("is_default"));
+
+                    addr.setProvinceId((Integer) rs.getObject("province_id"));
+                    addr.setProvinceName(Objects.requireNonNullElse(rs.getString("province_name"), ""));
+                    addr.setDistrictId((Integer) rs.getObject("district_id"));
+                    addr.setDistrictName(Objects.requireNonNullElse(rs.getString("district_name"), ""));
+                    addr.setWardCode(Objects.requireNonNullElse(rs.getString("ward_code"), ""));
+                    addr.setWardName(Objects.requireNonNullElse(rs.getString("ward_name"), ""));
+
+                    return addr;
                 }
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return addr;
+
+        return null;
     }
 }

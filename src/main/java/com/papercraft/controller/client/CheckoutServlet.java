@@ -236,8 +236,8 @@ public class CheckoutServlet extends HttpServlet {
             fullAddressBuilder.append(", ").append(nation.trim());
         }
 
-        String fullAddress = fullAddressBuilder.toString();
-
+//        String fullAddress = fullAddressBuilder.toString();
+        String fullAddress = address + ", " + wardName + ", " + districtName + ", " + city + ", " + nation;
 
         //parse phí ship
         BigDecimal shippingFee;
