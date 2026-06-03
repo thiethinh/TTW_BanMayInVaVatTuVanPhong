@@ -2,11 +2,12 @@ package com.papercraft.model;
 
 import com.papercraft.model.enums.NotificationType;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class Notification {
+public class Notification implements Serializable {
 
     private int id;
     private Integer userId;

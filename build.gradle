@@ -31,6 +31,9 @@ dependencies {
     // Servlet
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     compileOnly 'jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.1.1'
+
+    //cloudinary
+    implementation 'com.cloudinary:cloudinary-http44:1.39.0'
 }
 
 group = 'com.example'

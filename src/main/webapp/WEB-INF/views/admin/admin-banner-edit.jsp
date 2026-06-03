@@ -60,7 +60,7 @@
 
                     <div class="preview">
                         <img id="previewImg"
-                             src="${pageContext.request.contextPath}/${banner.imagePath}">
+                             src="${banner.imagePath}">
                     </div>
 
                 </div>

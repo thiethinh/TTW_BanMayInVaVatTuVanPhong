@@ -216,6 +216,33 @@
     margin: 0 0 15px 20px;
 }
 
+.general-sell-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    margin: 0 20px;
+}
+
+.rating {
+    background-color: #fff3e0;
+    border: 1px solid #f5c16c;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #d48806;
+    font-weight: 500;
+}
+
+.sold {
+    color: #666;
+}
+
+.sold span {
+    font-weight: 500;
+    color: #333;
+}
+
 .action {
     margin: 10px 20px;
     background-color: inherit;

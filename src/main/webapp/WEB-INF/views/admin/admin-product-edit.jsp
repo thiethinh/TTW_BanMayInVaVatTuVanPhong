@@ -154,7 +154,7 @@
                         <div class="image-preview" id="image-preview">
                             <c:choose>
                                 <c:when test="${not empty product.thumbnail}">
-                                    <img src="${product.thumbnail.startsWith('http') ? product.thumbnail : pageContext.request.contextPath.concat('/').concat(product.thumbnail)}"
+                                    <img src="${product.thumbnail}"
                                          class="image-preview-image">
                                 </c:when>
                                 <c:otherwise>
@@ -177,7 +177,7 @@
                             <c:if test="${not empty product.imageList}">
                                 <c:forEach var="img" items="${product.imageList}">
                                     <div class="current-gallery-item">
-                                        <img src="${pageContext.request.contextPath}/${img}" alt="Gallery Image">
+                                        <img src="${img}" alt="Gallery Image">
                                     </div>
                                 </c:forEach>
                             </c:if>

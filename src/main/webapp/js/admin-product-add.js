@@ -238,10 +238,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-            // nếu user chọn >5 => warn và cắt bớt
-            if (files.length > 5) {
+    // nếu user chọn >5 => warn và cắt bớt
+    if (files.length > 5) {
 
-                console.warn('Chỉ preview tối đa 5 ảnh gallery.');
-            }
+        console.warn('Chỉ preview tối đa 5 ảnh gallery.');
+    }
+    const form = document.querySelector('.admin-form-container');
+
+    if (form) {
+        form.addEventListener('submit', function () {
+            const data = {};
+            document.querySelectorAll('.spec-input').forEach(input => {
+                let key = input.dataset.key;
+
+                if (!key && input.id === 'printer-type') {
+                    key = 'type';
+                }
+                if (!key) return;
+                const value = input.value?.trim();
+                if (value) {
+                    data[key] = value;
+                }
+            });
+            document.getElementById('product-specs-hidden').value = JSON.stringify(data);
+        });
+    }
 
 });

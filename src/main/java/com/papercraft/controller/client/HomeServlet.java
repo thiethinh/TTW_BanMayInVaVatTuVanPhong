@@ -19,8 +19,9 @@ public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ProductDAO dao = new ProductDAO();
-        BannerDAO bannerD = new BannerDAO();
+        BannerDAO bannerDAO= new BannerDAO();
 
+        List<String> banners = bannerDAO.getActiveUrlBannerImage();
         List<Product> featuredPrinter = dao.getFeaturedProductsByType("Printer");
         List<Product> featuredStationery = dao.getFeaturedProductsByType("Stationery");
 
@@ -28,6 +29,7 @@ public class HomeServlet extends HttpServlet {
 
         request.setAttribute("printers", featuredPrinter);
         request.setAttribute("stationery", featuredStationery);
+        request.setAttribute("banners", banners);
         request.getRequestDispatcher("/WEB-INF/views/client/home.jsp").forward(request, response);
     }
 }

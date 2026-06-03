@@ -71,7 +71,7 @@
                         <td>${b.id}</td>
 
                         <td>
-                            <img src="${pageContext.request.contextPath}/${b.imagePath}"
+                            <img src="${b.imagePath}"
                                  alt="${b.title}"
                                  class="banner-img">
                         </td>

@@ -169,7 +169,7 @@
 
                         <td>
                             <img class="product-table-image"
-                                 src="${pageContext.request.contextPath}/${p.thumbnail}"
+                                 src="${p.thumbnail}"
                                  alt="${p.productName}">
                         </td>
 

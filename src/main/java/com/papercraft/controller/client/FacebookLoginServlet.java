@@ -3,7 +3,7 @@ package com.papercraft.controller.client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.papercraft.dao.UserDAO;
-import com.papercraft.model.FacebookUser;
+import com.papercraft.dto.FacebookUser;
 import com.papercraft.model.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

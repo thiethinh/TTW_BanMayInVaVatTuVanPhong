@@ -1,15 +1,18 @@
 package com.papercraft.dao;
 
+import com.papercraft.config.CloudinaryConfig;
 import com.papercraft.model.Banner;
 import com.papercraft.utils.DBConnect;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BannerDAO {
+    public static final String IMAGE_BASE_URL = CloudinaryConfig.IMAGE_BASE_URL;
 
     public List<Banner> getAllBanner(String keyword) {
 
@@ -21,33 +24,17 @@ public class BannerDAO {
                 WHERE title LIKE ? AND is_deleted=0
                 ORDER BY sort_order ASC
                 """;
-
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, "%" + keyword + "%");
 
             ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                Banner b = new Banner();
-
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setImgName(rs.getString("img_name"));
-                b.setImagePath(rs.getString("img_name"));
-                b.setActive(rs.getBoolean("is_active"));
-                b.setSortOrder(rs.getInt("sort_order"));
-                b.setCreatedAt(rs.getTimestamp("created_at"));
-
-                banners.add(b);
-            }
-
-        } catch (Exception e) {
+            banners = mapBannerList(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
             e.printStackTrace();
         }
-
         return banners;
     }
 
@@ -66,20 +53,7 @@ public class BannerDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-
-                Banner b = new Banner();
-
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setImgName(rs.getString("img_name"));
-                b.setImagePath(rs.getString("img_name"));
-                b.setActive(rs.getBoolean("is_active"));
-                b.setSortOrder(rs.getInt("sort_order"));
-                b.setCreatedAt(rs.getTimestamp("created_at"));
-
-                banners.add(b);
-            }
+            banners = mapBannerList(rs);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,7 +101,8 @@ public class BannerDAO {
     public void updateBanner(Banner b) {
 
         String sql = """
-            UPDATE banner
+            
+                UPDATE banner
             SET
             title = ?,
             img_name = ?,
@@ -159,9 +134,7 @@ public class BannerDAO {
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1,id);
-            ResultSet rs = ps.executeQuery();
-
-            if(rs.next()){
+            ResultSet rs = ps.executeQuery(); if(rs.next()){
 
                 Banner b = new Banner();
 
@@ -171,19 +144,21 @@ public class BannerDAO {
                 b.setImagePath(rs.getString("img_name"));
                 b.setActive(rs.getBoolean("is_active"));
                 b.setSortOrder(rs.getInt("sort_order"));
+                b.setImagePath(IMAGE_BASE_URL+rs.getString("img_name"));
                 return b;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 
     public int insertBanner(Banner b) {
         String sql = """
-            INSERT INTO banner(title,img_name,is_active,sort_order)
-            VALUES(?,?,?,?)
+            
+                INSERT INTO banner(title,img_name,is_active,sort_order)
+                            VALUES(?,?,?,?)
             """;
 
         try (Connection conn = DBConnect.getConnection();
@@ -201,4 +176,45 @@ public class BannerDAO {
         return  0;
     }
 
+    public List<String> getActiveUrlBannerImage() {
+        List<String> imageUrls = new ArrayList<>();
+        String sql = """
+                SELECT img_name
+                FROM banner
+                WHERE is_deleted=0 AND is_active=1
+                ORDER BY sort_order ASC;
+                """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                imageUrls.add(IMAGE_BASE_URL + rs.getString("img_name"));
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imageUrls;
+    }
+
+    private List<Banner> mapBannerList(ResultSet rs) throws SQLException {
+        List<Banner> banners = new ArrayList<>();
+        while (rs.next()){
+            Banner b = new Banner();
+
+            b.setId(rs.getInt("id"));
+            b.setTitle(rs.getString("title"));
+            b.setImgName(rs.getString("img_name"));
+            b.setImagePath(rs.getString("img_name"));
+            b.setActive(rs.getBoolean("is_active"));
+            b.setSortOrder(rs.getInt("sort_order"));
+            b.setCreatedAt(rs.getTimestamp("created_at"));
+            b.setImagePath(IMAGE_BASE_URL+rs.getString("img_name"));
+            banners.add(b);
+        }
+        return banners;
+    }
 }

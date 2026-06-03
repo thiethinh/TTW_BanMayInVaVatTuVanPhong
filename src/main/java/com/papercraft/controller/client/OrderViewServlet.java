@@ -80,7 +80,7 @@ public class OrderViewServlet extends HttpServlet {
             if (order != null && order.getUserId() == user.getId() && "pending".equalsIgnoreCase(order.getStatus())) {
                 OrderService orderService = new OrderService();
 
-                boolean isCanceled = orderService.cancelOrderAndRestoreStock(orderId, user.getId());
+                    boolean isCanceled = orderService.cancelOrderAndReleaseStock(orderId);
 
                 if (isCanceled) {
                     session.setAttribute("successMsg", "Đã hủy đơn hàng thành công! Số lượng sản phẩm đã được hoàn lại kho.");
