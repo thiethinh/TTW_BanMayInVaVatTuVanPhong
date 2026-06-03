@@ -181,27 +181,59 @@ public class CartServlet extends HttpServlet {
         }
 
         //=== Bill ====
-        double subTotal = Math.round(cart.total());
-        double shippingFee = 0;
-        double vat = Math.round(subTotal * 0.05);
-        double grandTotal = Math.round(subTotal + vat);
-
-
-        //set sang JSP
+//        double subTotal = Math.round(cart.total());
+//        double shippingFee = 0;
+//        double vat = Math.round(subTotal * 0.05);
+//        double grandTotal = Math.round(subTotal + vat);
+//
+//
+//        //set sang JSP
+//        List<Product> items = new ArrayList<>(cart.list());
+//        for (Product item : items) {
+//            Product fresh = dao.getProductById(item.getId());
+//            if (fresh != null) {
+//                item.setStockQuantity(fresh.getStockQuantity());
+//                item.setThumbnail(fresh.getThumbnail());
+//            }
+//        }
+//        request.setAttribute("items", items);
+//
+//        request.setAttribute("subTotal", subTotal);
+//        request.setAttribute("shippingFee", shippingFee);
+//        request.setAttribute("vat", vat);
+//        request.setAttribute("grandTotal", grandTotal);
+//
+//        request.getRequestDispatcher("/WEB-INF/views/client/cart.jsp").forward(request, response);
         List<Product> items = new ArrayList<>(cart.list());
+
+        List<Integer> availableIds = new ArrayList<>();
+
         for (Product item : items) {
             Product fresh = dao.getProductById(item.getId());
+
             if (fresh != null) {
                 item.setStockQuantity(fresh.getStockQuantity());
                 item.setThumbnail(fresh.getThumbnail());
+                item.setPrice(fresh.getPrice());
+                item.setOriginPrice(fresh.getOriginPrice());
+                item.setDiscount(fresh.getDiscount());
+
+                if (fresh.getStockQuantity() > 0 && item.getQuantity() <= fresh.getStockQuantity()) {
+                    availableIds.add(item.getId());
+                }
+            } else {
+                item.setStockQuantity(0);
             }
         }
-        request.setAttribute("items", items);
 
-        request.setAttribute("subTotal", subTotal);
-        request.setAttribute("shippingFee", shippingFee);
-        request.setAttribute("vat", vat);
-        request.setAttribute("grandTotal", grandTotal);
+// Bill mặc định chỉ tính sp còn hàng
+        double[] bill = calculateBillBySelectedItems(cart, availableIds);
+
+        request.setAttribute("items", items);
+        request.setAttribute("subTotal", bill[0]);
+        request.setAttribute("shippingFee", bill[1]);
+        request.setAttribute("vat", bill[2]);
+        request.setAttribute("grandTotal", bill[3]);
 
         request.getRequestDispatcher("/WEB-INF/views/client/cart.jsp").forward(request, response);
     }
@@ -215,17 +247,30 @@ public class CartServlet extends HttpServlet {
 
     //calculateBillBySelectedItems
     private double[] calculateBillBySelectedItems(Cart cart, List<Integer> selectedIds) {
+        ProductDAO dao = new ProductDAO();
         double subTotal = 0;
 
         for (Integer id : selectedIds) {
-            Product product = cart.get(id);
+            Product cartProduct = cart.get(id);
 
-            if (product != null) {
-                subTotal += product.getPrice() * product.getQuantity();
+            if (cartProduct == null) {
+                continue;
             }
-        }
-        subTotal = Math.round(subTotal);
 
+            Product freshProduct = dao.getProductById(id);
+
+            if (freshProduct == null || freshProduct.getStockQuantity() <= 0) {
+                continue;
+            }
+
+            if (cartProduct.getQuantity() > freshProduct.getStockQuantity()) {
+                continue;
+            }
+
+            subTotal += freshProduct.getPrice() * cartProduct.getQuantity();
+        }
+
+        subTotal = Math.round(subTotal);
         double shippingFee = 0;
         double vat = Math.round(subTotal * 0.05);
         double grandTotal = Math.round(subTotal + vat);

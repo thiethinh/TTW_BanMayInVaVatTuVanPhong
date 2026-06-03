@@ -92,15 +92,15 @@
                 <div class="product-list">
 
                     <c:forEach items="${items}" var="item">
-                        <div class="product-detail" id="row-${item.id}">
+                        <c:set var="outOfStock" value="${item.stockQuantity <= 0}"/>
+                        <div class="product-detail ${outOfStock ? 'cart-item-out-of-stock' : ''}" id="row-${item.id}">
 
                             <div class="checkout-check-wrapper"
                                  style="display:flex; align-items:center; padding: 0 10px;">
-                                <input type="checkbox"
-                                       class="checkout-item-checkbox"
-                                       value="${item.id}"
-                                       checked
-                                       onchange="updateSelectedBill()">
+                                <input type="checkbox" class="checkout-item-checkbox" value="${item.id}"
+                                       onchange="updateSelectedBill()"
+                                       <c:if test="${!outOfStock}">checked</c:if>
+                                       <c:if test="${outOfStock}">disabled</c:if>>
                             </div>
 
                             <a href="${pageContext.request.contextPath}/product-detail?productId=${item.id}">
@@ -115,34 +115,41 @@
 
                                     <div class="quantity-control">
                                         <button type="button" class="btn-qty"
-                                                onclick="updateQuantity(${item.id}, -1)">
+                                                onclick="updateQuantity(${item.id}, -1)"
+                                                <c:if test="${outOfStock}">disabled</c:if>>
                                             <i class="fa-solid fa-minus"></i>
                                         </button>
 
-                                        <input type="number"
-                                               id="qty-${item.id}"
-                                               value="${item.quantity}"
-                                               min="1"
-                                               maxlength="2"
-                                               max="${item.stockQuantity}"
-                                               class="input-qty"
+                                        <input type="number" id="qty-${item.id}" value="${item.quantity}" min="1"
+                                               maxlength="2" max="${item.stockQuantity}" class="input-qty"
                                                onchange="updateQuantity(${item.id}, 0)"
                                                oninput="this.value = this.value.replace(/\D/g,'').slice(0,2);"
                                                onblur="
                                                        if(this.value === '' || parseInt(this.value) < 1) this.value = 1;
                                                        if(parseInt(this.value) > ${item.stockQuantity}) this.value = ${item.stockQuantity};
                                                        updateQuantity(${item.id}, 0);"
+                                               <c:if test="${outOfStock}">disabled</c:if>
                                         />
 
-                                        <button type="button" class="btn-qty"
-                                                onclick="updateQuantity(${item.id}, 1)">
-                                            <i class="fa-solid fa-plus"></i>
+                                        <button type="button" class="btn-qty" onclick="updateQuantity(${item.id}, 1)"
+                                                <c:if test="${outOfStock}">disabled</c:if>><i
+                                                class="fa-solid fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <span class="stock-hint">
-                                    Còn lại trong kho: <strong>${item.stockQuantity}</strong>
-                                </span>
+                                <c:choose>
+                                    <c:when test="${outOfStock}">
+                                        <span class="stock-hint out-stock-label">
+                                            <i class="fa-solid fa-circle-exclamation"></i>
+                                                Sản phẩm hiện đã hết hàng
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="stock-hint">
+                                                Còn lại trong kho: <strong>${item.stockQuantity}</strong>
+                                         </span>
+                                    </c:otherwise>
+                                </c:choose>
 
                                 <button id="bt-remove" onclick="removeItem(${item.id})">
                                     <i class="fa fa-trash-can"></i> Xoá
