@@ -585,3 +585,35 @@
 .cart-autocomplete-list:empty {
     display: none;
 }
+
+.cart-item-out-of-stock {
+    background-color: #f1f1f1 !important;
+    opacity: 0.65;
+    filter: grayscale(100%);
+    position: relative;
+}
+
+.cart-item-out-of-stock img {
+    opacity: 0.55;
+}
+
+.cart-item-out-of-stock h2,
+.cart-item-out-of-stock .price,
+.cart-item-out-of-stock .label {
+    color: #777 !important;
+}
+
+.cart-item-out-of-stock .btn-qty,
+.cart-item-out-of-stock .input-qty,
+.cart-item-out-of-stock .checkout-item-checkbox {
+    cursor: not-allowed;
+}
+
+.out-stock-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #e74c3c;
+    font-weight: 600;
+    margin-top: 8px;
+}

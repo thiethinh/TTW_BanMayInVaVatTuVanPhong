@@ -179,8 +179,8 @@ function handleSelectiveCheckout(isLoggedIn) {
     if (selectedIds.length == 0) {
         Swal.fire({
             icon: "warning",
-            title: "Chưa chọn sản phẩm",
-            text: "Vui lòng chọn ít nhất 1 sản phẩm để thanh toán.",
+            title: "Chưa có sản phẩm hợp lệ",
+            text: "Vui lòng chọn ít nhất 1 sản phẩm còn hàng để thanh toán.",
             confirmButtonColor: "#165FF2"
         });
         return;
@@ -211,7 +211,7 @@ function handleSelectiveCheckout(isLoggedIn) {
 function getSelectedProductIds() {
     const selectedIds = [];
 
-    const checkedBoxes = document.querySelectorAll('.checkout-item-checkbox:checked');
+    const checkedBoxes = document.querySelectorAll('.checkout-item-checkbox:checked:not(:disabled)');
     checkedBoxes.forEach(function (checkbox) {
         selectedIds.push(checkbox.value);
     });
@@ -219,7 +219,7 @@ function getSelectedProductIds() {
 }
 
 function toggleSelectAllCheckout(selectAllCheckbox) {
-    const itemCheckboxes = document.querySelectorAll(".checkout-item-checkbox");
+    const itemCheckboxes = document.querySelectorAll(".checkout-item-checkbox:not(:disabled)");
 
     itemCheckboxes.forEach(function (checkbox) {
         checkbox.checked = selectAllCheckbox.checked;
@@ -266,8 +266,8 @@ function updateSelectedBill(){
 //updateSelectedAllStatus
 function updateSelectedAllStatus(){
     const selectAllCheckbox= document.getElementById("selectAllCheckout");
-    const itemCheckboxes= document.querySelectorAll(".checkout-item-checkbox");
-    const checkedItems= document.querySelectorAll(".checkout-item-checkbox:checked");
+    const itemCheckboxes = document.querySelectorAll(".checkout-item-checkbox:not(:disabled)");
+    const checkedItems = document.querySelectorAll(".checkout-item-checkbox:checked:not(:disabled)");
 
     if (!selectAllCheckbox){
         return;
