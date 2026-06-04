@@ -263,15 +263,8 @@
                     </div>
 
                     <div class="method momo-method">
-                        <input type="radio" name="paymentMethod" id="momo" value="Momo">
+                        <input type="radio" name="paymentMethod" id="momo" value="MOMO">
                         <label for="momo" style="font-weight: bold; margin-left: 5px;">Ví MoMo</label>
-
-                        <button type="button" class="toggle-btn"><i class="fa-solid fa-plus"></i></button>
-                        <div class="hidden-content" style="display: none; margin-top: 10px;">
-                            <p>Quét mã QR để thanh toán:</p>
-                            <img id="momo_qr" src="${pageContext.request.contextPath}/images/momo_qr.jpg" alt="momo_qr"
-                                 style="width: 150px;">
-                        </div>
                     </div>
                 </div>
 

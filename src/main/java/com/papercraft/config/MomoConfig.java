@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 
 public class MomoConfig {
     public static final String partnerCode = "MOMOBKUN20180810";
-    public static final String accessKey = "WbU5m69vM9SllgIs";
-    public static final String secretKey = "68979a059c39bc0f6c24522cd9540026";
+    public static final String accessKey = "W2UzYj6W2v7gNisb";
+    public static final String secretKey = "k9xh0CggssgJ36Ivn1ioA5WvLV37wP7I";
 
     public static final String momo_Url = "https://test-payment.momo.vn/v2/gateway/api/create";
 
