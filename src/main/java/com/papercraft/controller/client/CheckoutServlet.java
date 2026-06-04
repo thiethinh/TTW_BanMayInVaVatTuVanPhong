@@ -2,10 +2,7 @@ package com.papercraft.controller.client;
 
 import com.papercraft.config.MomoConfig;
 import com.papercraft.config.VNPAYConfig;
-import com.papercraft.dao.AddressDAO;
-import com.papercraft.dao.CartDAO;
-import com.papercraft.dao.UserVoucherDAO;
-import com.papercraft.dao.VoucherDAO;
+import com.papercraft.dao.*;
 import com.papercraft.model.*;
 import com.papercraft.service.OrderService;
 import jakarta.servlet.ServletException;
@@ -91,11 +88,24 @@ public class CheckoutServlet extends HttpServlet {
 
         List<OrderItem> items = new ArrayList<>();
         double subTotal = 0;
+        ProductDAO productDAO = new ProductDAO();
+        boolean hasInvalidStockItem = false;
 
         for (Product p : cart.list()) {
 
             //nếu sp khng được tick
             if (!selectedIds.contains(p.getId())) {
+                continue;
+            }
+            Product freshProduct = productDAO.getProductById(p.getId());
+
+            if (freshProduct == null || freshProduct.getStockQuantity() <= 0) {
+                hasInvalidStockItem = true;
+                continue;
+            }
+
+            if (p.getQuantity() > freshProduct.getStockQuantity()) {
+                hasInvalidStockItem = true;
                 continue;
             }
 
@@ -112,6 +122,11 @@ public class CheckoutServlet extends HttpServlet {
 
             items.add(item);
             subTotal += total.doubleValue();
+        }
+        if (hasInvalidStockItem) {
+            session.setAttribute("error", "Một số sản phẩm đã hết hàng hoặc không đủ tồn kho. Vui lòng kiểm tra lại giỏ hàng.");
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
         }
 
         //nếu selectedId gửi lên không khớp sp trong cart => không cho checkout(về cart )
@@ -185,11 +200,36 @@ public class CheckoutServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
+//        Cart selectedCart = new Cart();
+//        for (Product p : cart.list()) {
+//            if (selectedIds.contains(p.getId())) {
+//                selectedCart.put(p);
+//            }
+//        }
+        ProductDAO productDAO = new ProductDAO();
         Cart selectedCart = new Cart();
+
         for (Product p : cart.list()) {
-            if (selectedIds.contains(p.getId())) {
-                selectedCart.put(p);
+            if (!selectedIds.contains(p.getId())) {
+                continue;
             }
+
+            Product freshProduct = productDAO.getProductById(p.getId());
+
+            if (freshProduct == null || freshProduct.getStockQuantity() <= 0) {
+                session.setAttribute("error", "Một số sản phẩm đã hết hàng. Vui lòng kiểm tra lại giỏ hàng.");
+                response.sendRedirect(request.getContextPath() + "/cart");
+                return;
+            }
+
+            if (p.getQuantity() > freshProduct.getStockQuantity()) {
+                session.setAttribute("error", "Số lượng sản phẩm trong giỏ đã vượt quá tồn kho hiện tại.");
+                response.sendRedirect(request.getContextPath() + "/cart");
+                return;
+            }
+
+            freshProduct.setQuantity(p.getQuantity());
+            selectedCart.put(freshProduct);
         }
         if (selectedCart.list().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
