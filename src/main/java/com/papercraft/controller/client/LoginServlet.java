@@ -23,8 +23,7 @@ public class LoginServlet extends HttpServlet {
                 if ("cEmail".equals(cookie.getName())) {
                     request.setAttribute("cEmail", cookie.getValue());
                 }
-                if ("cPassword".equals(cookie.getName())) {
-                    request.setAttribute("cPassword", cookie.getValue());
+                if ("cRemember".equals(cookie.getName()) && "true".equals(cookie.getValue())) {
                     request.setAttribute("cRemember", "checked");
                 }
             }
@@ -55,22 +54,24 @@ public class LoginServlet extends HttpServlet {
             mergeCart(guestCart,user.getId(),session);
 
             Cookie uEmail = new Cookie("cEmail", email);
-            Cookie uPassword = new Cookie("cPassword", password);
+            Cookie uRemember = new Cookie("cRemember", "true");
             uEmail.setHttpOnly(true);
-            uPassword.setHttpOnly(true);
+            uRemember.setHttpOnly(true);
+            uEmail.setSecure(true);
+            uRemember.setSecure(true);
             uEmail.setPath("/");
-            uPassword.setPath("/");
+            uRemember.setPath("/");
 
             if ("on".equals(remember)) {
                 uEmail.setMaxAge(60 * 60 * 24 * 7);
-                uPassword.setMaxAge(60 * 60 * 24 * 7);
+                uRemember.setMaxAge(60 * 60 * 24 * 7);
             } else {
                 uEmail.setMaxAge(0);
-                uPassword.setMaxAge(0);
+                uRemember.setMaxAge(0);
             }
 
             response.addCookie(uEmail);
-            response.addCookie(uPassword);
+            response.addCookie(uRemember);
 
             String redirectUrl = request.getParameter("redirect");
             String contextPath = request.getContextPath();
