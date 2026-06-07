@@ -57,12 +57,12 @@
 
         <header class="admin-content-header">
             <h1>Chỉnh Sửa Sản Phẩm</h1>
-            <a href="${pageContext.request.contextPath}/admin-product" class="btn btn-secondary">
+            <a href="${pageContext.request.contextPath}/admin/admin-product" class="btn btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i> Quay Lại Danh Sách
             </a>
         </header>
 
-        <form action="${pageContext.request.contextPath}/admin-product-edit" method="post" enctype="multipart/form-data"
+        <form action="${pageContext.request.contextPath}/admin/admin-product-edit" method="post" enctype="multipart/form-data"
               class="admin-form-container">
 
             <input type="hidden" name="id" value="${product.id}">

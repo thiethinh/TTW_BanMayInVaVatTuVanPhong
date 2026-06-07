@@ -30,7 +30,7 @@ public class AdminAccDetailsServlet extends HttpServlet {
             request.setAttribute("orderList", orderList);
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-account-details.jsp").forward(request, response);
         } else {
-            response.sendRedirect("/admin-account");
+            response.sendRedirect("admin-account");
         }
     }
 }

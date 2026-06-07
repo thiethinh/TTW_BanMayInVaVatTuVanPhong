@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/revenue")
+@WebServlet("/admin/revenue")
 public class RevenueServlet extends HttpServlet {
 
     private PaymentDAO paymentDAO = new PaymentDAO();

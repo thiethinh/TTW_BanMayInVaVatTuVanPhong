@@ -1,4 +1,4 @@
-package com.papercraft.controller.filter;
+package com.papercraft.filter;
 
 import com.papercraft.model.User;
 import jakarta.servlet.*;
@@ -16,14 +16,17 @@ public class AdminFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        String uri = req.getRequestURI();
 
-        // Gom điều kiện: Nếu vào vùng /admin mà chưa log hoặc ko phải admin -> Redirect
+        String uri = req.getRequestURI();
+        String contextPath = req.getContextPath();
+
+        String path = uri.substring(contextPath.length());
+
         if ((uri.equals("/admin") || uri.startsWith("/admin/"))) {
             User user = (User) req.getSession().getAttribute("acc");
 
-            if (user == null || user.getRole()!="admin") {
-                resp.sendRedirect(req.getContextPath() + "/login");
+            if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
+                resp.sendRedirect(req.getContextPath() + "/home");
                 return;
             }
         }

@@ -32,7 +32,7 @@ public class AdminAccUpdateServlet extends HttpServlet {
             request.setAttribute("address", address);
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-account-update.jsp").forward(request, response);
         } else {
-            response.sendRedirect("/admin-account");
+            response.sendRedirect("admin-account");
         }
     }
 
@@ -84,6 +84,6 @@ public class AdminAccUpdateServlet extends HttpServlet {
             session.setAttribute("error", "Có lỗi xảy ra! Cập nhật thất bại");
         }
 
-        response.sendRedirect(request.getContextPath() + "/admin-account-update?id=" + id);
+        response.sendRedirect(request.getContextPath() + "/admin/admin-account-update?id=" + id);
     }
 }

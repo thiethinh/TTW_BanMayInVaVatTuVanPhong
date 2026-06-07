@@ -122,7 +122,7 @@ public class AdminProductAddServlet extends HttpServlet {
                 imageDAO.insertImage(productId, "Product", img, false);
             }
 
-            resp.sendRedirect(req.getContextPath() + "/admin-product?msg=add_success");
+            resp.sendRedirect(req.getContextPath() + "/admin/admin-product?msg=add_success");
 
         } catch (Exception e) {
             e.printStackTrace();
