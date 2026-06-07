@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-@WebServlet(name = "AdminReview", value = "/admin-review")
+@WebServlet(name = "AdminReview", value = "/admin/admin-review")
 public class AdminReview extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

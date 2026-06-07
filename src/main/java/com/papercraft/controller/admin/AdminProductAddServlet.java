@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProductAddServlet", value = "/admin-product-add")
+@WebServlet(name = "AdminProductAddServlet", value = "/admin/admin-product-add")
 @MultipartConfig
 public class AdminProductAddServlet extends HttpServlet {
     @Override

@@ -11,7 +11,7 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AdminAccDetailsServlet", value = "/admin-account-details")
+@WebServlet(name = "AdminAccDetailsServlet", value = "/admin/admin-account-details")
 public class AdminAccDetailsServlet extends HttpServlet {
 
     @Override

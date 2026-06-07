@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet(name = "AdminAccountServlet", value = "/admin-account")
+@WebServlet(name = "AdminAccountServlet", value = "/admin/admin-account")
 public class AdminAccountServlet extends HttpServlet {
 
     @Override

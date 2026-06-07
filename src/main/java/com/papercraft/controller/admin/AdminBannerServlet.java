@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-@WebServlet("/admin-banner")
+@WebServlet("/admin/admin-banner")
 @MultipartConfig
 public class AdminBannerServlet extends HttpServlet {
 

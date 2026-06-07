@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet(name = "AdminAccUpdateServlet", value = "/admin-account-update")
+@WebServlet(name = "AdminAccUpdateServlet", value = "/admin/admin-account-update")
 public class AdminAccUpdateServlet extends HttpServlet {
 
     @Override

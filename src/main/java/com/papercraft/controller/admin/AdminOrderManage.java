@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminOrderManage", value = "/admin-order-manage")
+@WebServlet(name = "AdminOrderManage", value = "/admin/admin-order-manage")
 public class AdminOrderManage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

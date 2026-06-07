@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProductEdit", value = "/admin-product-edit")
+@WebServlet(name = "AdminProductEdit", value = "/admin/admin-product-edit")
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
         maxFileSize = 10 * 1024 * 1024,

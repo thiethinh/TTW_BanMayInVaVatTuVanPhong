@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProduct", value = "/admin-product")
+@WebServlet(name = "AdminProduct", value = "/admin/admin-product")
 public class AdminProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
