@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProductEdit", value = "/admin-product-edit")
+@WebServlet(name = "AdminProductEdit", value = "/admin/admin-product-edit")
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
         maxFileSize = 10 * 1024 * 1024,
@@ -32,7 +32,7 @@ public class AdminProductEdit extends HttpServlet {
 
         String idParam = request.getParameter("id");
         if (idParam == null || idParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/admin-product");
+            response.sendRedirect(request.getContextPath() + "/admin/admin-product");
             return;
         }
 
@@ -44,7 +44,7 @@ public class AdminProductEdit extends HttpServlet {
             Product product = productDAO.getProductForEditById(id);
 
             if (product == null) {
-                response.sendRedirect(request.getContextPath() + "/admin-product?msg=not_found");
+                response.sendRedirect(request.getContextPath() + "/admin/admin-product?msg=not_found");
                 return;
             }
 
@@ -58,7 +58,7 @@ public class AdminProductEdit extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-product-edit.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/admin-product");
+            response.sendRedirect(request.getContextPath() + "/admin/admin-product");
         }
     }
 
@@ -76,7 +76,7 @@ public class AdminProductEdit extends HttpServlet {
             Product old = dao.getProductForEditById(id); // Lấy sản phẩm cũ để check
 
             if (old == null) {
-                response.sendRedirect(request.getContextPath() + "/admin-product?msg=not_found");
+                response.sendRedirect(request.getContextPath() + "/admin/admin-product?msg=not_found");
                 return;
             }
 
@@ -174,7 +174,7 @@ public class AdminProductEdit extends HttpServlet {
                 }
             }
 
-            response.sendRedirect(request.getContextPath() + "/admin-product-edit?id="+categoryId+"&msg=update_success");
+            response.sendRedirect(request.getContextPath() + "/admin/admin-product-edit?id="+categoryId+"&msg=update_success");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -183,7 +183,7 @@ public class AdminProductEdit extends HttpServlet {
             try {
                 doGet(request, response);
             } catch (Exception ex) {
-                response.sendRedirect(request.getContextPath() + "/admin-product");
+                response.sendRedirect(request.getContextPath() + "/admin/admin-product");
             }
         } finally {
             try { if (conn != null) conn.close(); } catch (Exception ignore) {}

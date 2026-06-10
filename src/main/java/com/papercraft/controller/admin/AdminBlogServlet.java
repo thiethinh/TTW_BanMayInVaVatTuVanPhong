@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AdminBlogServlet", value = "/admin-blog")
+@WebServlet(name = "AdminBlogServlet", value = "/admin/admin-blog")
 public class AdminBlogServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

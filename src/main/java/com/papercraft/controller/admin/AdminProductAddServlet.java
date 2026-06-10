@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProductAddServlet", value = "/admin-product-add")
+@WebServlet(name = "AdminProductAddServlet", value = "/admin/admin-product-add")
 @MultipartConfig
 public class AdminProductAddServlet extends HttpServlet {
     @Override
@@ -122,7 +122,7 @@ public class AdminProductAddServlet extends HttpServlet {
                 imageDAO.insertImage(productId, "Product", img, false);
             }
 
-            resp.sendRedirect(req.getContextPath() + "/admin-product?msg=add_success");
+            resp.sendRedirect(req.getContextPath() + "/admin/admin-product?msg=add_success");
 
         } catch (Exception e) {
             e.printStackTrace();

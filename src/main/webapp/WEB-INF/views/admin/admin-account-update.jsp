@@ -27,10 +27,10 @@
     <main class="admin-main-content">
 
         <header class="admin-customer-update-header">
-            <a href="${pageContext.request.contextPath}/admin-account"><i class="fa-solid fa-arrow-left"></i>
+            <a href="${pageContext.request.contextPath}/admin/admin-account"><i class="fa-solid fa-arrow-left"></i>
                 Quay lại</a>
             <h1>Sửa thông tin khách hàng</h1>
-            <a href="admin-account-details?id=${acc.id}"><i class="fa-solid fa-info-circle"></i> Chi tiết</a>
+            <a href="/admin/admin-account-details?id=${acc.id}"><i class="fa-solid fa-info-circle"></i> Chi tiết</a>
         </header>
 
         <c:if test="${not empty sessionScope.msg}">
@@ -44,7 +44,7 @@
 
         <section class="customer-update-view">
             <h3>Thông tin cá nhân</h3>
-            <form action="${pageContext.request.contextPath}/admin-account-update" method="post" id="editForm">
+            <form action="${pageContext.request.contextPath}/admin/admin-account-update" method="post" id="editForm">
                 <input type="hidden" name="id" value="${acc.id}">
 
                 <div>

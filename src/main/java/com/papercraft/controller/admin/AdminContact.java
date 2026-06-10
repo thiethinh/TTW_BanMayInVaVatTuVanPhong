@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.List;
 
-@WebServlet(name = "AdminContact", value = "/admin-contacts")
+@WebServlet(name = "AdminContact", value = "/admin/admin-contacts")
 public class AdminContact extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

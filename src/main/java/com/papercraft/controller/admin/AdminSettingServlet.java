@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-@WebServlet(name = "AdminSettingServlet", value = "/admin-setting")
+@WebServlet(name = "AdminSettingServlet", value = "/admin/admin-setting")
 public class AdminSettingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -45,6 +45,6 @@ public class AdminSettingServlet extends HttpServlet {
         }
 
         getServletContext().setAttribute("GLOBAL_SETTINGS", settingDAO.getAllSettings());
-        response.sendRedirect(request.getContextPath() + "/admin-setting");
+        response.sendRedirect(request.getContextPath() + "/admin/admin-setting");
     }
 }

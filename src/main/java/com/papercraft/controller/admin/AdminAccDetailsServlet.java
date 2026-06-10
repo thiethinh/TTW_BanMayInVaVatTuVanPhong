@@ -11,7 +11,7 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AdminAccDetailsServlet", value = "/admin-account-details")
+@WebServlet(name = "AdminAccDetailsServlet", value = "/admin/admin-account-details")
 public class AdminAccDetailsServlet extends HttpServlet {
 
     @Override
@@ -30,7 +30,7 @@ public class AdminAccDetailsServlet extends HttpServlet {
             request.setAttribute("orderList", orderList);
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-account-details.jsp").forward(request, response);
         } else {
-            response.sendRedirect("/admin-account");
+            response.sendRedirect("admin-account");
         }
     }
 }

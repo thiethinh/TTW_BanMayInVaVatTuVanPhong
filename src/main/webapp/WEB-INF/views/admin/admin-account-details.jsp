@@ -25,7 +25,7 @@
 
     <main class="admin-main-content">
         <header class="admin-customer-details-header">
-            <a href="${pageContext.request.contextPath}/admin-account"><i class="fa-solid fa-arrow-left"></i> Quay
+            <a href="${pageContext.request.contextPath}/admin/admin-account"><i class="fa-solid fa-arrow-left"></i> Quay
                 lại</a>
             <h1>Chi tiết khách hàng: ${acc.fullname}</h1>
             <a href="admin-account-update?id=${acc.id}"><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa</a>

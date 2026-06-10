@@ -187,7 +187,7 @@
                         <td>${o.createdAt}</td>
                         <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> ₫</td>
                         <td><span class="status-badge pending">${o.status}</span></td>
-                        <td><a href="${pageContext.request.contextPath}/admin-order-view?orderId=${o.id}"
+                        <td><a href="${pageContext.request.contextPath}/admin/admin-order-view?orderId=${o.id}"
                                class="btn-action view">Xem</a></td>
                     </tr>
                 </c:forEach>
@@ -202,7 +202,7 @@
             </table>
 
             <div class="table-footer">
-                <a href="${pageContext.request.contextPath}/admin-order-manage">Xem tất cả đơn hàng &rarr;</a>
+                <a href="${pageContext.request.contextPath}/admin/admin-order-manage">Xem tất cả đơn hàng &rarr;</a>
             </div>
         </section>
 
@@ -260,7 +260,7 @@
                     </tbody>
                 </table>
                 <div class="table-footer">
-                    <a href="${pageContext.request.contextPath}/admin-account">Xem chi tiết tất cả các tài khoản</a>
+                    <a href="${pageContext.request.contextPath}/admin/admin-account">Xem chi tiết tất cả các tài khoản</a>
                 </div>
             </div>
         </section>
@@ -268,6 +268,9 @@
     </main>
 </div>
 
+<script>
+    const contextPath = '${pageContext.request.contextPath}';
+</script>
 <script src="${pageContext.request.contextPath}/js/admin-dashboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/js/revenue.js"></script>

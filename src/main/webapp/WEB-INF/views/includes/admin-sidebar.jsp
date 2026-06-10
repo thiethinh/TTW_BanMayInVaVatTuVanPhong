@@ -22,7 +22,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('product-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-product"
+                <a href="${pageContext.request.contextPath}/admin/admin-product"
                    class="${fn:contains(uri, 'admin-product') ? 'active' : ''}">
                     <i class="fa-solid fa-box-archive"></i> Quản Lý Sản Phẩm
                 </a>
@@ -40,7 +40,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('review-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-review"
+                <a href="${pageContext.request.contextPath}/admin/admin-review"
                    class="${fn:contains(uri, 'admin-review') ? 'active' : ''}">
                     <i class="fa-solid fa-file-lines"></i> Quản Lý Đánh Giá
                 </a>
@@ -49,7 +49,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('order-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-order-manage"
+                <a href="${pageContext.request.contextPath}/admin/admin-order-manage"
                    class="${fn:contains(uri, 'admin-order-manage') ? 'active' : ''}">
                     <i class="fa-solid fa-receipt"></i> Quản Lý Đơn Hàng
                 </a>
@@ -58,7 +58,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('account-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-account"
+                <a href="${pageContext.request.contextPath}/admin/admin-account"
                    class="${fn:contains(uri, 'admin-customer-manage') ? 'active' : ''}">
                     <i class="fa-solid fa-users"></i> Quản Lý Tài Khoản
                 </a>
@@ -67,7 +67,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('blog-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-blog?view=pending"
+                <a href="${pageContext.request.contextPath}/admin/admin-blog?view=pending"
                    class="${fn:contains(uri, 'admin-blog') ? 'active' : ''}">
                     <i class="fa-solid fa-blog"></i> Quản Lí Blog
                 </a>
@@ -76,7 +76,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('contact-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-contacts"
+                <a href="${pageContext.request.contextPath}/admin/admin-contacts"
                    class="${fn:contains(uri, 'admin-contacts') ? 'active' : ''}">
                     <i class="fa-solid fa-message"></i> Tin Nhắn Liên Hệ
                 </a>
@@ -85,7 +85,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('setting-manage')}">
             <li>
-                <a href="${pageContext.request.contextPath}/admin-setting"
+                <a href="${pageContext.request.contextPath}/admin/admin-setting"
                    class="${fn:contains(uri, 'admin-setting') ? 'active' : ''}">
                     <i class="fa-solid fa-gear"></i> Cài Đặt Website
                 </a>
@@ -94,7 +94,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('banner-manage')}">
                 <li>
-                    <a href="${pageContext.request.contextPath}/admin-banner"
+                    <a href="${pageContext.request.contextPath}/admin/admin-banner"
                        class="${fn:contains(uri, 'admin-banner') ? 'active' : ''}">
                         <i class="fa-solid fa-images"></i> Quản Lí Banner
                     </a>
@@ -103,7 +103,7 @@
 
             <c:if test="${sessionScope.acc.role == 'admin' || sessionScope.acc.permissions.contains('banner-manage')}">
                 <li>
-                    <a href="${pageContext.request.contextPath}/admin-voucher"
+                    <a href="${pageContext.request.contextPath}/admin/admin-voucher"
                        class="${fn:contains(uri, 'admin-voucher') ? 'active' : ''}">
                         <i class="fa-solid fa-ticket"></i> Quản Lí Voucher
                     </a>

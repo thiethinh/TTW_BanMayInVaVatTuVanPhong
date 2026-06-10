@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "AdminProduct", value = "/admin-product")
+@WebServlet(name = "AdminProduct", value = "/admin/admin-product")
 public class AdminProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,7 +23,7 @@ public class AdminProduct extends HttpServlet {
         String idDeleted = request.getParameter("delete");
         if (idDeleted != null) {
             boolean isDeleted = productDAO.deleteProductById(Integer.parseInt(idDeleted));
-            response.sendRedirect(request.getContextPath()+ "/admin-product?msg=" + (isDeleted? "delete_success" : "delete_fail"));
+            response.sendRedirect(request.getContextPath()+ "/admin/admin-product?msg=" + (isDeleted? "delete_success" : "delete_fail"));
             return;
         }
 

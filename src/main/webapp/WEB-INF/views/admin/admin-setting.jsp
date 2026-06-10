@@ -45,7 +45,7 @@
                 <c:remove var="errorMsg" scope="session"/>
             </c:if>
 
-            <form action="${pageContext.request.contextPath}/admin-setting" method="POST" class="setting-form">
+            <form action="${pageContext.request.contextPath}/admin/admin-setting" method="POST" class="setting-form">
 
                 <div class="setting-card">
                     <div class="card-header">

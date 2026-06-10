@@ -30,7 +30,7 @@
 
         <header class="admin-content-header">
             <h1>Quản Lý Sản Phẩm</h1>
-            <a href="${pageContext.request.contextPath}/admin-product-add" class="btn btn-primary">
+            <a href="${pageContext.request.contextPath}/admin/admin-product-add" class="btn btn-primary">
                 <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm Mới
             </a>
         </header>
@@ -189,7 +189,7 @@
                         </td>
 
                         <td>
-                            <a href="${pageContext.request.contextPath}/admin-product-edit?id=${p.id}"
+                            <a href="${pageContext.request.contextPath}/admin/admin-product-edit?id=${p.id}"
                                class="btn-action edit">Sửa</a>
 
 
@@ -296,7 +296,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `${pageContext.request.contextPath}/admin-product?delete=\${id}`;
+                window.location.href = `${pageContext.request.contextPath}/admin/admin-product?delete=\${id}`;
             }
         });
     }
