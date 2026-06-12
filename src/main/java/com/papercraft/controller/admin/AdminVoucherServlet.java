@@ -7,6 +7,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,6 +20,8 @@ import java.util.List;
 @WebServlet("/admin/admin-voucher")
 public class AdminVoucherServlet extends HttpServlet {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminVoucherServlet.class);
+
     private final VoucherDAO voucherDAO = new VoucherDAO();
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
@@ -26,6 +30,7 @@ public class AdminVoucherServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        logger.debug("Nhận yêu cầu GET vào AdminVoucherServlet. Action: '{}'", action);
 
         if (action != null) {
             switch (action) {
@@ -39,10 +44,14 @@ public class AdminVoucherServlet extends HttpServlet {
                     editVoucher(request, response);
                     return;
                 case "add":
+                    logger.debug("Chuyển tiếp luồng (forward) sang biểu mẫu thêm Voucher.");
                     request.getRequestDispatcher(
                             "/WEB-INF/views/admin/admin-voucher-add.jsp"
                     ).forward(request, response);
                     return;
+                default:
+                    logger.warn("Cảnh báo: Nhận giá trị 'action' không hợp lệ: '{}'. Tự động rơi vào luồng tải trang mặc định.", action);
+                    break;
             }
         }
 
@@ -53,16 +62,19 @@ public class AdminVoucherServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
+        logger.info("Nhận yêu cầu POST xử lý Voucher. Action: '{}'", action);
 
         if ("insert".equals(action)) {
             Voucher v = buildVoucherFromRequest(request);
             voucherDAO.insertVoucher(v);
             response.sendRedirect("admin-voucher");
-
         } else if ("update".equals(action)) {
             Voucher v = buildVoucherFromRequest(request);
             v.setId(Integer.parseInt(request.getParameter("id")));
             voucherDAO.updateVoucher(v);
+            response.sendRedirect("admin-voucher");
+        } else {
+            logger.warn("Yêu cầu xử lý POST bị từ chối do 'action' không hợp lệ: '{}'", action);
             response.sendRedirect("admin-voucher");
         }
     }
@@ -72,18 +84,21 @@ public class AdminVoucherServlet extends HttpServlet {
         String keyword = request.getParameter("keyword");
         if (keyword == null) keyword = "";
 
+        logger.info("Tải danh sách cấu hình Voucher với từ khóa tìm kiếm: '{}'", keyword);
         List<Voucher> vouchers = voucherDAO.getAllVouchers(keyword);
+
         request.setAttribute("vouchers", vouchers);
         request.setAttribute("keyword", keyword);
-        request.getRequestDispatcher(
-                "/WEB-INF/views/admin/admin-voucher.jsp"
-        ).forward(request, response);
+
+        logger.debug("Truy vấn thành công {} bản ghi Voucher. Tiến hành Forward sang trang hiển thị.", vouchers.size());
+        request.getRequestDispatcher("/WEB-INF/views/admin/admin-voucher.jsp").forward(request, response);
     }
 
     private void toggleVoucher(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         voucherDAO.toggleStatus(id);
+        logger.info("Đã thay đổi trạng thái kích hoạt (Toggle Status) của Voucher ID: {}", id);
         response.sendRedirect("admin-voucher");
     }
 
@@ -91,6 +106,7 @@ public class AdminVoucherServlet extends HttpServlet {
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         voucherDAO.deleteVoucher(id);
+        logger.info("Đã thực thi xóa thành công Voucher ID: {}", id);
         response.sendRedirect("admin-voucher");
     }
 
@@ -98,10 +114,16 @@ public class AdminVoucherServlet extends HttpServlet {
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         Voucher voucher = voucherDAO.getVoucherById(id);
+
+        if (voucher == null) {
+            logger.warn("Không tìm thấy thông tin Voucher trong hệ thống ứng với ID: {}", id);
+            response.sendRedirect("admin-voucher?msg=not_found");
+            return;
+        }
+
         request.setAttribute("voucher", voucher);
-        request.getRequestDispatcher(
-                "/WEB-INF/views/admin/admin-voucher-edit.jsp"
-        ).forward(request, response);
+        logger.debug("Tải thành công thông tin Voucher ID {}. Chuyển tiếp sang trang chỉnh sửa.", id);
+        request.getRequestDispatcher("/WEB-INF/views/admin/admin-voucher-edit.jsp").forward(request, response);
     }
 
     private Voucher buildVoucherFromRequest(HttpServletRequest request) {
