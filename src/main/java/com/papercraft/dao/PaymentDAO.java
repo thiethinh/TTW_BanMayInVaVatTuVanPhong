@@ -262,5 +262,25 @@ public class PaymentDAO {
         }
         return false;
     }
+    //update thanh toán
+    public boolean markPaymentAsPaidByOrderId(int orderId) {
+        String sql = """
+            UPDATE payment
+            SET status = 1, paid_at = NOW()
+            WHERE order_id = ?
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.out.println("Lỗi markPaymentAsPaidByOrderId, orderId = " + orderId);
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
 }

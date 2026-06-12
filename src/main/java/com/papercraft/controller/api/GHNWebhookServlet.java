@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.papercraft.dao.NotificationDAO;
 import com.papercraft.dao.OrderDAO;
+import com.papercraft.dao.PaymentDAO;
 import com.papercraft.model.Notification;
 import com.papercraft.model.Order;
 import com.papercraft.model.enums.NotificationType;
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class GHNWebhookServlet extends HttpServlet {
     private final OrderDAO orderDAO = new OrderDAO();
     private final NotificationDAO notificationDAO = new NotificationDAO();
+    private final PaymentDAO paymentDAO = new PaymentDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -73,18 +75,25 @@ public class GHNWebhookServlet extends HttpServlet {
                 return;
             }
             boolean updated = orderDAO.updateStatusByGHNOrderCode(orderCode, internalStatus, ghnStatus);
+            //webhook giao hàng thành công thì => thanh toán thành công
+            if (updated && "completed".equalsIgnoreCase(internalStatus)) {
+                boolean paymentUpdated = paymentDAO.markPaymentAsPaidByOrderId(order.getId());
+
+                if (!paymentUpdated) {
+                    System.out.println("Đơn đã completed nhưng cập nhật thanh toán thất bại. OrderId = " + order.getId());
+                }
+            }
             //Tb đơn hàng thành công
             if (updated) {
                 NotificationType type = getNotificationTypeByOrderStatus(internalStatus);
 
                 if (type != null) {
-                    Notification notification = new Notification(
-                            order.getUserId(),
-                            type,
-                            order.getId()
-                    );
+                    Notification notification = new Notification(order.getUserId(),type,order.getId());
 
-                    notificationDAO.insertNotification(notification);
+                    boolean insertedNotification = notificationDAO.insertNotification(notification);
+                    if (!insertedNotification) {
+                        System.out.println("Cập nhật đơn thành công nhưng tạo thông báo thất bại. OrderId = " + order.getId());
+                    }
                 }
             }
             response.setStatus(HttpServletResponse.SC_OK);
