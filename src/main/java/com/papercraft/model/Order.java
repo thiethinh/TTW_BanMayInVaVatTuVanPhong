@@ -20,6 +20,17 @@ public class Order implements Serializable {
     public Timestamp createdAt;
     public List<OrderItem> orderItems;
 
+    private String ghnOrderCode;
+    private String ghnStatus;
+
+    private Integer shippingProvinceId;
+    private String shippingProvinceName;
+    private Integer shippingDistrictId;
+    private String shippingDistrictName;
+    private String shippingWardCode;
+    private String shippingWardName;
+
+
     public Order() {
     }
 
@@ -134,4 +145,36 @@ public class Order implements Serializable {
     public void setShippingProvider(String shippingProvider) {
         this.shippingProvider = shippingProvider;
     }
+
+    public String getGhnOrderCode() {return ghnOrderCode;}
+
+    public void setGhnOrderCode(String ghnOrderCode) {this.ghnOrderCode = ghnOrderCode;}
+
+    public String getGhnStatus() {return ghnStatus;}
+
+    public void setGhnStatus(String ghnStatus) {this.ghnStatus = ghnStatus;}
+
+    public Integer getShippingProvinceId() {return shippingProvinceId;}
+
+    public void setShippingProvinceId(Integer shippingProvinceId) {this.shippingProvinceId = shippingProvinceId;}
+
+    public String getShippingProvinceName() {return shippingProvinceName;}
+
+    public void setShippingProvinceName(String shippingProvinceName) {this.shippingProvinceName = shippingProvinceName;}
+
+    public Integer getShippingDistrictId() {return shippingDistrictId;}
+
+    public void setShippingDistrictId(Integer shippingDistrictId) {this.shippingDistrictId = shippingDistrictId;}
+
+    public String getShippingDistrictName() {return shippingDistrictName;}
+
+    public void setShippingDistrictName(String shippingDistrictName) {this.shippingDistrictName = shippingDistrictName;}
+
+    public String getShippingWardCode() {return shippingWardCode;}
+
+    public void setShippingWardCode(String shippingWardCode) {this.shippingWardCode = shippingWardCode;}
+
+    public String getShippingWardName() {return shippingWardName;}
+
+    public void setShippingWardName(String shippingWardName) {this.shippingWardName = shippingWardName;}
 }

@@ -3,6 +3,7 @@ package com.papercraft.controller.admin;
 import com.papercraft.dao.*;
 import com.papercraft.model.*;
 import com.papercraft.model.enums.NotificationType;
+import com.papercraft.service.OrderShippingService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -37,18 +38,24 @@ public class AdminOrderViewServlet extends HttpServlet {
             typeNoti = NotificationType.ORDER_CANCELLED;
         }
 
-        NotificationDAO notificationDAO = new NotificationDAO();
-        if (typeNoti != null) {
-            Notification noti = new Notification(userSession.getId(), typeNoti, id);
-            notificationDAO.insertNotification(noti);
-        }
+//        NotificationDAO notificationDAO = new NotificationDAO();
+//        if (typeNoti != null) {
+//            Notification noti = new Notification(userSession.getId(), typeNoti, id);
+//            notificationDAO.insertNotification(noti);
+//        }
 
         if (accept != null) {
             Order currentOrder = orderDAO.getOrderByID(id);
 
             if (currentOrder != null && isValidStatusChange(currentOrder.getStatus(), accept)) {
-                updated = orderDAO.updateOrderStatus(id, accept);
-                isAccept = true;
+                if ("shipped".equalsIgnoreCase(accept)) {
+                    OrderShippingService shippingService = new OrderShippingService();
+                    updated = shippingService.shipOrderWithGHN(id);
+                    isAccept = updated;
+                } else {
+                    updated = orderDAO.updateOrderStatus(id, accept);
+                    isAccept = updated;
+                }
             }
 
         } else if (cancel != null) {

@@ -8,6 +8,7 @@ import com.papercraft.model.Order;
 import com.papercraft.model.Product;
 import com.papercraft.model.User;
 import com.papercraft.model.enums.NotificationType;
+import com.papercraft.service.OrderShippingService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -44,18 +45,29 @@ public class AdminOrderManage extends HttpServlet {
 
                     Order order = orderDAO.getOrderByID(orderId);
                     if (order != null && isValidStatusChange(order.getStatus(), newStatus)){
-                        orderDAO.updateOrderStatus(orderId, newStatus);
+                        boolean updated;
+                        if ("shipped".equalsIgnoreCase(newStatus)) {
+                            OrderShippingService shippingService = new OrderShippingService();
+                            updated = shippingService.shipOrderWithGHN(orderId);
+                        } else {
+                            updated = orderDAO.updateOrderStatus(orderId, newStatus);
+                        }
 
                         //tao thong bao order
-                        NotificationType typeNoti = switch (newStatus) {
-                            case "pending" -> NotificationType.ORDER_PENDING;
-                            case "shipped" -> NotificationType.ORDER_SHIPPED;
-                            case "completed" -> NotificationType.ORDER_COMPLETED;
-                            case "canceled" -> NotificationType.ORDER_CANCELLED;
-                            default -> null;
-                        };
-                        Notification noti = new Notification(user.getId(), typeNoti,orderId);
-                        notificationDAO.insertNotification(noti);
+                        if (updated) {
+                            NotificationType typeNoti = switch (newStatus) {
+                                case "pending" -> NotificationType.ORDER_PENDING;
+                                case "shipped" -> NotificationType.ORDER_SHIPPED;
+                                case "completed" -> NotificationType.ORDER_COMPLETED;
+                                case "canceled" -> NotificationType.ORDER_CANCELLED;
+                                default -> null;
+                            };
+
+                            if (typeNoti != null && !"shipped".equalsIgnoreCase(newStatus)) {
+                                Notification noti = new Notification(order.getUserId(), typeNoti, orderId);
+                                notificationDAO.insertNotification(noti);
+                            }
+                        }
 
                     }
 
