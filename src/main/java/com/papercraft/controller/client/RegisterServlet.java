@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ import java.util.List;
 
 @WebServlet(name = "RegisterServlet", value = "/register")
 public class RegisterServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegisterServlet.class);
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String fname = request.getParameter("firstname") != null ? request.getParameter("firstname").trim() : "";
@@ -26,6 +31,8 @@ public class RegisterServlet extends HttpServlet {
         String gender = request.getParameter("gender");
         String password = request.getParameter("password") != null ? request.getParameter("password") : "";
         String confirmPassword = request.getParameter("confirmPassword") != null ? request.getParameter("confirmPassword") : "";
+
+        logger.info("Nhận yêu cầu đăng ký tài khoản mới. Email: '{}', Họ tên: '{} {}', Số điện thoại: '{}'", email, fname, lname, phone);
 
         UserDAO dao = new UserDAO();
         List<String> errors = new ArrayList<>();
@@ -53,6 +60,7 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (!errors.isEmpty()) {
+            logger.warn("Dữ liệu đăng ký của Email '{}' không hợp lệ. Số lượng lỗi phát hiện: {}. Chi tiết lỗi: {}", email, errors.size(), errors);
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
@@ -63,6 +71,7 @@ public class RegisterServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Long lastCreateTime = (Long) session.getAttribute("REG_OTP_createTime");
         if (lastCreateTime != null && (System.currentTimeMillis() - lastCreateTime) < 60000) {
+            logger.warn("Yêu cầu gửi mã OTP đăng ký từ Email '{}' bị chặn do spam (Chưa đủ 60 giây giãn cách).", email);
             errors.add("Vui lòng đợi 60 giây trước khi yêu cầu gửi lại OTP.");
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);
@@ -71,6 +80,7 @@ public class RegisterServlet extends HttpServlet {
         }
 
         // Chuẩn bị dữ liệu để gửi
+        logger.debug("Thông tin biểu mẫu hợp lệ. Tiến hành tạo mã OTP và mã hóa mật khẩu tài khoản...");
         String otp = EmailUtils.generateOTP();
         User newUser = new User();
         newUser.setFname(fname);
@@ -80,10 +90,12 @@ public class RegisterServlet extends HttpServlet {
         newUser.setGender(gender);
         newUser.setPasswordHash(MD5.getMD5(password));
 
+        logger.debug("Đang gửi email chứa mã xác thực OTP đăng ký tới '{}'...", newUser.getEmail());
         boolean isSent = EmailUtils.sendRegisterOTP(newUser.getEmail(), otp);
 
         // Kết quả gửi email
         if (isSent) {
+            logger.info("Gửi email chứa OTP thành công tới '{}'. Cấu hình thông tin tạm thời vào Session thời hạn 5 phút (300s).", newUser.getEmail());
             session.setAttribute("authCode", otp);
             session.setAttribute("tempUser", newUser);
             session.setAttribute("REG_OTP_createTime", System.currentTimeMillis());
@@ -91,6 +103,7 @@ public class RegisterServlet extends HttpServlet {
 
             String redirectUrl = request.getParameter("redirect");
             if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                logger.debug("Lưu giữ URL điều hướng sau đăng ký: '{}'", redirectUrl);
                 session.setAttribute("redirectAfterRegister", redirectUrl);
             }
 
@@ -98,6 +111,7 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("activeTab", "register");
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
         } else {
+            logger.error("Lỗi hệ thống: Gửi mail chứa OTP tới '{}' thất bại từ hệ thống Mail Server.", newUser.getEmail());
             errors.add("Gửi email thất bại! Vui lòng kiểm tra lại kết nối hoặc email.");
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);

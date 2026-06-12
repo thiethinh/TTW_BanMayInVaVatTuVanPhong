@@ -13,89 +13,104 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @WebServlet("/contact")
 public class ContactServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContactServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        logger.debug("Tải giao diện trang Liên hệ (contact.jsp).");
         request.getRequestDispatcher("/WEB-INF/views/client/contact.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-         //cấu hình TV
+        //cấu hình TV
         request.setCharacterEncoding("UTF-8");
 
         // Lấy dữ liệu từ Form
-        String fullname = request.getParameter("fullname") !=null ? request.getParameter("fullname") : "";
+        String fullname = request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
         String email = request.getParameter("email") != null ? request.getParameter("email") : "";
-        String subject = request.getParameter("subject") != null ? request.getParameter("subject"): "";
-        String message = request.getParameter("message") !=null ? request.getParameter("message") : "";
+        String subject = request.getParameter("subject") != null ? request.getParameter("subject") : "";
+        String message = request.getParameter("message") != null ? request.getParameter("message") : "";
 
-        String errorFullname="";
-        String errorEmail="";
-        String errorSubject= "";
-        String errorMessage="";
+        logger.info("Nhận yêu cầu gửi liên hệ mới. Người gửi: '{}', Email: '{}', Chủ đề: '{}'", fullname, email, subject);
 
-        if (fullname.isEmpty()){
+        String errorFullname = "";
+        String errorEmail = "";
+        String errorSubject = "";
+        String errorMessage = "";
+
+        if (fullname.isEmpty()) {
             errorFullname = "Vui lòng nhập họ và tên.";
         }
-        if (email.isEmpty()){
-            errorEmail="Vui lòng nhập Email";
-        }else if(!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
-            errorEmail="Email phải có dạng: nguyenvana@gmail.com.";
+        if (email.isEmpty()) {
+            errorEmail = "Vui lòng nhập Email";
+        } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$")) {
+            errorEmail = "Email phải có dạng: nguyenvana@gmail.com.";
         }
-        if (subject.isEmpty()){
-            errorSubject="Vui lòng nhập chủ dề.";
+        if (subject.isEmpty()) {
+            errorSubject = "Vui lòng nhập chủ dề.";
         }
-        if (message.isEmpty()){
-            errorMessage="Vui lòng nhập nội dung liên hệ.";
+        if (message.isEmpty()) {
+            errorMessage = "Vui lòng nhập nội dung liên hệ.";
         }
 
-        boolean hasError= !errorFullname.isEmpty()
+        boolean hasError = !errorFullname.isEmpty()
                 || !errorEmail.isEmpty()
                 || !errorSubject.isEmpty()
                 || !errorMessage.isEmpty();
-        JsonObject json= new JsonObject();
-        if (hasError){
-            json.addProperty("success",false);
-            json.addProperty("message","Vui lòng kiểm tra lại thông tin đã nhập.");
+        JsonObject json = new JsonObject();
+        if (hasError) {
+            logger.warn("Dữ liệu biểu mẫu liên hệ không hợp lệ. Chi tiết lỗi -> Họ tên: '{}', Email: '{}', Chủ đề: '{}', Nội dung: '{}'",
+                    errorFullname, errorEmail, errorSubject, errorMessage);
+
+            json.addProperty("success", false);
+            json.addProperty("message", "Vui lòng kiểm tra lại thông tin đã nhập.");
             json.addProperty("errorFullname", errorFullname);
             json.addProperty("errorEmail", errorEmail);
-            json.addProperty("errorSubject",errorSubject);
+            json.addProperty("errorSubject", errorSubject);
             json.addProperty("errorMessage", errorMessage);
 
             response.getWriter().write(json.toString());
             return;
         }
-        Contact contact= new Contact();
+
+        Contact contact = new Contact();
         contact.setUserFullname(fullname);
         contact.setEmail(email);
         contact.setContactTitle(subject);
         contact.setContent(message);
 
-        HttpSession session= request.getSession();
+        HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
         contact.setUserId(user != null ? user.getId() : null);
+        logger.debug("Tiến hành ghi nhận thông tin liên hệ vào CSDL. Liên kết User ID: {}", contact.getUserId());
 
-        ContactDAO dao= new ContactDAO();
-        boolean isuccess= dao.insertContact(contact);
-        if(isuccess&& user!=null){
+        ContactDAO dao = new ContactDAO();
+        boolean isuccess = dao.insertContact(contact);
+        if (isuccess && user != null) {
+            logger.info("Tạo thông báo hệ thống CONTACT_SUBMITTED cho User ID: '{}'", user.getId());
             NotificationDAO notificationDAO = new NotificationDAO();
-            Notification noti = new Notification(user.getId(), NotificationType.CONTACT_SUBMITTED,null);
+            Notification noti = new Notification(user.getId(), NotificationType.CONTACT_SUBMITTED, null);
             notificationDAO.insertNotification(noti);
+        } else {
+            logger.error("Lỗi hệ thống: Không thể lưu thông tin liên hệ của '{}' vào cơ sở dữ liệu.", email);
         }
 
         json.addProperty("success", isuccess);
-        json.addProperty("message",isuccess?"Gửi liên hệ thành công! chúng tôi sẽ phản hồi sớm" : "Có lỗi xảy ra. Vui lòng thử lại!");
-        json.addProperty("errorFullname","");
+        json.addProperty("message", isuccess ? "Gửi liên hệ thành công! chúng tôi sẽ phản hồi sớm" : "Có lỗi xảy ra. Vui lòng thử lại!");
+        json.addProperty("errorFullname", "");
         json.addProperty("errorEmail", "");
-        json.addProperty("errorSubject","");
-        json.addProperty("errorMessage","");
+        json.addProperty("errorSubject", "");
+        json.addProperty("errorMessage", "");
 
         response.getWriter().write(json.toString());
-
     }
 }

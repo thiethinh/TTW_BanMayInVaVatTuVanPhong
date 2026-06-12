@@ -11,21 +11,27 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @WebServlet(name = "UpdateProfileServlet", value = "/account")
 public class AccountServlet extends HttpServlet {
 
+    private static final Logger logger = LoggerFactory.getLogger(AccountServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
+
         if (user == null) {
+            logger.warn("Yêu cầu truy cập /account bị từ chối: Chưa đăng nhập.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-
+        logger.info("Tải trang thông tin tài khoản cho User ID: '{}'", user.getId());
 
         AddressDAO addressDAO = new AddressDAO();
         Address address = addressDAO.findDefaultAddress(user.getId());
@@ -60,6 +66,7 @@ public class AccountServlet extends HttpServlet {
                     districtId = Integer.parseInt(districtIdRaw);
                 }
             } catch (NumberFormatException e) {
+                logger.error("Lỗi định dạng số ID địa chỉ cho User ID '{}': ", user.getId(), e);
                 request.setAttribute("errorAddr", "Địa chỉ không hợp lệ, vui lòng chọn lại Tỉnh/Huyện/Xã.");
                 request.setAttribute("address", address);
                 request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
@@ -84,10 +91,12 @@ public class AccountServlet extends HttpServlet {
                 address.setWardName(wardName);
                 boolean isUpdateAddr = addressDAO.updateAddress(address, user.getId());
                 if (isUpdateAddr) {
+                    logger.info("User ID {} cập nhật địa chỉ giao hàng mặc định thành công.", user.getId());
                     request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
                     address = addressDAO.getAddresById(user.getId());
                     request.setAttribute("address", address);
                 } else {
+                    logger.error("Cập nhật địa chỉ thất bại tại DB cho khách hàng ID {}.", user.getId());
                     request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             } else {
@@ -114,11 +123,13 @@ public class AccountServlet extends HttpServlet {
                 boolean inserted = addressDAO.insertAddress(address);
 
                 if (inserted) {
+                    logger.info("Thêm địa chỉ thành công cho khách hàng ID {}.", user.getId());
                     request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
 //                    address = addressDAO.getAddresById(address.getId());
                     address = addressDAO.getAddresById(user.getId());
                     request.setAttribute("address", address);
                 } else {
+                    logger.info("Thêm địa chỉ thất bại cho khách hàng ID {}.", user.getId());
                     request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             }
@@ -178,6 +189,7 @@ public class AccountServlet extends HttpServlet {
                     user.setPhoneNumber(phone);
                     user.setGender(gender);
                     session.setAttribute("acc", user);
+                    logger.info("Cập nhật hồ sơ thành công cho User ID: {}", user.getId());
 
                     if (missingInformation != null && missingInformation.equals("true")) {
                         session.setAttribute("success", "Cập nhật thông tin thành công!");
@@ -190,9 +202,14 @@ public class AccountServlet extends HttpServlet {
                     }
                     request.setAttribute("msg", "Cập nhật thông tin thành công!");
                 } else {
+                    logger.error("Lỗi cập nhật tầng DB khi thay đổi thông tin cá nhân của User ID: {}", user.getId());
                     request.setAttribute("error", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             }
+        } else {
+            session.setAttribute("error", "Họ tên và số điện thoại không được để trống.");
+            response.sendRedirect(request.getContextPath() + "/account");
+            return;
         }
         request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
     }

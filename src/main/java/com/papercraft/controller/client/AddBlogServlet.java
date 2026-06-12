@@ -7,13 +7,26 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 @WebServlet(name = "AddBlogServlet", value = "/add_blog")
-@MultipartConfig
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
+)
 public class AddBlogServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(AddBlogServlet.class);
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
@@ -27,10 +40,12 @@ public class AddBlogServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
+            logger.warn("Một yêu cầu đăng bài viết bị từ chối do chưa đăng nhập hệ thống.");
             session.setAttribute("failedMsg", "Vui lòng đăng nhập để viết bài");
             response.sendRedirect("login");
             return;
         }
+        logger.info("User ID '{}' bắt đầu tạo bài viết mới với tiêu đề: '{}'", user.getId(), title);
 
         // Xử lý ảnh
         Part part = request.getPart("image");
@@ -54,9 +69,11 @@ public class AddBlogServlet extends HttpServlet {
         boolean result = blogDao.addBlog(blog, fileName);
 
         if (result) {
+            logger.info("Đăng bài viết mới thành công (Chờ duyệt) cho User ID: {}", user.getId());
             session.setAttribute("success", "Đăng bài thành công, bạn hãy đợi admin duyệt nhé!");
             response.sendRedirect("blog");
         } else {
+            logger.error("Lỗi tầng DB: Không thể chèn bản ghi bài viết mới của User ID: {}", user.getId());
             session.setAttribute("failedMsg", "Có lỗi xảy ra, vui lòng thử lại");
             response.sendRedirect("create-blog");
         }

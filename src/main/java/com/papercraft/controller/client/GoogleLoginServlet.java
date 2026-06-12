@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,6 +22,9 @@ import java.util.Scanner;
 
 @WebServlet(name = "GoogleLoginServlet", value = "/google-login")
 public class GoogleLoginServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(GoogleLoginServlet.class);
+
     private static final String CLIENT_ID = "1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com";
     private static final String CLIENT_SECRET = "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";
 
@@ -31,18 +36,27 @@ public class GoogleLoginServlet extends HttpServlet {
         String redirectUri = requestUrl.split("\\?")[0];
 
         if (code == null || code.isEmpty()) {
+            logger.warn("Đăng nhập Google thất bại: Không nhận được tham số 'code' từ Google OAuth.");
             session.setAttribute("msg", "Đăng nhập Google thất bại hoặc đã bị hủy.");
             response.sendRedirect("login");
             return;
         }
+        logger.info("Nhận được mã code từ Google. Bắt đầu tiến trình xác thực tài khoản. Redirect URI sử dụng: '{}'", redirectUri);
 
         try {
+            logger.debug("Đang trao đổi mã code lấy Access Token từ Google...");
             String accessToken = getAccessToken(code, redirectUri);
+
+            logger.debug("Đang gửi yêu cầu lấy thông tin người dùng từ Google...");
             GoogleUser googleUser = getUserInfo(accessToken);
             String email = googleUser.getEmail();
 
+            logger.info("Xử lý tài khoản Google có Email: '{}', Tên: '{}'", email, googleUser.getName());
+
             UserDAO userDAO = new UserDAO();
             if (!userDAO.checkEmailExists(email)) {
+                logger.info("Email '{}' chưa tồn tại trong hệ thống. Tiến hành tự động đăng ký tài khoản mới.", email);
+
                 // Đăng ký nếu email chưa tồn tại
                 User newUser = new User();
                 newUser.setEmail(email);
@@ -61,6 +75,7 @@ public class GoogleLoginServlet extends HttpServlet {
                 newUser.setPasswordHash("");
 
                 userDAO.signup(newUser);
+                logger.info("Đăng ký tài khoản mới thành công từ Google OAuth cho Email: '{}'", email);
             }
 
             // Đăng nhập nếu email đã tồn tại
@@ -68,20 +83,23 @@ public class GoogleLoginServlet extends HttpServlet {
             if (loggedUser != null) {
                 session.setAttribute("acc", loggedUser);
 
-                if(loggedUser.getEmail().isEmpty() || loggedUser.getPhoneNumber().isEmpty() || loggedUser.getPasswordHash().isEmpty()) {
+                if (loggedUser.getEmail().isEmpty() || loggedUser.getPhoneNumber().isEmpty() || loggedUser.getPasswordHash().isEmpty()) {
+                    logger.info("User ID '{}' đăng nhập qua Google thành công nhưng tài khoản còn thiếu thông tin bắt buộc. Điều hướng tới trang cập nhật thông tin cá nhân.", loggedUser.getId());
                     session.setAttribute("error", "Vui lòng nhập thông tin còn thiếu để hoàn thiện tài khoản");
                     session.setAttribute("missingInformation", true);
                     response.sendRedirect("account");
                 } else {
+                    logger.info("User ID '{}' đăng nhập thành công bằng tài khoản Google. Điều hướng về trang chủ.", loggedUser.getId());
                     session.setAttribute("success", "Đăng nhập thành công");
                     response.sendRedirect("home");
                 }
             } else {
+                logger.error("Lỗi logic hệ thống: Không thể truy vấn đối tượng User từ CSDL sau khi đã xác thực/đăng ký thành công với Email '{}'", email);
                 session.setAttribute("msg", "Lỗi khi tải thông tin tài khoản");
                 response.sendRedirect("login");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi hệ thống nghiêm trọng xảy ra trong luồng xử lý Google OAuth: ", e);
             session.setAttribute("msg", "Lỗi hệ thống khi kết nối với Google");
             response.sendRedirect("login");
         }
