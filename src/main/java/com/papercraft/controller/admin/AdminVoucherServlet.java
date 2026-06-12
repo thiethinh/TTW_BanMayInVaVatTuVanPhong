@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@WebServlet("/admin-voucher")
+@WebServlet("/admin/admin-voucher")
 public class AdminVoucherServlet extends HttpServlet {
 
     private final VoucherDAO voucherDAO = new VoucherDAO();

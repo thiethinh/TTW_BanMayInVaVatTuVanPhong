@@ -108,7 +108,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/admin-order-view?orderId=${o.id}"
+                                    <a href="${pageContext.request.contextPath}/admin/admin-order-view?orderId=${o.id}"
                                        class="btn-action view">Xem</a>
                                 </td>
                             </tr>

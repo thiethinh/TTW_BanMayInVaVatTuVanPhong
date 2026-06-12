@@ -10,7 +10,7 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AdminOrderViewServlet", value = "/admin-order-view")
+@WebServlet(name = "AdminOrderViewServlet", value = "/admin/admin-order-view")
 public class AdminOrderViewServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

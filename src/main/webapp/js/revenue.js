@@ -14,7 +14,7 @@ function loadRevenue() {
 
     if (!from || !to) return;
 
-    fetch(`revenue?from=${from}&to=${to}`)
+    fetch(`${contextPath}/admin/revenue?from=${from}&to=${to}`)
         .then(res => res.json())
         .then(data => renderChart(data, idRevenueChart))
         .catch(err => console.error(err));
@@ -27,7 +27,7 @@ function loadDailyRevenue() {
     const month = monthInput.value;
     if (!month) return;
 
-    fetch(`revenue-by-month?month=${month}`)
+    fetch(`${contextPath}/admin/revenue-by-month?month=${month}`)
         .then(res => res.json())
         .then(data => renderChart(data, idRevenueChartMonth))
         .catch(err => console.error(err));

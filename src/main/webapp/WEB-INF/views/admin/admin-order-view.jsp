@@ -139,14 +139,14 @@
                                     <button
                                             class="btn-accept"
                                             type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=shipped&orderId=${order.id}'">
+                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?accept=shipped&orderId=${order.id}'">
                                         Duyệt đơn
                                     </button>
 
                                     <button
                                             class="btn-cancel"
                                             type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?cancel=canceled&orderId=${order.id}'">
+                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?cancel=canceled&orderId=${order.id}'">
                                         Hủy đơn
                                     </button>
                                 </c:when>
@@ -155,14 +155,14 @@
                                     <button
                                             class="btn-accept"
                                             type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?accept=completed&orderId=${order.id}'">
+                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?accept=completed&orderId=${order.id}'">
                                         Xác nhận hoàn thành
                                     </button>
 
                                     <button
                                             class="btn-cancel"
                                             type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin-order-view?cancel=canceled&orderId=${order.id}'">
+                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?cancel=canceled&orderId=${order.id}'">
                                         Hủy đơn
                                     </button>
                                 </c:when>
@@ -242,7 +242,7 @@
                         </p>
 
                         <c:if test="${not empty payment and not payment.status}">
-                            <form action="${pageContext.request.contextPath}/admin-order-view" method="get"
+                            <form action="${pageContext.request.contextPath}/admin/admin-order-view" method="get"
                                   style="margin-top: 12px;">
                                 <input type="hidden" name="orderId" value="${order.id}">
                                 <input type="hidden" name="verifyPayment" value="1">

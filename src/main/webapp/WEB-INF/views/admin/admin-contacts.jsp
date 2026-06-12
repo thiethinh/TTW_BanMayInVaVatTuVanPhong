@@ -126,7 +126,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href =
-                    baseUrl + "/admin-contacts?action=delete&id=" + id;
+                    baseUrl + "/admin/admin-contacts?action=delete&id=" + id;
             }
         });
     };

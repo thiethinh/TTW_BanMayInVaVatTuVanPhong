@@ -131,7 +131,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href =
-                    baseUrl + "/admin-review?action=delete&id=" + id;
+                    baseUrl + "/admin/admin-review?action=delete&id=" + id;
             }
         });
     };
