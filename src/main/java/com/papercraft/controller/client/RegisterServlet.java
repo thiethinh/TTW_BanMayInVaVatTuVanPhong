@@ -32,7 +32,7 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password") != null ? request.getParameter("password") : "";
         String confirmPassword = request.getParameter("confirmPassword") != null ? request.getParameter("confirmPassword") : "";
 
-        logger.info("Nhận yêu cầu đăng ký tài khoản mới. Email: '{}', Họ tên: '{} {}', Số điện thoại: '{}'", email, fname, lname, phone);
+        logger.info("Received registration request for new account. Email: '{}', Full Name: '{} {}', Phone: '{}'", email, fname, lname, phone);
 
         UserDAO dao = new UserDAO();
         List<String> errors = new ArrayList<>();
@@ -60,7 +60,7 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (!errors.isEmpty()) {
-            logger.warn("Dữ liệu đăng ký của Email '{}' không hợp lệ. Số lượng lỗi phát hiện: {}. Chi tiết lỗi: {}", email, errors.size(), errors);
+            logger.warn("Registration data for Email '{}' is invalid. Number of errors detected: {}. Error details: {}", email, errors.size(), errors);
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
@@ -71,7 +71,7 @@ public class RegisterServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Long lastCreateTime = (Long) session.getAttribute("REG_OTP_createTime");
         if (lastCreateTime != null && (System.currentTimeMillis() - lastCreateTime) < 60000) {
-            logger.warn("Yêu cầu gửi mã OTP đăng ký từ Email '{}' bị chặn do spam (Chưa đủ 60 giây giãn cách).", email);
+            logger.warn("Registration OTP code send request from Email '{}' blocked due to spam (Less than 60 seconds interval).", email);
             errors.add("Vui lòng đợi 60 giây trước khi yêu cầu gửi lại OTP.");
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);
@@ -80,7 +80,7 @@ public class RegisterServlet extends HttpServlet {
         }
 
         // Chuẩn bị dữ liệu để gửi
-        logger.debug("Thông tin biểu mẫu hợp lệ. Tiến hành tạo mã OTP và mã hóa mật khẩu tài khoản...");
+        logger.debug("Form information is valid. Proceeding to generate OTP code and hash account password...");
         String otp = EmailUtils.generateOTP();
         User newUser = new User();
         newUser.setFname(fname);
@@ -90,12 +90,12 @@ public class RegisterServlet extends HttpServlet {
         newUser.setGender(gender);
         newUser.setPasswordHash(MD5.getMD5(password));
 
-        logger.debug("Đang gửi email chứa mã xác thực OTP đăng ký tới '{}'...", newUser.getEmail());
+        logger.debug("Sending email containing registration verification OTP code to '{}'...", newUser.getEmail());
         boolean isSent = EmailUtils.sendRegisterOTP(newUser.getEmail(), otp);
 
         // Kết quả gửi email
         if (isSent) {
-            logger.info("Gửi email chứa OTP thành công tới '{}'. Cấu hình thông tin tạm thời vào Session thời hạn 5 phút (300s).", newUser.getEmail());
+            logger.info("Successfully sent email containing OTP to '{}'. Saved temporary information in Session for 5 minutes (300s).", newUser.getEmail());
             session.setAttribute("authCode", otp);
             session.setAttribute("tempUser", newUser);
             session.setAttribute("REG_OTP_createTime", System.currentTimeMillis());
@@ -103,7 +103,7 @@ public class RegisterServlet extends HttpServlet {
 
             String redirectUrl = request.getParameter("redirect");
             if (redirectUrl != null && !redirectUrl.isEmpty()) {
-                logger.debug("Lưu giữ URL điều hướng sau đăng ký: '{}'", redirectUrl);
+                logger.debug("Preserving redirection URL after registration: '{}'", redirectUrl);
                 session.setAttribute("redirectAfterRegister", redirectUrl);
             }
 
@@ -111,7 +111,7 @@ public class RegisterServlet extends HttpServlet {
             request.setAttribute("activeTab", "register");
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
         } else {
-            logger.error("Lỗi hệ thống: Gửi mail chứa OTP tới '{}' thất bại từ hệ thống Mail Server.", newUser.getEmail());
+            logger.error("System error: Failed to send email containing OTP to '{}' from Mail Server.", newUser.getEmail());
             errors.add("Gửi email thất bại! Vui lòng kiểm tra lại kết nối hoặc email.");
             request.setAttribute("errorRegister", errors);
             setFormDataToRequest(request, fname, lname, email, phone, gender);

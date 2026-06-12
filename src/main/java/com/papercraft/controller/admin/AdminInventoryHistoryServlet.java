@@ -23,16 +23,16 @@ public class AdminInventoryHistoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String transactionIdParam = request.getParameter("transactionId");
-        logger.debug("Nhận yêu cầu vào AdminInventoryHistoryServlet. Tham số transactionId raw: '{}'", transactionIdParam);
+        logger.debug("Received request to AdminInventoryHistoryServlet. Raw transactionId parameter: '{}'", transactionIdParam);
 
         if (transactionIdParam != null && !transactionIdParam.isEmpty()) {
             try {
                 int transactionId = Integer.parseInt(transactionIdParam);
-                logger.info("Yêu cầu AJAX: Lấy chi tiết lịch sử kho cho Transaction ID: {}", transactionId);
+                logger.info("AJAX Request: Retrieving inventory history details for Transaction ID: {}", transactionId);
 
                 InventoryDAO inventoryDAO = new InventoryDAO();
                 List<InventoryDetailDTO> detailList = inventoryDAO.getTransactionDetails(transactionId);
-                logger.debug("Truy xuất thành công từ DB. Số lượng bản ghi chi tiết tìm thấy: {}",
+                logger.debug("Successfully retrieved from DB. Number of detail records found: {}",
                         (detailList != null ? detailList.size() : 0));
 
                 Gson gson = new Gson();
@@ -42,11 +42,11 @@ public class AdminInventoryHistoryServlet extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().write(jsonResponse);
             } catch (NumberFormatException e) {
-                logger.error("Lỗi định dạng tham số transactionId không phải là số hợp lệ: '{}'", transactionIdParam);
+                logger.error("Format error: transactionId parameter is not a valid number: '{}'", transactionIdParam);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"ID không hợp lệ\"}");
             } catch (Exception e) {
-                logger.error("Lỗi hệ thống nghiêm trọng khi lấy chi tiết phiếu kho ID '{}': ", transactionIdParam, e);
+                logger.error("Critical system error while retrieving details of inventory transaction ID '{}': ", transactionIdParam, e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\": \"Lỗi hệ thống xảy ra trên server\"}");
             }
@@ -58,19 +58,19 @@ public class AdminInventoryHistoryServlet extends HttpServlet {
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
         if (type == null) type = "all";
-        logger.info("Tải danh sách lịch sử kho - Bộ lọc: [Loại phiếu: '{}', Từ khóa: '{}', Từ ngày: '{}', Đến ngày: '{}']",
+        logger.info("Loading inventory history list - Filters: [Transaction type: '{}', Keyword: '{}', From date: '{}', To date: '{}']",
                 type, search, fromDate, toDate);
 
         InventoryDAO inventoryDAO = new InventoryDAO();
         List<InventoryTransaction> transactions = inventoryDAO.getAllTransactions(type, search, fromDate, toDate);
-        logger.debug("Tìm thấy tổng số {} phiếu giao dịch kho thỏa mãn bộ lọc.",
+        logger.debug("Found total of {} inventory transaction slips matching the filter.",
                 (transactions != null ? transactions.size() : 0));
 
         request.setAttribute("transactions", transactions);
         request.setAttribute("type", type);
         request.setAttribute("param", request.getParameterMap());
 
-        logger.debug("Chuyển tiếp dữ liệu (forward) sang giao diện admin-inventory-history.jsp");
+        logger.debug("Forwarding data to admin-inventory-history.jsp interface");
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-inventory-history.jsp").forward(request, response);
     }
 }

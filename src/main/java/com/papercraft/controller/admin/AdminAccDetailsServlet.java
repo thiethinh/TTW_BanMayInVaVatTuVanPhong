@@ -23,7 +23,7 @@ public class AdminAccDetailsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idRaw = request.getParameter("id");
-        logger.debug("Nhận yêu cầu xem chi tiết tài khoản với tham số id raw: '{}'", idRaw);
+        logger.debug("Received request to view account details with raw ID parameter: '{}'", idRaw);
 
         int id = Integer.parseInt(idRaw);
 
@@ -34,16 +34,16 @@ public class AdminAccDetailsServlet extends HttpServlet {
         List<Order> orderList = orderDAO.getOrdersByUserId(id);
 
         if (user != null) {
-            logger.info("Tìm thấy người dùng '{}' (Email: {}). Đang tải thông tin đơn hàng.", user.getFullname(), user.getEmail());
-            logger.debug("Số lượng đơn hàng tìm thấy cho User ID {}: {} đơn hàng.", id, (orderList != null ? orderList.size() : 0));
+            logger.info("User found '{}' (Email: {}). Loading order details.", user.getFullname(), user.getEmail());
+            logger.debug("Number of orders found for User ID {}: {} orders.", id, (orderList != null ? orderList.size() : 0));
 
             request.setAttribute("acc", user);
             request.setAttribute("orderList", orderList);
 
-            logger.debug("Chuyển tiếp (forward) dữ liệu sang giao diện admin-account-details.jsp");
+            logger.debug("Forwarding data to admin-account-details.jsp interface");
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-account-details.jsp").forward(request, response);
         } else {
-            logger.warn("Không tìm thấy tài khoản nào có ID = {} trong hệ thống. Đang chuyển hướng về admin-account.", id);
+            logger.warn("No account found with ID = {} in the system. Redirecting to admin-account.", id);
             response.sendRedirect("admin-account");
         }
     }

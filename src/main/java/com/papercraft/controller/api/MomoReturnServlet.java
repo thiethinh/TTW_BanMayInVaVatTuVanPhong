@@ -33,7 +33,7 @@ public class MomoReturnServlet extends HttpServlet {
         String responseTime = request.getParameter("responseTime");
         String extraData = request.getParameter("extraData");
         String signatureMoMo = request.getParameter("signature");
-        logger.info("Nhận phản hồi giao dịch từ MoMo (Return URL). MoMo OrderId: '{}', ResultCode: '{}', TransId: '{}'",
+        logger.info("Received transaction response from MoMo (Return URL). MoMo OrderId: '{}', ResultCode: '{}', TransId: '{}'",
                 orderIdMomo, resultCodeStr, transId);
 
         int orderId = 0;
@@ -41,7 +41,7 @@ public class MomoReturnServlet extends HttpServlet {
             try {
                 orderId = Integer.parseInt(orderIdMomo.split("_")[0]);
             } catch (NumberFormatException e) {
-                logger.error("Không thể bóc tách mã đơn hàng hệ thống từ chuỗi MoMo OrderId: '{}'", orderIdMomo);
+                logger.error("Could not extract system order ID from MoMo OrderId string: '{}'", orderIdMomo);
             }
         }
 
@@ -59,27 +59,27 @@ public class MomoReturnServlet extends HttpServlet {
         String mySignature = MomoConfig.hcmacSHA256(MomoConfig.secretKey, rawHash);
 
         if (mySignature.equals(signatureMoMo)) {
-            logger.debug("Xác thực chữ ký số thành công. Dữ liệu từ MoMo hợp lệ và không bị chỉnh sửa giả mạo.");
+            logger.debug("Signature verification successful. Data from MoMo is valid and untampered.");
             if ("0".equals(resultCodeStr)) {
                 try {
                     PaymentDAO paymentDAO = new PaymentDAO();
                     paymentDAO.verifyPaymentSuccess(orderId, transId);
-                    logger.info("Giao dịch thành công hoàn toàn. Đơn hàng nội bộ ID {} đã được xác minh.", orderId);
+                    logger.info("Transaction completely successful. Internal Order ID {} has been verified.", orderId);
                     response.sendRedirect(request.getContextPath() + "/order-success");
                 } catch (Exception e) {
-                    logger.error("Lỗi nghiêm trọng: Cập nhật trạng thái CSDL thất bại cho Đơn hàng ID '{}' dù tiền đã trừ tại MoMo! ", orderId, e);
+                    logger.error("Critical error: Database status update failed for Order ID '{}' despite successful charge on MoMo! ", orderId, e);
                     request.getSession().setAttribute("error", "Thanh toán thành công tại MoMo nhưng hệ thống gặp sự cố cập nhật. Vui lòng liên hệ Admin kèm mã MoMo: " + transId);
                     response.sendRedirect(request.getContextPath() + "/cart");
                 }
             } else {
-                logger.warn("Giao dịch MoMo thất bại hoặc bị hủy bỏ bởi khách hàng. Mã lỗi: {}, Thông điệp: {}", resultCodeStr, message);
+                logger.warn("MoMo transaction failed or was cancelled by the customer. Error code: {}, Message: {}", resultCodeStr, message);
                 if (orderId > 0) {
                     try {
                         OrderService orderService = new OrderService();
                         orderService.cancelOrderAndReleaseStock(orderId);
-                        logger.info("Đã tự động hủy đơn và hoàn trả số lượng tồn kho thành công cho Đơn hàng ID: {}", orderId);
+                        logger.info("Successfully cancelled order automatically and released stock for Order ID: {}", orderId);
                     } catch (Exception e) {
-                        logger.error("Lỗi phát sinh khi cố gắng hủy đơn hàng tự động ID {} sau khi MoMo báo thất bại: ", orderId, e);
+                        logger.error("Error occurred while attempting to automatically cancel Order ID {} after MoMo failed: ", orderId, e);
                     }
                 }
 
@@ -87,8 +87,8 @@ public class MomoReturnServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/cart");
             }
         } else {
-            logger.error("CẢNH BÁO AN NINH NGUY HIỂM: Phát hiện sai lệch chữ ký số (Signature Mismatch)! " +
-                    "Chữ ký nhận được: '{}', Chữ ký tự tính toán: '{}'. Khả năng cao dữ liệu Request bị thay đổi trái phép.", signatureMoMo, mySignature);
+            logger.error("DANGEROUS SECURITY WARNING: Signature Mismatch detected! " +
+                    "Received signature: '{}', Calculated signature: '{}'. The request data might have been unauthorizedly modified.", signatureMoMo, mySignature);
             request.getSession().setAttribute("error", "Cảnh báo an ninh: Chữ ký xác thực trả về từ MoMo không hợp lệ!");
             response.sendRedirect(request.getContextPath() + "/cart");
         }

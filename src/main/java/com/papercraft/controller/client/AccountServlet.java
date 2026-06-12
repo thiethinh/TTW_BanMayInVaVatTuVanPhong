@@ -27,11 +27,11 @@ public class AccountServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Yêu cầu truy cập /account bị từ chối: Chưa đăng nhập.");
+            logger.warn("Access request to /account denied: Not logged in.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        logger.info("Tải trang thông tin tài khoản cho User ID: '{}'", user.getId());
+        logger.info("Loading account information page for User ID: '{}'", user.getId());
 
         AddressDAO addressDAO = new AddressDAO();
         Address address = addressDAO.findDefaultAddress(user.getId());
@@ -66,7 +66,7 @@ public class AccountServlet extends HttpServlet {
                     districtId = Integer.parseInt(districtIdRaw);
                 }
             } catch (NumberFormatException e) {
-                logger.error("Lỗi định dạng số ID địa chỉ cho User ID '{}': ", user.getId(), e);
+                logger.error("Invalid number format for address ID for User ID '{}': ", user.getId(), e);
                 request.setAttribute("errorAddr", "Địa chỉ không hợp lệ, vui lòng chọn lại Tỉnh/Huyện/Xã.");
                 request.setAttribute("address", address);
                 request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
@@ -91,12 +91,12 @@ public class AccountServlet extends HttpServlet {
                 address.setWardName(wardName);
                 boolean isUpdateAddr = addressDAO.updateAddress(address, user.getId());
                 if (isUpdateAddr) {
-                    logger.info("User ID {} cập nhật địa chỉ giao hàng mặc định thành công.", user.getId());
+                    logger.info("User ID {} successfully updated default shipping address.", user.getId());
                     request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
                     address = addressDAO.getAddresById(user.getId());
                     request.setAttribute("address", address);
                 } else {
-                    logger.error("Cập nhật địa chỉ thất bại tại DB cho khách hàng ID {}.", user.getId());
+                    logger.error("Failed to update address in DB for customer ID {}.", user.getId());
                     request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             } else {
@@ -123,13 +123,13 @@ public class AccountServlet extends HttpServlet {
                 boolean inserted = addressDAO.insertAddress(address);
 
                 if (inserted) {
-                    logger.info("Thêm địa chỉ thành công cho khách hàng ID {}.", user.getId());
+                    logger.info("Address added successfully for customer ID {}.", user.getId());
                     request.setAttribute("msgAddr", "Cập nhật thông tin thành công!");
 //                    address = addressDAO.getAddresById(address.getId());
                     address = addressDAO.getAddresById(user.getId());
                     request.setAttribute("address", address);
                 } else {
-                    logger.info("Thêm địa chỉ thất bại cho khách hàng ID {}.", user.getId());
+                    logger.info("Failed to add address for customer ID {}.", user.getId());
                     request.setAttribute("errorAddr", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             }
@@ -189,7 +189,7 @@ public class AccountServlet extends HttpServlet {
                     user.setPhoneNumber(phone);
                     user.setGender(gender);
                     session.setAttribute("acc", user);
-                    logger.info("Cập nhật hồ sơ thành công cho User ID: {}", user.getId());
+                    logger.info("Profile updated successfully for User ID: {}", user.getId());
 
                     if (missingInformation != null && missingInformation.equals("true")) {
                         session.setAttribute("success", "Cập nhật thông tin thành công!");
@@ -202,7 +202,7 @@ public class AccountServlet extends HttpServlet {
                     }
                     request.setAttribute("msg", "Cập nhật thông tin thành công!");
                 } else {
-                    logger.error("Lỗi cập nhật tầng DB khi thay đổi thông tin cá nhân của User ID: {}", user.getId());
+                    logger.error("DB update error while changing personal information for User ID: {}", user.getId());
                     request.setAttribute("error", "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             }

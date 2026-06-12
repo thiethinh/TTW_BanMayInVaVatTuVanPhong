@@ -34,7 +34,7 @@ public class StationeryServlet extends HttpServlet {
             try {
                 categoryId = Integer.parseInt(categoryIdRaw);
             } catch (NumberFormatException e) {
-                logger.error("Định dạng tham số mã danh mục 'category' gửi lên không đúng kiểu số: '{}'", categoryIdRaw);
+                logger.error("Invalid format for category ID parameter 'category': '{}'", categoryIdRaw);
                 categoryId = 0;
             }
         }
@@ -44,37 +44,37 @@ public class StationeryServlet extends HttpServlet {
         sort = (sort == null || sort.isEmpty() || sort.isBlank()) ? "rating" : sort;
         brand = (brand == null || brand.isEmpty() || brand.isBlank()) ? null : brand.trim();
 
-        logger.info("Nhận yêu cầu tải danh sách Văn phòng phẩm. Tiêu chí bộ lọc -> Từ khóa: '{}', Category ID: {}, Thương hiệu: '{}', Tiêu chí xếp: '{}'",
+        logger.info("Received request to load Stationery list. Filters -> Keyword: '{}', Category ID: {}, Brand: '{}', Sort by: '{}'",
                 search, categoryId, brand, sort);
 
         ProductDAO dao = new ProductDAO();
 
-        logger.debug("Đang truy vấn danh sách Văn phòng phẩm (Stationery) từ cơ sở dữ liệu dựa trên bộ lọc...");
+        logger.debug("Querying Stationery list from the database based on filters...");
         List<Product> stationery = dao.filterProduct("Stationery", search, categoryId, brand, sort);
 
         // Kiểm tra null an toàn
         if (stationery == null) {
-            logger.debug("Danh sách sản phẩm văn phòng phẩm trả về bị null, khởi tạo danh sách trống.");
+            logger.debug("Returned stationery product list is null, initializing empty list.");
             stationery = new ArrayList<>();
         }
 
         // Lấy danh sách danh mục để hiển thị trong dropdown filter
         CategoryDAO categoryDAO = new CategoryDAO();
-        logger.debug("Đang lấy danh sách các danh mục thuộc nhóm 'Stationery'...");
+        logger.debug("Retrieving category list for 'Stationery' group...");
         List<Category> categories = categoryDAO.getAllCategories("Stationery");
         if (categories == null) {
-            logger.debug("Danh sách danh mục văn phòng phẩm bị null, khởi tạo danh sách trống.");
+            logger.debug("Stationery category list is null, initializing empty list.");
             categories = new ArrayList<>();
         }
 
-        logger.debug("Đang lấy danh sách toàn bộ các thương hiệu của nhóm sản phẩm 'Stationery'...");
+        logger.debug("Retrieving list of all brands under 'Stationery' product group...");
         Set<String> brands = dao.getAllBrandByType("Stationery");
         if (brands == null) {
-            logger.debug("Danh sách thương hiệu bị null, khởi tạo cấu trúc TreeSet trống.");
+            logger.debug("Brand list is null, initializing empty TreeSet.");
             brands = new TreeSet<>();
         }
 
-        logger.info("Tải dữ liệu hoàn tất. Kết quả tìm kiếm: {} sản phẩm, {} phân loại danh mục, {} thương hiệu sẵn có.",
+        logger.info("Data loading complete. Search results: {} products, {} categories, {} available brands.",
                 stationery.size(), categories.size(), brands.size());
 
         // Gửi dữ liệu sang JSP
@@ -88,7 +88,7 @@ public class StationeryServlet extends HttpServlet {
         request.setAttribute("sortReturn", sort);
         request.setAttribute("brandReturn", brand);
 
-        logger.debug("Chuyển tiếp luồng xử lý dữ liệu (Forward) sang giao diện stationery.jsp");
+        logger.debug("Forwarding data processing flow to stationery.jsp interface");
         request.getRequestDispatcher("/WEB-INF/views/client/stationery.jsp").forward(request, response);
     }
 }

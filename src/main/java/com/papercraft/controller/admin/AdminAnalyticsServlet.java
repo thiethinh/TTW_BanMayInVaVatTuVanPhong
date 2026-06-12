@@ -29,7 +29,7 @@ public class AdminAnalyticsServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
         if (user == null || (!user.getRole().equals("admin") && !user.getRole().equals("mod"))) {
-            logger.warn("Cảnh báo bảo mật: Tài khoản '{}' (Role: {}) cố gắng truy cập API thống kê mà không có quyền.",
+            logger.warn("Security warning: Account '{}' (Role: {}) attempted to access analytics API without permission.",
                     user.getEmail(), user.getRole());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\": \"Không có quyền truy cập\"}");
@@ -37,7 +37,7 @@ public class AdminAnalyticsServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        logger.info("Tài khoản '{}' ({}) yêu cầu dữ liệu phân tích với action: '{}'",
+        logger.info("Account '{}' ({}) requested analytics data with action: '{}'",
                 user.getEmail(), user.getRole(), action);
 
         AnalyticsDAO analyticsDAO = new AnalyticsDAO();
@@ -46,27 +46,27 @@ public class AdminAnalyticsServlet extends HttpServlet {
         try {
             if ("profit".equals(action)) {
                 String yearStr = request.getParameter("year");
-                logger.debug("Tham số năm nhận được cho thống kê profit: '{}'", yearStr);
+                logger.debug("Year parameter received for profit statistics: '{}'", yearStr);
                 int year = Integer.parseInt(yearStr);
-                logger.info("Đang truy xuất dữ liệu lợi nhuận hàng tháng của năm: {}", year);
+                logger.info("Retrieving monthly profit data for year: {}", year);
 
                 List<ProfitStatDTO> profitStats = analyticsDAO.getMonthlyProfitStat(year);
-                logger.debug("Truy xuất thành công dữ liệu lợi nhuận năm {}. Số lượng bản ghi: {}",
+                logger.debug("Successfully retrieved profit data for year {}. Number of records: {}",
                         year, (profitStats != null ? profitStats.size() : 0));
                 response.getWriter().write(gson.toJson(profitStats));
             } else if ("restock".equals(action)) {
-                logger.info("Đang truy xuất dữ liệu hiệu suất sản phẩm và dự báo nhập hàng.");
+                logger.info("Retrieving product performance data and restocking forecast.");
                 List<ProductPerformanceDTO> restockData = analyticsDAO.getProductPerformanceAndForecast();
-                logger.debug("Truy xuất thành công dữ liệu dự báo. Số lượng sản phẩm phân tích: {}",
+                logger.debug("Successfully retrieved forecast data. Number of analyzed products: {}",
                         (restockData != null ? restockData.size() : 0));
                 response.getWriter().write(gson.toJson(restockData));
             } else {
-                logger.warn("Yêu cầu không hợp lệ. Hành động '{}' không được hỗ trợ.", action);
+                logger.warn("Invalid request. Action '{}' is not supported.", action);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\": \"Hành động không hợp lệ\"}");
             }
         } catch (Exception e) {
-            logger.error("Lỗi hệ thống nghiêm trọng xảy ra khi xử lý phân tích dữ liệu (Action: {}): ", action, e);
+            logger.error("Critical system error occurred while processing data analytics (Action: {}): ", action, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\": \"Lỗi server:" + e.getMessage() + "\"}");
         }

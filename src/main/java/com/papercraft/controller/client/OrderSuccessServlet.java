@@ -36,29 +36,29 @@ public class OrderSuccessServlet extends HttpServlet {
 
         // Nếu user vào trực tiếp /order-success mà không qua checkout thì chuyển về /home
         if (orderSuccess == null || !orderSuccess || lastOrderId == null || lastOrderId <= 0) {
-            logger.warn("Cảnh báo: Phát hiện lượt truy cập trực tiếp/trái phép vào URL /order-success mà không qua luồng thanh toán.");
+            logger.warn("Warning: Detected direct/unauthorized access to URL /order-success without going through the payment flow.");
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
-        logger.info("Xử lý hoàn tất đơn hàng thành công. Đơn hàng ID: '{}', Khách hàng: '{}'",
-                lastOrderId, (user != null ? user.getEmail() : "Khách vãng lai"));
+        logger.info("Order completion processed successfully. Order ID: '{}', Customer: '{}'",
+                lastOrderId, (user != null ? user.getEmail() : "Guest"));
 
         ProductDAO productDAO = new ProductDAO();
-        logger.debug("Đang truy vấn danh sách sản phẩm gợi ý cho trang hoàn tất đơn hàng...");
+        logger.debug("Querying suggested product list for order completion page...");
         List<Product> suggestedProducts = productDAO.getSuggestedProductsSimple(8);
 
         if (suggestedProducts == null) {
-            logger.debug("Danh sách sản phẩm gợi ý trả về bị null, khởi tạo danh sách trống.");
+            logger.debug("Returned suggested product list is null, initializing empty list.");
             suggestedProducts = new ArrayList<>();
         }
 
         if (voucherId != null && voucherId != 0) {
-            logger.info("Phát hiện mã giảm giá sử dụng trong đơn hàng. Tiến hành cập nhật trạng thái ĐÃ DÙNG cho Voucher ID '{}' của User ID '{}'", voucherId, user.getId());
+            logger.info("Voucher detected in the order. Updating status to USED for Voucher ID '{}' of User ID '{}'", voucherId, user.getId());
             UserVoucherDAO userVoucherDAO = new UserVoucherDAO();
             userVoucherDAO.setUsedVoucher(user.getId(), voucherId);
         } else {
-            logger.warn("Lỗi logic: Tìm thấy Voucher ID '{}' nhưng đối tượng người dùng (User) trong session bị null.", voucherId);
+            logger.warn("Logic error: Voucher ID '{}' found but user object (User) in session is null.", voucherId);
         }
 
         // Gửi data sang JSP
@@ -66,11 +66,11 @@ public class OrderSuccessServlet extends HttpServlet {
         request.setAttribute("suggestedProducts", suggestedProducts);
 
         // Xóa session để k vào lại trang success trực tiếp nhiều lần
-        logger.debug("Đang dọn dẹp các thuộc tính kiểm tra đặt hàng ('orderSuccess', 'lastOrderId') trong session để tránh F5/truy cập lại.");
+        logger.debug("Clearing order verification attributes ('orderSuccess', 'lastOrderId') in session to avoid F5/re-access.");
         session.removeAttribute("orderSuccess");
         session.removeAttribute("lastOrderId");
 
-        logger.info("Chuyển tiếp luồng (Forward) dữ liệu thành công sang giao diện hiển thị order-success.jsp");
+        logger.info("Successfully forwarded data to order-success.jsp display interface");
         request.getRequestDispatcher("/WEB-INF/views/client/order-success.jsp")
                 .forward(request, response);
     }

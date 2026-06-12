@@ -24,7 +24,7 @@ public class RevenueByMonthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String month = req.getParameter("month");
-        logger.info("Nhận yêu cầu API lấy dữ liệu doanh thu. Tham số tháng (month): '{}'", month);
+        logger.info("Received API request for revenue data. Month parameter: '{}'", month);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
@@ -32,13 +32,13 @@ public class RevenueByMonthServlet extends HttpServlet {
             List<RevenueDTO> list = paymentDAO.getRevenueByMonth(month);
 
             if (list == null || list.isEmpty()) {
-                logger.warn("Không tìm thấy dữ liệu doanh thu ứng với tháng: '{}'. Phản hồi mảng rỗng.", month);
+                logger.warn("No revenue data found for month: '{}'. Returning empty array.", month);
                 out.print("[]");
                 out.flush();
                 return;
             }
 
-            logger.debug("Truy vấn thành công {} bản ghi doanh thu. Tiến hành chuyển đổi cấu trúc JSON...", list.size());
+            logger.debug("Successfully queried {} revenue records. Converting to JSON structure...", list.size());
 
             StringBuilder json = new StringBuilder("[");
             for (int i = 0; i < list.size(); i++) {
@@ -53,9 +53,9 @@ public class RevenueByMonthServlet extends HttpServlet {
 
             out.print(json.toString());
             out.flush();
-            logger.info("Đã phản hồi thành công chuỗi JSON dữ liệu doanh thu cho Client.");
+            logger.info("Successfully sent JSON revenue data response to the client.");
         } catch (Exception e) {
-            logger.error("Xảy ra lỗi nghiêm trọng khi xử lý API doanh thu tháng '{}': ", month, e);
+            logger.error("Critical error occurred while processing revenue API for month '{}': ", month, e);
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().print("{\"error\":\"Lỗi hệ thống nội bộ khi tổng hợp dữ liệu doanh thu.\"}");

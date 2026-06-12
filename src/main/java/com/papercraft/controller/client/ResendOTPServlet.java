@@ -26,7 +26,7 @@ public class ResendOTPServlet extends HttpServlet {
         String resetEmail = (String) session.getAttribute("RESET_EMAIL");
 
         if (tempUser == null && resetEmail == null) {
-            logger.warn("Yêu cầu gửi lại OTP bị từ chối: Phiên làm việc (Session) không chứa thông tin tempUser hoặc RESET_EMAIL.");
+            logger.warn("OTP resend request denied: Session does not contain tempUser or RESET_EMAIL information.");
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Phiên giao dịch hết hạn, vui lòng thao tác lại!\"}");
             return;
         }
@@ -36,18 +36,18 @@ public class ResendOTPServlet extends HttpServlet {
         Long lockoutTime = (Long) session.getAttribute("OTP_lockout_time");
         if (lockoutTime != null && currentTime < lockoutTime) {
             long remainingTime = (lockoutTime - currentTime) / 60000;
-            logger.warn("Yêu cầu gửi lại OTP cho '{}' bị chặn do tài khoản đang trong trạng thái khóa tạm thời (Lockout). Thời gian còn lại: ~{} phút.", resetEmail, remainingTime + 1);
+            logger.warn("OTP resend request for '{}' blocked because the account is in a temporary lockout state. Remaining time: ~{} minutes.", resetEmail, remainingTime + 1);
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Vui lòng thử lại sau " + (remainingTime + 1) + " phút\"}");
             return;
         }
 
-        logger.info("Nhận yêu cầu gửi lại mã OTP cho Email mục tiêu: '{}' (Luồng: '{}')",
+        logger.info("Received request to resend OTP code for target Email: '{}' (Flow: '{}')",
                 resetEmail, (tempUser != null ? "Đăng ký thành viên" : "Quên mật khẩu"));
 
         Long lastCreatedTime = (Long) session.getAttribute("REG_OTP_createTime");
         if (lastCreatedTime != null && (currentTime - lastCreatedTime) < 30000) {
             long remainingSeconds = 30 - ((currentTime - lastCreatedTime) / 1000);
-            logger.warn("Yêu cầu gửi lại OTP cho '{}' bị chặn do thao tác quá nhanh (Chưa đủ 30 giây giãn cách). Còn thiếu: {} giây.", resetEmail, remainingSeconds);
+            logger.warn("OTP resend request for '{}' blocked due to rapid requests (Less than 30 seconds interval). Remaining: {} seconds.", resetEmail, remainingSeconds);
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Vui lòng đợi 30s trước khi gửi lại\"}");
             return;
         }
@@ -56,32 +56,32 @@ public class ResendOTPServlet extends HttpServlet {
         int resendCount = count == null ? 0 : count;
         if (resendCount >= 3) {
             session.setAttribute("OTP_lockout_time", currentTime + 900000);
-            logger.warn("CẢNH BÁO BẢO MẬT: Email '{}' đã vượt quá giới hạn 3 lần gửi lại mã OTP liên tiếp. Tiến hành kích hoạt hình phạt khóa (Lockout) trong 15 phút.", resetEmail);
+            logger.warn("SECURITY WARNING: Email '{}' has exceeded the limit of 3 consecutive OTP resend attempts. Activating 15-minute lockout penalty.", resetEmail);
             session.removeAttribute("OTP_resend_count");
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Vượt quá 3 lần. Vui lòng thử lại sau 15 phút\"}");
             return;
         }
 
-        logger.debug("Mọi điều kiện kiểm tra tần suất đều hợp lệ (Lần yêu cầu: {}). Bắt đầu sinh mã OTP mới...", resendCount + 1);
+        logger.debug("All frequency check conditions are valid (Attempt: {}). Starting to generate new OTP code...", resendCount + 1);
         String newOTP = EmailUtils.generateOTP();
         boolean isSent = false;
         if (tempUser != null) {
-            logger.debug("Gọi dịch vụ gửi OTP đăng ký thành viên tới: '{}'", tempUser.getEmail());
+            logger.debug("Calling registration OTP service to: '{}'", tempUser.getEmail());
             isSent = EmailUtils.sendRegisterOTP(tempUser.getEmail(), newOTP);
             if (isSent) session.setAttribute("authCode", newOTP);
         } else if (resetEmail != null) {
-            logger.debug("Gọi dịch vụ gửi OTP khôi phục mật khẩu tới: '{}'", resetEmail);
+            logger.debug("Calling forgot password OTP service to: '{}'", resetEmail);
             isSent = EmailUtils.sendForgotPasswordOTP(resetEmail, newOTP);
             if (isSent) session.setAttribute("OTP_CODE", newOTP);
         }
 
         if (isSent) {
-            logger.info("Gửi lại mã OTP thành công đến Email: '{}'. Cập nhật lại số lần gửi và dấu mốc thời gian vào Session.", resetEmail);
+            logger.info("Successfully resent OTP code to Email: '{}'. Updating resend count and timestamp in Session.", resetEmail);
             session.setAttribute("OTP_resend_count", resendCount + 1);
             session.setAttribute("REG_OTP_createTime", currentTime);
             response.getWriter().write("{\"status\": \"success\", \"message\": \"Gửi lại mã thành công\"}");
         } else {
-            logger.error("Lỗi hệ thống: Không thể gửi lại mã OTP tới '{}' thông qua Mail Server.", resetEmail);
+            logger.error("System error: Cannot resend OTP code to '{}' via Mail Server.", resetEmail);
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Hệ thống gửi mail đang bận, vui lòng thử lại sau\"}");
         }
     }

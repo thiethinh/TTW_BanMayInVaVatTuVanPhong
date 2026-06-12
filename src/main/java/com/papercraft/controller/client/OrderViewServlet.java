@@ -32,7 +32,7 @@ public class OrderViewServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Yêu cầu xem chi tiết đơn hàng bị từ chối: Người dùng chưa đăng nhập.");
+            logger.warn("Request to view order details denied: User not logged in.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -40,18 +40,18 @@ public class OrderViewServlet extends HttpServlet {
         String orderIdStr = request.getParameter("orderId");
         int orderId = orderIdStr != null ? Integer.parseInt(orderIdStr) : 0;
 
-        logger.info("User ID '{}' (Role: '{}') yêu cầu xem chi tiết đơn hàng ID: '{}'", user.getId(), user.getRole(), orderId);
+        logger.info("User ID '{}' (Role: '{}') requested to view details for order ID: '{}'", user.getId(), user.getRole(), orderId);
 
         OrderDAO orderDAO = new OrderDAO();
         Order order = orderDAO.getOrderByID(orderId);
 
         if (order == null || order.getUserId() != user.getId() && !user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("mod")) {
-            logger.warn("CẢNH BÁO BẢO MẬT: Người dùng ID '{}' cố gắng truy cập trái phép hoặc đơn hàng ID '{}' không tồn tại.", user.getId(), orderId);
+            logger.warn("SECURITY WARNING: User ID '{}' attempted unauthorized access or order ID '{}' does not exist.", user.getId(), orderId);
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
-        logger.debug("Xác thực quyền xem đơn hàng thành công. Tiến hành nạp dữ liệu chi tiết đơn hàng...");
+        logger.debug("Order view permission verified successfully. Loading detailed order data...");
 
         OrderItemDAO orderItemDAO = new OrderItemDAO();
         List<OrderItem> orderItems = orderItemDAO.getItemByOrderId(orderId);
@@ -67,7 +67,7 @@ public class OrderViewServlet extends HttpServlet {
         request.setAttribute("user", orderUser);
         request.setAttribute("payment", payment);
 
-        logger.info("Tải thông tin đơn hàng ID '{}' thành công. Chuyển tiếp luồng sang giao diện order-view.jsp", orderId);
+        logger.info("Successfully loaded order ID '{}' details. Forwarding flow to order-view.jsp", orderId);
         request.getRequestDispatcher("/WEB-INF/views/client/order-view.jsp").forward(request, response);
     }
 
@@ -78,7 +78,7 @@ public class OrderViewServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Yêu cầu thao tác hủy đơn hàng bị từ chối: Người dùng chưa đăng nhập.");
+            logger.warn("Request to cancel order denied: User not logged in.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -87,32 +87,32 @@ public class OrderViewServlet extends HttpServlet {
         String orderIdStr = request.getParameter("orderId");
         if ("cancel".equals(action)) {
             int orderId = Integer.parseInt(orderIdStr);
-            logger.warn("Yêu cầu thao tác hủy đơn hàng bị từ chối: Người dùng chưa đăng nhập.");
+            logger.warn("Request to cancel order denied: User not logged in.");
 
             OrderDAO orderDAO = new OrderDAO();
             Order order = orderDAO.getOrderByID(orderId);
 
             if (order != null && order.getUserId() == user.getId() && "pending".equalsIgnoreCase(order.getStatus())) {
-                logger.debug("Đơn hàng hợp lệ và đang ở trạng thái 'pending'. Tiến hành gọi OrderService để hủy và hoàn lại kho...");
+                logger.debug("Order is valid and in 'pending' status. Calling OrderService to cancel and release stock...");
                 OrderService orderService = new OrderService();
 
                 boolean isCanceled = orderService.cancelOrderAndReleaseStock(orderId);
 
                 if (isCanceled) {
-                    logger.info("Hủy đơn hàng ID '{}' thành công và đã giải phóng số lượng tồn kho.", orderId);
+                    logger.info("Successfully canceled order ID '{}' and released stock quantity.", orderId);
                     session.setAttribute("successMsg", "Đã hủy đơn hàng thành công! Số lượng sản phẩm đã được hoàn lại kho.");
                 } else {
-                    logger.error("Lỗi nghiệp vụ: Gọi OrderService hủy đơn hàng ID '{}' thất bại.", orderId);
+                    logger.error("Business logic error: Failed to call OrderService to cancel order ID '{}'.", orderId);
                     session.setAttribute("errorMsg", "Hủy đơn hàng thất bại, vui lòng thử lại!");
                 }
             } else {
-                logger.warn("Yêu cầu hủy đơn hàng ID '{}' không hợp lệ. Nguyên nhân có thể do: Đơn hàng không tồn tại, không thuộc quyền sở hữu của User ID '{}' hoặc trạng thái hiện tại không phải 'pending' (Trạng thái thực tế: '{}').",
+                logger.warn("Invalid request to cancel order ID '{}'. Reason could be: Order does not exist, does not belong to User ID '{}', or current status is not 'pending' (Actual status: '{}').",
                         orderId, user.getId(), (order != null ? order.getStatus() : "NULL"));
                 session.setAttribute("errorMsg", "Không thể hủy đơn hàng");
             }
             response.sendRedirect(request.getContextPath() + "/order-view?orderId=" + orderId);
         } else {
-            logger.warn("Nhận yêu cầu POST tại /order-view với hành động 'action' không được hỗ trợ: '{}'", action);
+            logger.warn("Received POST request at /order-view with unsupported action: '{}'", action);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }

@@ -34,27 +34,27 @@ public class FacebookLoginServlet extends HttpServlet {
         String code = request.getParameter("code");
 
         if (code == null || code.isEmpty()) {
-            logger.warn("Đăng nhập Facebook thất bại: Không nhận được tham số 'code' từ Facebook OAuth.");
+            logger.warn("Facebook login failed: 'code' parameter not received from Facebook OAuth.");
             session.setAttribute("msg", "Đăng nhập Facebook thất bại hoặc đã bị hủy.");
             response.sendRedirect("login");
             return;
         }
 
-        logger.info("Nhận được mã code từ Facebook. Bắt đầu tiến trình xác thực tài khoản.");
+        logger.info("Received authorization code from Facebook. Starting account verification process.");
 
         try {
-            logger.debug("Đang trao đổi mã code để lấy Access Token...");
+            logger.debug("Exchanging code to obtain Access Token...");
             String accessToken = getAccessToken(code);
 
-            logger.debug("Đang lấy thông tin người dùng từ Facebook Graph API...");
+            logger.debug("Retrieving user information from Facebook Graph API...");
             FacebookUser facebookUser = getUserInfo(accessToken);
 
             String email = facebookUser.getEmail();
-            logger.info("Xử lý tài khoản Facebook có Email: '{}', Tên: '{}'", email, facebookUser.getName());
+            logger.info("Processing Facebook account with Email: '{}', Name: '{}'", email, facebookUser.getName());
 
             UserDAO userDAO = new UserDAO();
             if (!userDAO.checkEmailExists(email)) {
-                logger.info("Email '{}' chưa tồn tại trong hệ thống. Tiến hành tự động đăng ký thành viên mới.", email);
+                logger.info("Email '{}' does not exist in the system yet. Proceeding with automatic registration of a new member.", email);
                 // Đăng ký nếu email chưa tồn tại
                 User newUser = new User();
                 newUser.setEmail(email);
@@ -73,24 +73,24 @@ public class FacebookLoginServlet extends HttpServlet {
                 newUser.setPasswordHash("");
 
                 userDAO.signup(newUser);
-                logger.info("Đăng ký thành công tài khoản mới từ Facebook cho Email: '{}'", email);
+                logger.info("Successfully registered new account from Facebook for Email: '{}'", email);
             }
 
             // Đăng nhập nếu email đã tồn tại
-            logger.debug("Đang truy vấn thông tin chi tiết tài khoản từ CSDL cho Email: '{}'", email);
+            logger.debug("Querying detailed account information from DB for Email: '{}'", email);
             User loggedUser = userDAO.getUserByEmail(email);
             if (loggedUser != null) {
-                logger.info("User ID '{}' đăng nhập thành công bằng tài khoản Facebook.", loggedUser.getId());
+                logger.info("User ID '{}' successfully logged in using Facebook account.", loggedUser.getId());
                 session.setAttribute("acc", loggedUser);
                 session.setAttribute("success", "Đăng nhập thành công");
                 response.sendRedirect("home");
             } else {
-                logger.error("Lỗi logic hệ thống: Đã kiểm tra/đăng ký email '{}' nhưng không thể lấy ra đối tượng User từ CSDL.", email);
+                logger.error("System logic error: Checked/registered email '{}' but could not retrieve User object from DB.", email);
                 session.setAttribute("msg", "Lỗi khi tải thông tin tài khoản");
                 response.sendRedirect("login");
             }
         } catch (Exception e) {
-            logger.error("Lỗi hệ thống nghiêm trọng trong tiến trình xác thực Facebook OAuth: ", e);
+            logger.error("Serious system error in Facebook OAuth verification process: ", e);
             session.setAttribute("msg", "Lỗi hệ thống khi kết nối với Facebook");
             response.sendRedirect("login");
         }

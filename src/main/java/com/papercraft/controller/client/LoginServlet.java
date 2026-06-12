@@ -22,12 +22,12 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Tải giao diện trang Đăng nhập (login.jsp).");
+        logger.debug("Loading Login page interface (login.jsp).");
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("cEmail".equals(cookie.getName())) {
-                    logger.debug("Tìm thấy cookie email ghi nhớ: '{}'", cookie.getValue());
+                    logger.debug("Found remembered email cookie: '{}'", cookie.getValue());
                     request.setAttribute("cEmail", cookie.getValue());
                 }
                 if ("cRemember".equals(cookie.getName()) && "true".equals(cookie.getValue())) {
@@ -44,16 +44,16 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String remember = request.getParameter("remember");
 
-        logger.info("Nhận yêu cầu xử lý đăng nhập cho Email: '{}'", email);
+        logger.info("Received login request for Email: '{}'", email);
 
         UserDAO userDAO = new UserDAO();
         String passwordHash = MD5.getMD5(password);
         User user = userDAO.login(email, passwordHash);
 
         if (user != null) {
-            logger.info("Đăng nhập thành công! User ID: '{}', Vai trò: '{}'", user.getId(), user.getRole());
+            logger.info("Login successful! User ID: '{}', Role: '{}'", user.getId(), user.getRole());
             if ("mod".equalsIgnoreCase(user.getRole())) {
-                logger.debug("Tài khoản thuộc nhóm Điều phối (mod). Tiến hành nạp quyền hạn (Permissions)...");
+                logger.debug("Account belongs to Coordinator group (mod). Loading permissions...");
                 user.setPermissions(userDAO.getPermissions(user.getId()));
             }
 
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("acc", user);
             session.setAttribute("success", "Bạn đã đăng nhập thành công!");
 
-            logger.debug("Tiến hành kiểm tra và gộp giỏ hàng vãng lai cho User ID '{}'...", user.getId());
+            logger.debug("Proceeding to check and merge guest cart for User ID '{}'...", user.getId());
             mergeCart(guestCart, user.getId(), session);
 
             Cookie uEmail = new Cookie("cEmail", email);
@@ -76,11 +76,11 @@ public class LoginServlet extends HttpServlet {
             uRemember.setPath("/");
 
             if ("on".equals(remember)) {
-                logger.debug("Bật chế độ ghi nhớ tài khoản (Remember me) trong 7 ngày.");
+                logger.debug("Enabling Remember Me mode for 7 days.");
                 uEmail.setMaxAge(60 * 60 * 24 * 7);
                 uRemember.setMaxAge(60 * 60 * 24 * 7);
             } else {
-                logger.debug("Tắt hoặc không chọn chế độ ghi nhớ tài khoản. Xóa Cookies cũ.");
+                logger.debug("Disabling or not selecting Remember Me mode. Deleting old Cookies.");
                 uEmail.setMaxAge(0);
                 uRemember.setMaxAge(0);
             }
@@ -98,19 +98,19 @@ public class LoginServlet extends HttpServlet {
                 } else {
                     finalRedirect = contextPath + (redirectUrl.startsWith("/") ? "" : "/") + redirectUrl;
                 }
-                logger.info("Điều hướng người dùng về trang yêu cầu trước đó (Redirect URL): '{}'", finalRedirect);
+                logger.info("Redirecting user to previous requested page (Redirect URL): '{}'", finalRedirect);
                 response.sendRedirect(finalRedirect);
             } else {
                 if ("admin".equalsIgnoreCase(user.getRole()) || "mod".equalsIgnoreCase(user.getRole())) {
-                    logger.info("Người dùng thuộc nhóm Quản trị. Điều hướng sang khu vực Admin.");
+                    logger.info("User belongs to Admin group. Redirecting to Admin area.");
                     response.sendRedirect(contextPath + "/admin");
                 } else {
-                    logger.info("Người dùng thông thường. Điều hướng sang trang chủ.");
+                    logger.info("Regular user. Redirecting to homepage.");
                     response.sendRedirect(contextPath + "/home");
                 }
             }
         } else {
-            logger.warn("Đăng nhập thất bại: Tài khoản hoặc mật khẩu không chính xác đối với Email: '{}'", email);
+            logger.warn("Login failed: Incorrect email or password for Email: '{}'", email);
             request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng!");
             request.setAttribute("email", email);
             request.setAttribute("redirect", request.getParameter("redirect"));
@@ -128,11 +128,11 @@ public class LoginServlet extends HttpServlet {
         boolean hasGuestItems = (guestCart != null && guestCart.getTotalQuantity() > 0);
 
         if (hasGuestItems) {
-            logger.info("Phát hiện giỏ hàng vãng lai (Guest Cart) có mặt hàng. Tiến hành gộp dữ liệu vào DB Cart của User ID: '{}'", userId);
+            logger.info("Detected items in Guest Cart. Merging data into DB Cart of User ID: '{}'", userId);
             for (Product guestItem : guestCart.list()) {
                 Product fresh = productDAO.getProductById(guestItem.getId());
                 if (fresh == null) {
-                    logger.warn("Sản phẩm ID '{}' từ giỏ hàng vãng lai không còn tồn tại trong DB, bỏ qua.", guestItem.getId());
+                    logger.warn("Product ID '{}' from guest cart no longer exists in DB, skipping.", guestItem.getId());
                     continue;
                 }
                 //Giuwx sluong Guest muốn thêm
@@ -143,7 +143,7 @@ public class LoginServlet extends HttpServlet {
             }
 
             // lưu ngược lại xuống db cho lần sau
-            logger.debug("Đang dọn dẹp và cập nhật lại giỏ hàng hợp nhất xuống CSDL cho User ID: '{}'", userId);
+            logger.debug("Clearing and updating merged cart to DB for User ID: '{}'", userId);
             cartDAO.clearCart(userId);
 
             int savedCount = 0;
@@ -151,9 +151,9 @@ public class LoginServlet extends HttpServlet {
                 cartDAO.saveItem(userId, item.getId(), item.getQuantity());
                 savedCount++;
             }
-            logger.info("Gộp giỏ hàng hoàn tất. Đã đồng bộ {} sản phẩm xuống CSDL cho User ID: '{}'", savedCount, userId);
+            logger.info("Cart merge complete. Synchronized {} products to DB for User ID: '{}'", savedCount, userId);
         } else {
-            logger.debug("Giỏ hàng vãng lai trống. Sử dụng trực tiếp dữ liệu giỏ hàng từ CSDL.");
+            logger.debug("Guest cart is empty. Using cart data directly from DB.");
         }
         session.setAttribute("cart", dbCart);
     }

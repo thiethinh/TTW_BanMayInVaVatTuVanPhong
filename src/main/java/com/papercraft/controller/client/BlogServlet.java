@@ -24,7 +24,7 @@ public class BlogServlet extends HttpServlet {
         String search = request.getParameter("search");
         String type = request.getParameter("type");
         if (type == null) type = "all";
-        logger.info("Tải danh sách bài viết. Bộ lọc -> Từ khóa: '{}', Thể loại: '{}'",
+        logger.info("Loading blog post list. Filter -> Keyword: '{}', Category: '{}'",
                 search, type);
 
         BlogDao blogDao = new BlogDao();

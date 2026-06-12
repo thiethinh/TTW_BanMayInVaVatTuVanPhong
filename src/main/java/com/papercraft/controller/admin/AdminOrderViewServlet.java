@@ -31,7 +31,7 @@ public class AdminOrderViewServlet extends HttpServlet {
         String accept = request.getParameter("accept");
         String cancel = request.getParameter("cancel");
 
-        logger.debug("Nhận yêu cầu GET vào AdminOrderViewServlet. orderIdRaw='{}', verifyPayment='{}', accept='{}', cancel='{}'",
+        logger.debug("Received GET request to AdminOrderViewServlet. orderIdRaw='{}', verifyPayment='{}', accept='{}', cancel='{}'",
                 orderID, verifyPayment, accept, cancel);
 
         int id = orderID != null ? Integer.parseInt(orderID) : 0;
@@ -52,9 +52,9 @@ public class AdminOrderViewServlet extends HttpServlet {
         if (typeNoti != null) {
             Notification noti = new Notification(userSession.getId(), typeNoti, id);
             notificationDAO.insertNotification(noti);
-            logger.debug("Đã lưu thông báo loại '{}' cho đơn hàng ID: {} bởi Admin ID: {}", typeNoti, id, userSession.getId());
+            logger.debug("Saved notification of type '{}' for Order ID: {} by Admin ID: {}", typeNoti, id, userSession.getId());
         } else {
-            logger.warn("Không thể tạo thông báo đổi trạng thái đơn hàng vì phiên làm việc (Session) của Admin đã hết hạn.");
+            logger.warn("Cannot create status change notification for the order because the Admin's session has expired.");
         }
 
         if (accept != null) {
@@ -63,9 +63,9 @@ public class AdminOrderViewServlet extends HttpServlet {
             if (currentOrder != null && isValidStatusChange(currentOrder.getStatus(), accept)) {
                 updated = orderDAO.updateOrderStatus(id, accept);
                 isAccept = true;
-                logger.info("Cập nhật trạng thái đơn hàng ID {} thành công sang [Duyệt/Giao hàng: '{}']. Kết quả CSDL: {}", id, accept, updated);
+                logger.info("Successfully updated order ID {} status to [Approve/Ship: '{}']. DB result: {}", id, accept, updated);
             } else {
-                logger.warn("Hành động duyệt đơn hàng ID {} bị từ chối do trạng thái hiện tại [{}] không hợp lệ để chuyển sang [{}]",
+                logger.warn("Approval action for order ID {} rejected because the current status [{}] is invalid to transition to [{}]",
                         id, (currentOrder != null ? currentOrder.getStatus() : "NULL"), accept);
             }
 
@@ -75,9 +75,9 @@ public class AdminOrderViewServlet extends HttpServlet {
             if (currentOrder != null && isValidStatusChange(currentOrder.getStatus(), cancel)) {
                 updated = orderDAO.updateOrderStatus(id, cancel);
                 isCancel = true;
-                logger.info("Cập nhật trạng thái đơn hàng ID {} thành công sang [Hủy: '{}']. Kết quả CSDL: {}", id, cancel, updated);
+                logger.info("Successfully updated order ID {} status to [Cancel: '{}']. DB result: {}", id, cancel, updated);
             } else {
-                logger.warn("Hành động hủy đơn hàng ID {} bị từ chối do trạng thái hiện tại [{}] không hợp lệ để chuyển sang [{}]",
+                logger.warn("Cancellation action for order ID {} rejected because the current status [{}] is invalid to transition to [{}]",
                         id, (currentOrder != null ? currentOrder.getStatus() : "NULL"), cancel);
             }
         }
@@ -94,7 +94,7 @@ public class AdminOrderViewServlet extends HttpServlet {
 
             if (currentPayment != null && !Boolean.TRUE.equals(currentPayment.getStatus())) {
                 String method = currentPayment.getPaymentMethod();
-                logger.info("Bắt đầu xác thực thanh toán cho đơn hàng ID: {}. Phương thức: '{}', Mã giao dịch: '{}'", id, method, transactionCode);
+                logger.info("Starting payment verification for order ID: {}. Method: '{}', Transaction Code: '{}'", id, method, transactionCode);
 
                 //Gia su cho COD verify khi owr trang thai shipping/complete
                 if ("COD".equalsIgnoreCase(method)) {
@@ -103,14 +103,14 @@ public class AdminOrderViewServlet extends HttpServlet {
                         verifiedPayment = paymentDAO.verifyPaymentSuccess(id, transactionCode);
                         isVeryfyPayment = true;
                     } else {
-                        logger.warn("Xác thực thanh toán thất bại cho đơn COD ID {}: Đơn hàng phải có trạng thái 'shipped' hoặc 'completed' thay vì [{}]",
+                        logger.warn("Payment verification failed for COD order ID {}: Order must be in 'shipped' or 'completed' status instead of [{}]",
                                 id, (currentOrder != null ? currentOrder.getStatus() : "NULL"));
                     }
                 } else {
                     verifiedPayment = paymentDAO.verifyPaymentSuccess(id, transactionCode);
                     isVeryfyPayment = true;
                 }
-                logger.info("Kết quả xác thực thanh toán đơn hàng ID {}: {}", id, verifiedPayment);
+                logger.info("Payment verification result for order ID {}: {}", id, verifiedPayment);
             }
         }
 
@@ -118,7 +118,7 @@ public class AdminOrderViewServlet extends HttpServlet {
         Order order = orderDAO.getOrderByID(id);
 
         if (order == null) {
-            logger.error("Không tìm thấy đơn hàng trong hệ thống ứng với ID: {}. Hủy tải trang chi tiết.", id);
+            logger.error("Order not found in the system for ID: {}. Aborting details page load.", id);
             return;
         }
 
@@ -129,7 +129,7 @@ public class AdminOrderViewServlet extends HttpServlet {
         User user = new UserDAO().getBasicInfoById(order.getUserId());
 
         Payment payment = new PaymentDAO().getPaymentByOrderId(id);
-        logger.debug("Tải thành công toàn bộ dữ liệu đơn hàng ID {}. Số lượng sản phẩm: {}, Khách hàng: '{}'",
+        logger.debug("Successfully loaded all data for order ID {}. Product count: {}, Customer: '{}'",
                 id, (orderItems != null ? orderItems.size() : 0), (user != null ? user.getEmail() : "N/A"));
 
         request.setAttribute("order", order);

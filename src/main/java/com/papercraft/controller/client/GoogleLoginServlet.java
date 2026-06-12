@@ -36,26 +36,26 @@ public class GoogleLoginServlet extends HttpServlet {
         String redirectUri = requestUrl.split("\\?")[0];
 
         if (code == null || code.isEmpty()) {
-            logger.warn("Đăng nhập Google thất bại: Không nhận được tham số 'code' từ Google OAuth.");
+            logger.warn("Google login failed: 'code' parameter not received from Google OAuth.");
             session.setAttribute("msg", "Đăng nhập Google thất bại hoặc đã bị hủy.");
             response.sendRedirect("login");
             return;
         }
-        logger.info("Nhận được mã code từ Google. Bắt đầu tiến trình xác thực tài khoản. Redirect URI sử dụng: '{}'", redirectUri);
+        logger.info("Received authorization code from Google. Starting account verification process. Redirect URI used: '{}'", redirectUri);
 
         try {
-            logger.debug("Đang trao đổi mã code lấy Access Token từ Google...");
+            logger.debug("Exchanging code to retrieve Access Token from Google...");
             String accessToken = getAccessToken(code, redirectUri);
 
-            logger.debug("Đang gửi yêu cầu lấy thông tin người dùng từ Google...");
+            logger.debug("Sending request to retrieve user information from Google...");
             GoogleUser googleUser = getUserInfo(accessToken);
             String email = googleUser.getEmail();
 
-            logger.info("Xử lý tài khoản Google có Email: '{}', Tên: '{}'", email, googleUser.getName());
+            logger.info("Processing Google account with Email: '{}', Name: '{}'", email, googleUser.getName());
 
             UserDAO userDAO = new UserDAO();
             if (!userDAO.checkEmailExists(email)) {
-                logger.info("Email '{}' chưa tồn tại trong hệ thống. Tiến hành tự động đăng ký tài khoản mới.", email);
+                logger.info("Email '{}' does not exist in the system yet. Proceeding with automatic registration of a new account.", email);
 
                 // Đăng ký nếu email chưa tồn tại
                 User newUser = new User();
@@ -75,7 +75,7 @@ public class GoogleLoginServlet extends HttpServlet {
                 newUser.setPasswordHash("");
 
                 userDAO.signup(newUser);
-                logger.info("Đăng ký tài khoản mới thành công từ Google OAuth cho Email: '{}'", email);
+                logger.info("Successfully registered new account from Google OAuth for Email: '{}'", email);
             }
 
             // Đăng nhập nếu email đã tồn tại
@@ -84,22 +84,22 @@ public class GoogleLoginServlet extends HttpServlet {
                 session.setAttribute("acc", loggedUser);
 
                 if (loggedUser.getEmail().isEmpty() || loggedUser.getPhoneNumber().isEmpty() || loggedUser.getPasswordHash().isEmpty()) {
-                    logger.info("User ID '{}' đăng nhập qua Google thành công nhưng tài khoản còn thiếu thông tin bắt buộc. Điều hướng tới trang cập nhật thông tin cá nhân.", loggedUser.getId());
+                    logger.info("User ID '{}' successfully logged in via Google, but the account is missing required information. Redirecting to update profile page.", loggedUser.getId());
                     session.setAttribute("error", "Vui lòng nhập thông tin còn thiếu để hoàn thiện tài khoản");
                     session.setAttribute("missingInformation", true);
                     response.sendRedirect("account");
                 } else {
-                    logger.info("User ID '{}' đăng nhập thành công bằng tài khoản Google. Điều hướng về trang chủ.", loggedUser.getId());
+                    logger.info("User ID '{}' successfully logged in using Google account. Redirecting to home page.", loggedUser.getId());
                     session.setAttribute("success", "Đăng nhập thành công");
                     response.sendRedirect("home");
                 }
             } else {
-                logger.error("Lỗi logic hệ thống: Không thể truy vấn đối tượng User từ CSDL sau khi đã xác thực/đăng ký thành công với Email '{}'", email);
+                logger.error("System logic error: Cannot retrieve User object from DB after successful verification/registration with Email '{}'", email);
                 session.setAttribute("msg", "Lỗi khi tải thông tin tài khoản");
                 response.sendRedirect("login");
             }
         } catch (Exception e) {
-            logger.error("Lỗi hệ thống nghiêm trọng xảy ra trong luồng xử lý Google OAuth: ", e);
+            logger.error("Serious system error in Google OAuth workflow: ", e);
             session.setAttribute("msg", "Lỗi hệ thống khi kết nối với Google");
             response.sendRedirect("login");
         }

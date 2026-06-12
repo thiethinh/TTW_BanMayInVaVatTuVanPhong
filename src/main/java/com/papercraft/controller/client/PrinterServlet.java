@@ -39,7 +39,7 @@ public class PrinterServlet extends HttpServlet {
             try {
                 categoryId = Integer.parseInt(categoryRaw);
             } catch (NumberFormatException ignored) {
-                logger.error("Định dạng tham số danh mục 'category' gửi lên không phải kiểu số hợp lệ: '{}'", categoryRaw);
+                logger.error("Format of submitted category parameter 'category' is not a valid number: '{}'", categoryRaw);
             }
         }
 
@@ -47,28 +47,28 @@ public class PrinterServlet extends HttpServlet {
             sort = "rating";
         }
 
-        logger.info("Nhận yêu cầu lọc danh sách Máy in. Tiêu chí tìm kiếm -> Từ khóa: '{}', Category ID: {}, Thương hiệu: '{}', Sắp xếp: '{}'",
+        logger.info("Received request to filter Printer list. Search criteria -> Keyword: '{}', Category ID: {}, Brand: '{}', Sort: '{}'",
                 search, categoryId, brand, sort);
 
         ProductDAO productDAO = new ProductDAO();
-        logger.debug("Đang truy vấn danh sách sản phẩm Máy in theo bộ lọc...");
+        logger.debug("Querying Printer products list according to filter...");
         List<Product> printers = productDAO.filterProduct("Printer", search, categoryId, brand, sort);
         if (printers == null) {
-            logger.debug("Danh sách máy in trả về bị null, khởi tạo danh sách trống.");
+            logger.debug("Returned printers list is null, initializing empty list.");
             printers = new ArrayList<>();
         }
 
         CategoryDAO categoryDAO = new CategoryDAO();
-        logger.debug("Đang lấy danh sách tất cả danh mục thuộc nhóm 'Printer'...");
+        logger.debug("Getting list of all categories in 'Printer' group...");
         List<Category> categories = categoryDAO.getAllCategories("Printer");
         if (categories == null) {
-            logger.debug("Danh sách danh mục trả về bị null, khởi tạo danh sách trống.");
+            logger.debug("Returned categories list is null, initializing empty list.");
             categories = new ArrayList<>();
         }
 
-        logger.debug("Đang lấy danh sách toàn bộ thương hiệu thuộc nhóm 'Printer'...");
+        logger.debug("Getting list of all brands in 'Printer' group...");
         Set<String> brands = productDAO.getAllBrandByType("Printer");
-        logger.info("Tải dữ liệu thành công. Kết quả lọc: {} Máy in, {} Danh mục, {} Thương hiệu.",
+        logger.info("Successfully loaded data. Filter results: {} Printers, {} Categories, {} Brands.",
                 printers.size(), categories.size(), (brands != null ? brands.size() : 0));
 
         request.setAttribute("searchReturn", search);
@@ -79,7 +79,7 @@ public class PrinterServlet extends HttpServlet {
         request.setAttribute("categories", categories);
         request.setAttribute("brands", brands);
 
-        logger.debug("Chuyển tiếp luồng (Forward) sang giao diện hiển thị printer.jsp");
+        logger.debug("Forwarding flow to printer.jsp display interface");
         request.getRequestDispatcher("/WEB-INF/views/client/printer.jsp").forward(request, response);
     }
 
