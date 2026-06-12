@@ -2,6 +2,8 @@ package com.papercraft.dao;
 
 import com.papercraft.model.Voucher;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,7 +11,10 @@ import java.util.List;
 
 public class VoucherDAO {
 
+    private static final Logger logger = LoggerFactory.getLogger(VoucherDAO.class);
+
     private Voucher mapAllRowVoucher(ResultSet rs) throws SQLException {
+
         Voucher v = new Voucher();
         v.setId(rs.getInt("id"));
         v.setCode(rs.getString("code"));
@@ -40,8 +45,10 @@ public class VoucherDAO {
             ps.setString(2, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapAllRowVoucher(rs));
+        }catch (SQLException e) {
+            logger.error("SQL error while getting vouchers with keyword={}", keyword, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while getting vouchers with keyword={}", keyword, e);
         }
         return list;
     }
@@ -53,8 +60,10 @@ public class VoucherDAO {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return mapAllRowVoucher(rs);
+        } catch (SQLException e) {
+            logger.error("SQL error while getting voucher id={}", id, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while getting voucher id={}", id, e);
         }
         return null;
     }
@@ -66,8 +75,10 @@ public class VoucherDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
+        }catch (SQLException e) {
+            logger.error("SQL error while deleting voucher id={}", id, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while deleting voucher id={}", id, e);
         }
     }
 
@@ -81,8 +92,10 @@ public class VoucherDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
+        }catch (SQLException e) {
+            logger.error("SQL error while toggling voucher status. id={}", id, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while toggling voucher status. id={}", id, e);
         }
     }
 
@@ -107,8 +120,10 @@ public class VoucherDAO {
             ps.setTimestamp(10, v.getEndDate());
             ps.setString(11, v.getStatus());
             ps.executeUpdate();
+        }catch (SQLException e) {
+            logger.error("SQL error while creating voucher. code={}", v.getCode(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while creating voucher. code={}", v.getCode(), e);
         }
     }
 
@@ -135,8 +150,10 @@ public class VoucherDAO {
             ps.setString(11, v.getStatus());
             ps.setInt(12, v.getId());
             ps.executeUpdate();
+        }catch (SQLException e) {
+            logger.error("SQL error while updating voucher. id={}", v.getId(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while updating voucher. id={}", v.getId(), e);
         }
     }
 
@@ -157,8 +174,10 @@ public class VoucherDAO {
             if (rs.next()) {
                 return mapAllRowVoucher(rs);
             }
+        }catch (SQLException e) {
+            logger.error("SQL error while getting voucher by code={}", code, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while getting voucher by code={}", code, e);
         }
         return null;
     }

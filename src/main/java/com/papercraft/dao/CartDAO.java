@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.model.Cart;
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +12,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CartDAO {
+    private static final Logger logger = LoggerFactory.getLogger(CartDAO.class);
+
     //lẤY CART TỪ DB lên theo userId
     public Cart getCartByUserId(int userId){
+        logger.info("Starting getCartByUserId method with userId: {}", userId);
         Cart cart= new Cart();
         String sql = """
                 SELECT ci.product_id,
@@ -52,10 +57,14 @@ public class CartDAO {
 
                     cart.put(p);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            }catch (Exception e) {
+                logger.error("Failed to load cart, userId={}", userId, e);
+                throw new RuntimeException(e);
+            }finally {
+                try {conn.close();} catch (SQLException e) {e.printStackTrace();}
             }
         }  catch (Exception e) {
+            logger.error("Failed to retrieve cart items", e);
             throw new RuntimeException(e);
         }
         return cart;
@@ -83,7 +92,7 @@ public class CartDAO {
             ps.executeUpdate();
 
         }  catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to save cart item, userId={}, productId={}", userId, productId, e);
         }
     }
 
@@ -91,13 +100,13 @@ public class CartDAO {
     public void clearCart(int userId){
         String sql= """
                 Delete from cart_item where user_id =?""";
-        try (Connection conn = DBConnect.getConnection();
+        try(Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1,userId);
             ps.executeUpdate();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to clear cart, userId={}", userId, e);
         }
     }
 
@@ -111,8 +120,7 @@ public class CartDAO {
             ps.setInt(2,productId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
+            logger.error("Failed to delete cart item, userId={}, productId={}", userId, productId, e);        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

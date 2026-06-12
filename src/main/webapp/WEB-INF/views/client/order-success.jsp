@@ -95,7 +95,7 @@
                                 -<fmt:formatNumber value="${p.discount * 100}" maxFractionDigits="0"/>%
                             </span>
                         </c:if>
-                        <img src="${pageContext.request.contextPath}/${p.thumbnail}" height="300" width="300"
+                        <img src="${p.thumbnail}" height="300" width="300"
                              loading="lazy" alt="${p.productName}">
                     </a>
                     <h3 class="product-name">

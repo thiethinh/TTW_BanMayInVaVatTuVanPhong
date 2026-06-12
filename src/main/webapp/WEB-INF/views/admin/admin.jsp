@@ -168,38 +168,40 @@
         <section id="order-pending" class="content-table-card">
             <h2>Đơn Hàng Chưa Phản Hồi</h2>
 
-            <table class="content-table">
-                <thead>
-                <tr>
-                    <th>Mã ĐH</th>
-                    <th>Khách Hàng</th>
-                    <th>Ngày Đặt</th>
-                    <th>Tổng Tiền</th>
-                    <th>Trạng Thái</th>
-                    <th>Hành Động</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${orders}" var="o">
+            <div class="table-wrapper">
+                <table class="content-table">
+                    <thead>
                     <tr>
-                        <td>${o.id}</td>
-                        <td>${o.shippingName}</td>
-                        <td>${o.createdAt}</td>
-                        <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> ₫</td>
-                        <td><span class="status-badge pending">${o.status}</span></td>
-                        <td><a href="${pageContext.request.contextPath}/admin/admin-order-view?orderId=${o.id}"
-                               class="btn-action view">Xem</a></td>
+                        <th>Mã ĐH</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
                     </tr>
-                </c:forEach>
+                    </thead>
+                    <tbody>
+                    <c:forEach items="${orders}" var="o">
+                        <tr>
+                            <td>${o.id}</td>
+                            <td>${o.shippingName}</td>
+                            <td>${o.createdAt}</td>
+                            <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> ₫</td>
+                            <td><span class="status-badge pending">${o.status}</span></td>
+                            <td><a href="${pageContext.request.contextPath}/admin/admin-order-view?orderId=${o.id}"
+                                   class="btn-action view">Xem</a></td>
+                        </tr>
+                    </c:forEach>
 
-                <c:if test="${empty orders}">
-                    <tr>
-                        <td colspan="6" style="text-align: center">Không tìm thấy đơn hàng</td>
-                    </tr>
+                    <c:if test="${empty orders}">
+                        <tr>
+                            <td colspan="6" style="text-align: center">Không tìm thấy đơn hàng</td>
+                        </tr>
 
-                </c:if>
-                </tbody>
-            </table>
+                    </c:if>
+                    </tbody>
+                </table>
+            </div>
 
             <div class="table-footer">
                 <a href="${pageContext.request.contextPath}/admin/admin-order-manage">Xem tất cả đơn hàng &rarr;</a>
@@ -260,7 +262,8 @@
                     </tbody>
                 </table>
                 <div class="table-footer">
-                    <a href="${pageContext.request.contextPath}/admin/admin-account">Xem chi tiết tất cả các tài khoản</a>
+                    <a href="${pageContext.request.contextPath}/admin/admin-account">Xem chi tiết tất cả các tài
+                        khoản</a>
                 </div>
             </div>
         </section>

@@ -2,6 +2,8 @@ package com.papercraft.dao;
 
 import com.papercraft.model.Review;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,16 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewDAO {
+    private static final Logger logger = LoggerFactory.getLogger(ProductDAO.class);
+
 
     // Lấy danh sách đanh giá của một sản phẩm
     public List<Review> getReviewsByProductId(int productId) {
         List<Review> reviews = new ArrayList<>();
 
-        String sql = "SELECT r.*, u.fullname " +
-                "FROM review r " +
-                "JOIN users u ON r.user_id = u.id " +
-                "WHERE r.product_id = ? " +
-                "ORDER BY r.created_at DESC";
+        String sql = """
+                SELECT r.*, u.fullname
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.product_id = ?
+                ORDER BY r.created_at DESC""";
 
         try (
                 Connection conn = DBConnect.getConnection();
@@ -44,16 +49,10 @@ public class ReviewDAO {
                     reviews.add(review);
                 }
             }
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error in getReviewsByProductId for product ID " + productId + ": " + e.getMessage());
-            e.printStackTrace();
-            // Ném lại RuntimeException để tầng trên xử lý
-            throw new RuntimeException("Database error occurred while fetching product reviews.", e);
-        } catch (Exception e) {
+        }catch (Exception e) {
+            logger.error("Failed to get reviews, productId={}", productId, e);
             throw new RuntimeException(e);
         }
-
         return reviews;
     }
 
@@ -73,7 +72,7 @@ public class ReviewDAO {
             int result = ps.executeUpdate();
             return result > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to add review, userId={}, productId={}", review.getUserId(), review.getProductId(), e);
             return false;
         }
     }
@@ -122,8 +121,8 @@ public class ReviewDAO {
                     reviews.add(review);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get reviews, keyword={}", keyword, e);
         }
         return reviews;
     }
@@ -140,10 +139,8 @@ public class ReviewDAO {
             return ps.executeUpdate() > 0;
 
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to delete review, reviewId={}", idReview, e);
         }
         return false;
     }
@@ -180,10 +177,8 @@ public class ReviewDAO {
                 reviews.add(review);
             }
 
-        }catch (SQLException e) {
-            e.printStackTrace();
         }catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to find reviews, start={}, end={}", start, end, e);
         }
 
         return reviews;
@@ -203,7 +198,6 @@ public class ReviewDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1,"%"+ content.trim().toLowerCase()+"%");
 
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -218,13 +212,9 @@ public class ReviewDAO {
                 review.setProductName(rs.getString("product_name"));
                 reviews.add(review);
             }
-
-        }catch (SQLException e) {
-            e.printStackTrace();
         }catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to find reviews by content, keyword={}", content, e);
         }
-
         return reviews;
     }
 
@@ -242,7 +232,6 @@ public class ReviewDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1,"%"+ userName.trim().toLowerCase()+"%");
 
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -258,12 +247,9 @@ public class ReviewDAO {
                 reviews.add(review);
             }
 
-        }catch (SQLException e) {
-            e.printStackTrace();
         }catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to find reviews by user, userName={}", userName, e);
         }
-
         return reviews;
     }
 
@@ -296,16 +282,9 @@ public class ReviewDAO {
                 review.setProductName(rs.getString("product_name"));
                 reviews.add(review);
             }
-
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Failed to find reviews by rating, rating={}", ratingNumb, e);
         }
-
         return reviews;
     }
-
-
-
 }

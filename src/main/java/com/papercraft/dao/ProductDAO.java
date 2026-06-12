@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.config.CloudinaryConfig;
 import com.papercraft.model.Product;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.TreeSet;
 
 public class ProductDAO {
     public static final String IMAGE_BASE_URL = CloudinaryConfig.IMAGE_BASE_URL;
+    private static final Logger logger = LoggerFactory.getLogger(ProductDAO.class);
 
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
@@ -46,13 +49,10 @@ public class ProductDAO {
                     }
                     list.add(p);
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
             return list;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
+        }catch (Exception e) {
+            logger.error("Failed to get all products", e);
             throw new RuntimeException(e);
         }
     }
@@ -91,14 +91,10 @@ public class ProductDAO {
                     }
                     list.add(p);
                 }
-            } catch (SQLException e) {
-                System.err.println("Lỗi tại getAllProduct với type = " + type);
-                e.printStackTrace();
             }
             return list;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
+            logger.error("Failed to get products, type={}", type, e);
             throw new RuntimeException(e);
         }
     }
@@ -132,20 +128,16 @@ public class ProductDAO {
 
                     String imgName = rs.getString("img_name");
                     if (imgName != null && !imgName.trim().isEmpty()) {
-                        p.setThumbnail(IMAGE_BASE_URL+ rs.getString("img_name"));
+                        p.setThumbnail(IMAGE_BASE_URL + rs.getString("img_name"));
                     } else {
                         p.setThumbnail("images/logo.webp");
                     }
                     products.add(p);
                 }
-            } catch (SQLException e) {
-                System.err.println("Lỗi tại getAllProduct với type = " + type);
-                e.printStackTrace();
             }
             return products;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
+            logger.error("Failed to get products, type={}, categoryId={}", type, categoryId, e);
             throw new RuntimeException(e);
         }
     }
@@ -169,10 +161,8 @@ public class ProductDAO {
                     }
                 }
             }
-        } catch (Exception e) {
-
-            System.err.println("Lỗi tại getAllImageOfProduct với Product ID: " + id);
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get product images, productId={}", id, e);
         }
         return images;
     }
@@ -212,11 +202,9 @@ public class ProductDAO {
             }
             return false;
 
-        } catch (SQLException e) {
-            System.err.println("SQL Error when inserting product: " + e.getMessage());
-            e.printStackTrace();
-
-            throw new RuntimeException("Database error occurred while adding a new product.", e);
+        }catch (Exception e) {
+            logger.error("Failed to insert product, productName={}", product.getProductName(), e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -231,10 +219,8 @@ public class ProductDAO {
             ps.setInt(1, id);
             int rowDeleted = ps.executeUpdate();
             return rowDeleted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to delete product, productId={}", id, e);
         }
         return false;
     }
@@ -299,13 +285,9 @@ public class ProductDAO {
                     }
                     list.add(p);
                 }
-            } catch (Exception e) {
-                System.err.println("Lỗi tại getFeaturedProductsByType: " + e.getMessage());
-                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
+        }catch (Exception e) {
+            logger.error("Failed to get featured products, type={}", type, e);
             throw new RuntimeException(e);
         }
         return list;
@@ -362,39 +344,11 @@ public class ProductDAO {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get product, productId={}", id, e);
         }
         return p;
     }
-
-    // =========UpdateProduct =========
-//    public boolean updateProduct(Product p) {
-//        String sql = """
-//                UPDATE product
-//                        SET category_id = ?, product_name = ?, product_description = ?, product_detail = ?,
-//                            origin_price = ?, price = ?, stock_quantity = ?
-//                        WHERE id = ?
-//                """;
-//        try (Connection conn = DBConnect.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setInt(1, p.getCategoryId());
-//            ps.setString(2, p.getProductName());
-//            ps.setString(3, p.getProductDescription());
-//            ps.setString(4, p.getProductDetail());
-//            ps.setDouble(5, p.getOriginPrice());
-//            ps.setDouble(6, p.getPrice());
-//            ps.setInt(7, p.getStockQuantity());
-//            ps.setInt(8, p.getId());
-//
-//            return ps.executeUpdate() > 0;
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     //field price my sql computed
     public boolean updateProduct(Product p) {
@@ -423,9 +377,8 @@ public class ProductDAO {
 
             return ps.executeUpdate() > 0;
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }catch (Exception e) {
+            logger.error("Failed to update product, productId={}", p.getId(), e);
             throw new RuntimeException(e);
         }
     }
@@ -537,38 +490,13 @@ public class ProductDAO {
 
                 }
             }
-        } catch (Exception e) {
+        }catch (Exception e) {
+            logger.error("Failed to filter products, type={}, categoryId={}, sort={}", type, categoryId, sort, e);
             throw new RuntimeException(e);
         }
         return list;
     }
 
-    //======= countProducts =====
-    public int countProducts(String keyword) {
-        String sql = """
-                SELECT COUNT(*) FROM product p WHERE p.product_name LIKE ? AND p.is_deleted=0
-                """;
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            String search = (keyword == null || keyword.trim().isEmpty()) ? "%%" : "%" + keyword.trim() + "%";
-            ps.setString(1, search);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return 0;
-    }
-
-    // ===== getProductsPagination =========
 // ======= getAllBrandByType =========
     public Set<String> getAllBrandByType(String type) {
         Set<String> brands = new TreeSet<>();
@@ -586,18 +514,12 @@ public class ProductDAO {
                     brands.add(rs.getString("brand"));
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
+        }catch (Exception e) {
+            logger.error("Failed to get brands, type={}", type, e);
             throw new RuntimeException(e);
         }
         return brands;
     }
-
-    // ========== searchProductForAdmin ========
-//======= filterProduct =========
-//======= searchProduct ==========
-//=== getProductForManagement=======
 
     //=========== getProductForEditById ==========
     public Product getProductForEditById(int idProduct) {
@@ -644,8 +566,8 @@ public class ProductDAO {
                     return product;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get product for edit, productId={}", idProduct, e);
         }
         return null;
     }
@@ -690,7 +612,7 @@ public class ProductDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search products, keyword={}", keyword, e);
         }
         return list;
     }
@@ -715,10 +637,8 @@ public class ProductDAO {
                 }
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to find product suggestions, keyword={}, type={}", keyword, type, e);
         }
         return names;
     }
@@ -811,8 +731,8 @@ public class ProductDAO {
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get suggested products, limit={}", limit, e);
         }
 
         return result;

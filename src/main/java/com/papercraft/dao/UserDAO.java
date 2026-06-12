@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Review;
 import com.papercraft.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {
+    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     //getReviewsByProductId
     public List<Review> getReviewsByProductId(int productId) {
@@ -43,17 +46,13 @@ public class UserDAO {
                     reviews.add(r);
                 }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Error getting reviews for productId={}", productId, e);
         }
         return reviews;
     }
 
     public boolean checkEmailExists(String email) {
-        // In ra log để xem server nhận được chuỗi gì
-        System.out.println("DEBUG CHECK EMAIL: [" + email + "]");
-
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
 
         try (Connection conn = DBConnect.getConnection();
@@ -67,12 +66,13 @@ public class UserDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error checking email={}", email, e);
         }
         return false;
     }
 
     public void signup(User user) {
+        logger.info("Creating new user account with email={}", user.getEmail());
         String sql = "INSERT INTO users (fname, lname, email, phone_number, gender, password_hash, role, status) VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
 
         try (Connection conn = DBConnect.getConnection();
@@ -85,12 +85,14 @@ public class UserDAO {
             ps.setString(6, user.getPasswordHash());
             ps.setString(7, "user");
             ps.executeUpdate();
+            logger.info("User account created successfully email={}", user.getEmail());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to create user email={}", user.getEmail(), e);
         }
     }
 
     public User login(String account, String passwordHash) {
+        logger.debug("Login account={}", account);
         String sql = "SELECT * FROM users WHERE (email = ? OR phone_number = ?) AND password_hash = ?";
 
         try (Connection conn = DBConnect.getConnection();
@@ -115,11 +117,13 @@ public class UserDAO {
                     List<String> permissions = getPermissions(user.getId());
                     user.setPermissions(permissions);
                 }
+                logger.info("Login successful userId={} role={}", user.getId(), user.getRole());
 
                 return user;
             }
+            logger.warn("Login failed account={}", account);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error during login account={}", account, e);
         }
         return null;
     }
@@ -150,8 +154,8 @@ public class UserDAO {
 
             int rowAffected = ps.executeUpdate();
             return rowAffected > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed updating profile userId={}", user.getId(), e);
         }
         return false;
     }
@@ -167,7 +171,7 @@ public class UserDAO {
             int rowAffected = ps.executeUpdate();
             return rowAffected > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed changing password userId={}", id, e);
         }
         return false;
     }
@@ -183,12 +187,9 @@ public class UserDAO {
                     return rs.getInt("total_user");
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error counting users", e);
         }
-
         return 0;
     }
 
@@ -211,12 +212,9 @@ public class UserDAO {
                     return user;
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Error getting basic info for userId={}", userID, e);
         }
-
         return null;
     }
 
@@ -257,7 +255,7 @@ public class UserDAO {
                 if (rs.next()) return rs.getInt(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error counting customers keyword={}, statusFilter={}, roleFilter={}", keyword, statusFilter, roleFilter, e);
         }
         return 0;
     }
@@ -338,7 +336,7 @@ public class UserDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting customers page={} pageSize={}", page, pageSize, e);
         }
         return list;
     }
@@ -351,8 +349,8 @@ public class UserDAO {
             ps.setInt(1, newStatus ? 1 : 0);
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed updating user status userId={}", userId, e);
         }
         return false;
     }
@@ -365,7 +363,7 @@ public class UserDAO {
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed updating role userId={} role={}", userId, newRole, e);
         }
         return false;
     }
@@ -379,7 +377,7 @@ public class UserDAO {
             ps.setString(2, email);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed updating password for email={}", email, e);
         }
         return false;
     }
@@ -406,7 +404,7 @@ public class UserDAO {
                 return user;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting user by email={}", email, e);
         }
         return null;
     }
@@ -436,7 +434,7 @@ public class UserDAO {
                 return user;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting user by id={}", id, e);
         }
         return null;
     }
@@ -476,7 +474,7 @@ public class UserDAO {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting customers by month={} year={}", month, year, e);
         }
 
         return list;
@@ -496,7 +494,8 @@ public class UserDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting permissions for userId={}", userId, e
+            );
         }
         return permissions;
     }
@@ -529,10 +528,10 @@ public class UserDAO {
                 return true;
             } catch (SQLException e) {
                 conn.rollback();
-                e.printStackTrace();
+                logger.error("Failed updating permissions for userId={}, rolling back transaction", userId, e);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error updating permissions for userId={}", userId, e);
         }
         return false;
     }
