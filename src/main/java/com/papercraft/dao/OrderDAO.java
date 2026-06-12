@@ -144,11 +144,12 @@ public class OrderDAO {
 
     public Order getOrderByID(int orderId) {
         String sql = """
-            SELECT id,user_id,status,total_price,note,shipping_fee,shipping_provider,ghn_order_code,ghn_status,shipping_name,shipping_phone,shipping_address,shipping_province_id,
-                shipping_province_name,shipping_district_id,shipping_district_name,shipping_ward_code,shipping_ward_name,created_at
-            FROM orders
-            WHERE id = ?
-            """;
+                SELECT id,user_id,status,total_price,note,shipping_fee,shipping_provider,ghn_order_code,ghn_status,
+                       shipping_name,shipping_phone,shipping_address,shipping_province_id,shipping_province_name,
+                       shipping_district_id,shipping_district_name,shipping_ward_code,shipping_ward_name,created_at
+                FROM orders
+                WHERE id = ?
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -179,16 +180,13 @@ public class OrderDAO {
                     order.setShippingWardName(rs.getString("shipping_ward_name"));
 
                     order.setCreatedAt(rs.getTimestamp("created_at"));
-
                     return order;
                 }
             }
-
         } catch (Exception e) {
             System.out.println("Lỗi getOrderByID với orderId = " + orderId);
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -434,10 +432,9 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return orders;
     }
-// logic khi cancel đơn hàng => +stock quantity
+    // logic khi cancel đơn hàng => +stock quantity
     public boolean updateOrderStatusFromPendingToCanceled(Connection conn, int orderId) throws SQLException {
         String sql = """
             UPDATE orders

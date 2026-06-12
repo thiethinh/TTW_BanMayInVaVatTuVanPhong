@@ -97,7 +97,10 @@ public class AdminOrderViewServlet extends HttpServlet {
 
         Order order = orderDAO.getOrderByID(id);
 
-        if(order == null){
+        if (order == null) {
+            System.out.println("Không lấy được chi tiết đơn hàng admin, orderId = " + id);
+            session.setAttribute("errorMsg", "Không tìm thấy hoặc không tải được đơn hàng #" + id);
+            response.sendRedirect(request.getContextPath() + "/admin/admin-order-manage");
             return;
         }
         OrderItemDAO orderItemDAO = new OrderItemDAO();
