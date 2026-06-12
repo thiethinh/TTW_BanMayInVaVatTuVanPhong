@@ -8,11 +8,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @WebServlet(value = "/momo-return")
 public class MomoReturnServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(MomoReturnServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String partnerCode = request.getParameter("partnerCode");
@@ -28,13 +33,15 @@ public class MomoReturnServlet extends HttpServlet {
         String responseTime = request.getParameter("responseTime");
         String extraData = request.getParameter("extraData");
         String signatureMoMo = request.getParameter("signature");
+        logger.info("Nhận phản hồi giao dịch từ MoMo (Return URL). MoMo OrderId: '{}', ResultCode: '{}', TransId: '{}'",
+                orderIdMomo, resultCodeStr, transId);
 
         int orderId = 0;
         if (orderIdMomo != null && orderIdMomo.contains("_")) {
             try {
                 orderId = Integer.parseInt(orderIdMomo.split("_")[0]);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                logger.error("Không thể bóc tách mã đơn hàng hệ thống từ chuỗi MoMo OrderId: '{}'", orderIdMomo);
             }
         }
 
@@ -52,27 +59,36 @@ public class MomoReturnServlet extends HttpServlet {
         String mySignature = MomoConfig.hcmacSHA256(MomoConfig.secretKey, rawHash);
 
         if (mySignature.equals(signatureMoMo)) {
+            logger.debug("Xác thực chữ ký số thành công. Dữ liệu từ MoMo hợp lệ và không bị chỉnh sửa giả mạo.");
             if ("0".equals(resultCodeStr)) {
                 try {
                     PaymentDAO paymentDAO = new PaymentDAO();
                     paymentDAO.verifyPaymentSuccess(orderId, transId);
-
+                    logger.info("Giao dịch thành công hoàn toàn. Đơn hàng nội bộ ID {} đã được xác minh.", orderId);
                     response.sendRedirect(request.getContextPath() + "/order-success");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Lỗi nghiêm trọng: Cập nhật trạng thái CSDL thất bại cho Đơn hàng ID '{}' dù tiền đã trừ tại MoMo! ", orderId, e);
                     request.getSession().setAttribute("error", "Thanh toán thành công tại MoMo nhưng hệ thống gặp sự cố cập nhật. Vui lòng liên hệ Admin kèm mã MoMo: " + transId);
                     response.sendRedirect(request.getContextPath() + "/cart");
                 }
             } else {
+                logger.warn("Giao dịch MoMo thất bại hoặc bị hủy bỏ bởi khách hàng. Mã lỗi: {}, Thông điệp: {}", resultCodeStr, message);
                 if (orderId > 0) {
-                    OrderService orderService = new OrderService();
-                    orderService.cancelOrderAndReleaseStock(orderId);
+                    try {
+                        OrderService orderService = new OrderService();
+                        orderService.cancelOrderAndReleaseStock(orderId);
+                        logger.info("Đã tự động hủy đơn và hoàn trả số lượng tồn kho thành công cho Đơn hàng ID: {}", orderId);
+                    } catch (Exception e) {
+                        logger.error("Lỗi phát sinh khi cố gắng hủy đơn hàng tự động ID {} sau khi MoMo báo thất bại: ", orderId, e);
+                    }
                 }
 
                 request.getSession().setAttribute("error", "Giao dịch MoMo thất bại hoặc đã bị hủy bỏ (Mã lỗi: " + resultCodeStr + ")");
                 response.sendRedirect(request.getContextPath() + "/cart");
             }
         } else {
+            logger.error("CẢNH BÁO AN NINH NGUY HIỂM: Phát hiện sai lệch chữ ký số (Signature Mismatch)! " +
+                    "Chữ ký nhận được: '{}', Chữ ký tự tính toán: '{}'. Khả năng cao dữ liệu Request bị thay đổi trái phép.", signatureMoMo, mySignature);
             request.getSession().setAttribute("error", "Cảnh báo an ninh: Chữ ký xác thực trả về từ MoMo không hợp lệ!");
             response.sendRedirect(request.getContextPath() + "/cart");
         }
