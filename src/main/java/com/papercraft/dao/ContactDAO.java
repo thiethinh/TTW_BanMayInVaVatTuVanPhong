@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.dto.ContactDTO;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Contact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactDAO {
+    private static final Logger logger = LoggerFactory.getLogger(ContactDAO.class);
 
     public List<Contact> getAllContact(){
         List<Contact> contacts = new ArrayList<>();
@@ -38,10 +41,13 @@ public class ContactDAO {
 
             }
 
-        }catch (SQLException e){
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to load contacts", e);
+            throw new RuntimeException("Failed to load contacts", e);
+        }
+        catch (Exception e) {
+            logger.error("Unexpected error while loading contacts", e);
+            throw new RuntimeException(e);
         }
         return contacts;
     }
@@ -50,6 +56,7 @@ public class ContactDAO {
 
         String sql = "INSERT INTO contact (user_id, user_fullname, email, contact_title, content, rely, created_at) VALUES (?, ?, ?, ?, ?, 0, NOW())";
 
+        boolean inserted = false;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -64,14 +71,19 @@ public class ContactDAO {
             ps.setString(4, c.getContactTitle());
             ps.setString(5, c.getContent());
 
-            return ps.executeUpdate() > 0;
+            inserted = ps.executeUpdate() > 0;
+            if (inserted) {
+                logger.info("Contact created, userId={}", c.getUserId());
+            }
+            return inserted;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failed to create contact, userId={}", c.getUserId(), e);
         } catch (Exception e) {
+            logger.error("Unexpected error while creating contact, userId={}", c.getUserId(), e);
             throw new RuntimeException(e);
         }
-        return false;
+        return inserted;
     }
 
     public boolean deleteContactById(int id){
@@ -79,11 +91,18 @@ public class ContactDAO {
         try(Connection conn =DBConnect.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            int affectedRows = ps.executeUpdate();
 
+            if (affectedRows > 0) {
+                logger.info("Contact deleted, contactId={}", id);
+                return true;
+            }
+            logger.warn("Contact delete failed, contactId={}", id);
         }catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+            logger.error("Failed to delete contact, contactId={}", id, e);
+        }
+        catch (Exception e) {
+            logger.error("Unexpected error while deleting contact, contactId={}", id, e);
             throw new RuntimeException(e);
         }
         return false;
@@ -101,11 +120,11 @@ public class ContactDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to count unreplied contacts", e);
         }
-
+        catch (Exception e) {
+            logger.error("Unexpected error while counting unreplied contacts", e);
+        }
         return 0;
     }
 
@@ -164,10 +183,10 @@ public class ContactDAO {
                 }
 
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to search contacts", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while searching contacts", e);
         }
         return contacts;
     }
@@ -180,9 +199,17 @@ public class ContactDAO {
             ps.setInt(1, newStatus ? 1 : 0);
             ps.setInt(2, id);
 
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows > 0) {
+                logger.info("Contact status updated, contactId={}, replied={}", id, newStatus);
+                return true;
+            }
+            logger.warn("Contact status update failed, contactId={}", id);
+        }catch (SQLException e) {
+            logger.error("Failed to update contact status, contactId={}", id, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while updating contact status, contactId={}", id, e);
         }
         return false;
     }
@@ -218,11 +245,11 @@ public class ContactDAO {
                 c.setRely(rs.getBoolean("rely"));
                 list.add(c);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to load contacts by month, month={}, year={}", month, year, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while loading contacts by month, month={}, year={}", month, year, e);
         }
-
         return list;
     }
 }

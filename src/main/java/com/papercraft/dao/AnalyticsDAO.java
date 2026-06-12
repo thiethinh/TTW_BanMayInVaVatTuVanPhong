@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.dto.ProductPerformanceDTO;
 import com.papercraft.dto.ProfitStatDTO;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnalyticsDAO {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnalyticsDAO.class);
+
     public List<ProfitStatDTO> getMonthlyProfitStat(int year) {
         List<ProfitStatDTO> result = new ArrayList<>();
         String sql = """
@@ -48,7 +53,7 @@ public class AnalyticsDAO {
                 result.add(dto);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to generate monthly profit statistics for year={}", year, e);
         }
         return result;
     }
@@ -86,7 +91,7 @@ public class AnalyticsDAO {
                 result.add(dto);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to generate product performance report", e);
         }
         return result;
     }
@@ -141,7 +146,6 @@ public class AnalyticsDAO {
                 dto.setRecommendedImportQty(0);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-        }
+            logger.error("Failed to calculate forecast for productId={}", dto.getProductId(), e);        }
     }
 }

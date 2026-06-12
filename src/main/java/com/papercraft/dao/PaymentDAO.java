@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.dto.RevenueDTO;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Payment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -11,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentDAO {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentDAO.class);
+
     public double getTotalRevenue() {
         String sql = """
                 SELECT COALESCE(SUM(payment_amount), 0) AS revenue
@@ -28,12 +33,10 @@ public class PaymentDAO {
                 }
             }
 
-        } catch (SQLException e) {
-
-            System.err.println("SQL Error : " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e) {
+            logger.error("Failed to get total revenue", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting total revenue", e);
         }
         return 0.0;
     }
@@ -55,29 +58,21 @@ public class PaymentDAO {
                 Connection conn = DBConnect.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
         ) {
-
-            // từ: 2026-01 → 2026-01-01
             ps.setString(1, from + "-01");
-
-            // đến: 2026-04 → 2026-04-31 (OK vì MySQL tự hiểu)
             ps.setString(2, to + "-31");
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String label = rs.getString("label");
                     double total = rs.getDouble("total");
-
                     list.add(new RevenueDTO(label, total));
                 }
             }
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e) {
+            logger.error("Failed to get revenue, from={}, to={}", from, to, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting revenue, from={}, to={}", from, to, e);
         }
-
         return list;
     }
 
@@ -104,12 +99,10 @@ public class PaymentDAO {
                 }
             }
 
-        } catch (SQLException e) {
-
-            System.err.println("SQL Error : " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e) {
+            logger.error("Failed to get current month revenue", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting current month revenue", e);
         }
         return 0.0;
     }
@@ -151,8 +144,8 @@ public class PaymentDAO {
                 ));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to get revenue by month, month={}", month, e);
         }
 
         return list;
@@ -193,12 +186,10 @@ public class PaymentDAO {
                 }
             }
 
-        } catch (SQLException e) {
-
-            System.err.println("SQL Error : " + e.getMessage());
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e) {
+            logger.error("Failed to get payment, orderId={}", orderId, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting payment, orderId={}", orderId, e);
         }
         return null;
     }
@@ -255,10 +246,10 @@ public class PaymentDAO {
             ps.setInt(2, orderId);
             return ps.executeUpdate() > 0;
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch (SQLException e) {
+            logger.error("Failed to verify payment, orderId={}", orderId, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while verifying payment, orderId={}", orderId, e);
         }
         return false;
     }

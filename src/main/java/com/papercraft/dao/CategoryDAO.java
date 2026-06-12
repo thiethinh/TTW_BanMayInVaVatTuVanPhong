@@ -2,6 +2,8 @@ package com.papercraft.dao;
 
 import com.papercraft.model.Category;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryDAO {
+    private static final Logger logger = LoggerFactory.getLogger(CategoryDAO.class);
 
     // Lấy danh sách tất cả các danh mục từ cơ sở dữ liệu.
     public List<Category> getAllCategories(String type) {
@@ -37,7 +40,8 @@ public class CategoryDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("lỗi ko lấy đc category list", e);
+            logger.error("Failed to load categories, type={}", type, e);
+            throw new RuntimeException("lỗi ko lấy đc category list trong dao");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

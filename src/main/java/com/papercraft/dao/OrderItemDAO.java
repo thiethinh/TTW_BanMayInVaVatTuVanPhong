@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.OrderItem;
 import com.papercraft.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -14,6 +16,8 @@ import java.util.List;
 
 public class OrderItemDAO {
     private static final String ROOT_PATH = "images/upload/";
+    private static final Logger logger = LoggerFactory.getLogger(OrderItemDAO.class);
+
 
     public List<OrderItem> getItemByOrderId(int orderId) {
         List<OrderItem> orderItems = new ArrayList<>();
@@ -70,10 +74,10 @@ public class OrderItemDAO {
                 }
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to get order items, orderId={}", orderId, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting order items, orderId={}", orderId, e);
         }
 
         return orderItems;
@@ -91,7 +95,8 @@ public class OrderItemDAO {
                 ps.addBatch();
             }
             ps.executeBatch();
-        } catch (SQLException e) {
+        }catch (SQLException e) {
+            logger.error("Failed to insert order items, itemCount={}", oi.size(), e);
             throw new RuntimeException(e);
         }
     }
