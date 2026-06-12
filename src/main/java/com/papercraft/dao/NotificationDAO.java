@@ -3,12 +3,15 @@ package com.papercraft.dao;
 import com.papercraft.model.Notification;
 import com.papercraft.model.enums.NotificationType;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationDAO {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationDAO.class);
     public List<Notification> getAllNotificationByUserId(int userId) {
         List<Notification> list = new ArrayList<>();
         String sql = """
@@ -40,8 +43,8 @@ public class NotificationDAO {
                     list.add(noti);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to load notifications, userId={}", userId, e);
         }
         return list;
     }
@@ -85,10 +88,8 @@ public class NotificationDAO {
 
             ps.setInt(1, notificationId);
             ps.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
         }catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to count unseen notifications, notificationId={}", notificationId, e);
         }
     }
     public void markAllSeen(int userId) {
@@ -103,8 +104,8 @@ public class NotificationDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to mark notification as read, userId={}", userId, e);
         }
     }
 
@@ -146,9 +147,10 @@ public class NotificationDAO {
             ps.setTimestamp(7, notification.getCreatedAt() != null ? notification.getCreatedAt() : new Timestamp(System.currentTimeMillis()));
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Failed to insert notification, userId={}, type={}, referenceId={}",
+                    notification.getUserId(), notification.getType(), notification.getReferenceId(), e);
             return false;
-        } catch (Exception e){
+        }catch (Exception e){
             e.printStackTrace();
             return false;
         }

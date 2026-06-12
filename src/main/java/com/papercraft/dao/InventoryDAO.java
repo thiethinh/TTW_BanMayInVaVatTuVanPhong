@@ -4,12 +4,17 @@ import com.papercraft.dto.InventoryDetailDTO;
 import com.papercraft.model.InventoryTransaction;
 import com.papercraft.model.InventoryTransactionDetail;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryDAO {
+
+    private static final Logger logger = LoggerFactory.getLogger(InventoryDAO.class);
+
     public boolean insertTransaction(InventoryTransaction transaction) {
         Connection conn = null;
         PreparedStatement psTrans = null;
@@ -63,11 +68,10 @@ public class InventoryDAO {
             try {
                 if (conn != null) conn.rollback();
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                logger.error("Rollback inventory transaction failed", ex);
             }
-            e.printStackTrace();
-        } finally {
-
+            logger.error("Failed to insert inventory transaction, type={}, userId={}",
+                    transaction.getTransactionType(), transaction.getUserId(), e);
         }
         return false;
     }
@@ -135,8 +139,9 @@ public class InventoryDAO {
                 transaction.setAdminName(rs.getString("admin_name"));
                 result.add(transaction);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to load inventory transactions, type={}, search={}, fromDate={}, toDate={}",
+                    type, search, fromDate, toDate, e);
         }
         return result;
     }
@@ -161,8 +166,8 @@ public class InventoryDAO {
                 detail.setPrice(rs.getDouble("price"));
                 result.add(detail);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to load transaction details, transactionId={}", transactionId, e);
         }
         return result;
     }

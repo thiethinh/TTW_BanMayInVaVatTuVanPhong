@@ -2,14 +2,19 @@ package com.papercraft.dao;
 
 import com.papercraft.model.Voucher;
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserVoucherDAO {
+    private static final Logger logger = LoggerFactory.getLogger(UserVoucherDAO.class);
+
 
     public List<Voucher> getVouchersByUserId(int userId) {
 
@@ -56,8 +61,10 @@ public class UserVoucherDAO {
                 vouchers.add(voucher);
             }
 
+        }catch (SQLException e) {
+            logger.error("SQL error while getting vouchers for userId={}", userId, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while getting vouchers for userId={}", userId, e);
         }
 
         return vouchers;
@@ -77,8 +84,10 @@ public class UserVoucherDAO {
 
             return ps.executeUpdate()>0;
 
+        }catch (SQLException e) {
+            logger.error("SQL error while assigning voucherId={} to userId={}", voucherId, userId, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while assigning voucherId={} to userId={}", voucherId, userId, e);
         }
         return false;
     }
@@ -97,8 +106,10 @@ public class UserVoucherDAO {
 
             return ps.executeUpdate()>0;
 
+        }catch (SQLException e) {
+            logger.error("SQL error while marking voucher as used. userId={}, voucherId={}", userId, voucherId, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error while marking voucher as used. userId={}, voucherId={}", userId, voucherId, e);
         }
         return false;
     }

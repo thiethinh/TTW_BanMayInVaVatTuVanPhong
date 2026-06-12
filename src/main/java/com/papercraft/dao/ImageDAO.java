@@ -1,14 +1,19 @@
 package com.papercraft.dao;
 
 import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageDAO {
+    private static final Logger logger = LoggerFactory.getLogger(ImageDAO.class);
+
     public List<String> getSideImageByEntityID(int idEntity) {
         List<String> imageNames = new ArrayList<>();
         String sql = """
@@ -30,8 +35,10 @@ public class ImageDAO {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to load side images, productId={}", idEntity, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while loading side images, productId={}", idEntity, e);
         }
         return imageNames;
     }
@@ -52,6 +59,9 @@ public class ImageDAO {
             ps.setByte(4, (byte) (isThumbnail ? 1 : 0));
 
             return ps.executeUpdate() > 0;
+        }catch (SQLException e) {
+            logger.error("Failed to insert image, entityId={}, entityType={}, imgName={}, isThumbnail={}", entityId, entityType, imgName, isThumbnail, e);
+            throw e;
         }
     }
 
@@ -59,7 +69,10 @@ public class ImageDAO {
         String sql = "DELETE FROM image WHERE entity_id=? AND entity_type='Product' AND is_thumbnail=b'0'";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                logger.warn("No side images found to delete, productId={}", productId);
+            }
         }
     }
 
@@ -75,6 +88,9 @@ public class ImageDAO {
                 ps.addBatch();
             }
             ps.executeBatch();
+        }catch (SQLException e) {
+            logger.error("Failed to insert side images, productId={}", productId, e);
+            throw e;
         }
     }
 
@@ -102,6 +118,9 @@ public class ImageDAO {
                         ps2.executeUpdate();
                     }
                 }
+            }catch (SQLException e) {
+                logger.error("Failed to upsert thumbnail, productId={}, imgName={}", productId, imgName, e);
+                throw e;
             }
         }
     }
