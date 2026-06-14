@@ -108,8 +108,8 @@
                                         </td>
                                         <td>${oi.product.productName}</td>
                                         <td style="text-align: center;">${oi.quantity}</td>
-                                        <td><fmt:formatNumber value="${oi.price}" pattern="#,###"/> đ</td>
-                                        <td><fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#,###"/> đ</td>
+                                        <td><fmt:formatNumber value="${oi.price}" pattern="#.###"/> đ</td>
+                                        <td><fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#.###"/> đ</td>
                                     </tr>
                                 </c:forEach>
                                 </tbody>
@@ -126,13 +126,13 @@
                             <div class="summary-bill">
                                 <h4>Tóm tắt thanh toán: </h4>
                                 <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice - order.shippingFee}"
-                                                                      pattern="#,###"/> đ</span></p>
+                                                                      pattern="#.###"/> đ</span></p>
                                 <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}"
-                                                                            pattern="#,###"/> đ</span>
+                                                                            pattern="#.###"/> đ</span>
                                 </p>
                                 <p> Thuế(VAT): <span>Đã bao gồm</span></p>
                                 <h3>Tổng Cộng: <span style="color: red"><fmt:formatNumber value="${order.totalPrice}"
-                                                                                          pattern="#,###"/> đ</span>
+                                                                                          pattern="#.###"/> đ</span>
                                 </h3>
                             </div>
 

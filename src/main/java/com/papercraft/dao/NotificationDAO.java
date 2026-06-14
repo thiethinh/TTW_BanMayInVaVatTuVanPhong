@@ -130,7 +130,7 @@ public class NotificationDAO {
 
             String content = notification.getContent();
             if (content == null || content.isBlank()) {
-                content = buildNotificationContent(notification.getType());
+                content = buildNotificationContent(notification);
             }
             ps.setString(2, content);
             ps.setString(3, notification.getType().name());
@@ -155,25 +155,19 @@ public class NotificationDAO {
             return false;
         } catch (Exception e) {
             System.out.println("Lỗi hệ thống khi insertNotification:");
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
-    private String buildNotificationContent(NotificationType type) {
-        if (type == NotificationType.ORDER_PENDING) {
-            return "Đơn hàng của bạn đang chờ xử lý.";
+    private String buildNotificationContent(Notification notification) {
+        NotificationType type = notification.getType();
+        if (type == null) {
+            return "Bạn có thông báo mới từ PaperCraft.";
         }
-        if (type == NotificationType.ORDER_SHIPPED) {
-            return "Đơn hàng của bạn đang được giao.";
+        Integer referenceId = notification.getReferenceId();
+        if (type.requiresReferenceId() && referenceId != null) {
+            return String.format(type.getContentTemplate(), referenceId);
         }
-        if (type == NotificationType.ORDER_COMPLETED) {
-            return "Đơn hàng của bạn đã giao thành công.";
-        }
-        if (type == NotificationType.ORDER_CANCELLED) {
-            return "Đơn hàng của bạn đã bị hủy.";
-        }
-        return "Bạn có thông báo mới từ PaperCraft.";
+        return type.getContentTemplate();
     }
 }

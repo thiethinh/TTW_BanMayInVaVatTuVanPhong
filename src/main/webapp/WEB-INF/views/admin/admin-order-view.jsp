@@ -137,35 +137,24 @@
                             <c:choose>
 
                                 <c:when test="${order.status == 'pending'}">
-                                    <button
-                                            class="btn-accept"
-                                            type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?accept=shipped&orderId=${order.id}'">
+                                    <button class="btn-accept" type="button" onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?accept=shipped&orderId=${order.id}'">
                                         Duyệt đơn
                                     </button>
 
-                                    <button
-                                            class="btn-cancel"
-                                            type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?cancel=canceled&orderId=${order.id}'">
+                                    <button class="btn-cancel" type="button" onclick="return confirm('Bạn chắc chắn muốn hủy đơn này?')? location.href='${pageContext.request.contextPath}/admin/admin-order-view?cancel=canceled&orderId=${order.id}': false;">
                                         Hủy đơn
                                     </button>
                                 </c:when>
 
                                 <c:when test="${order.status == 'shipped'}">
-                                    <button
-                                            class="btn-accept"
-                                            type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?accept=completed&orderId=${order.id}'">
-                                        Xác nhận hoàn thành
-                                    </button>
+                                    <div style="text-align:center;color:#0d6efd;font-weight:bold;line-height:1.6;">
+                                        <p>Đơn hàng đang được GHN giao.</p>
+                                        <p>Trạng thái hoàn thành sẽ được tự động cập nhật khi GHN giao hàng thành công.</p>
 
-                                    <button
-                                            class="btn-cancel"
-                                            type="button"
-                                            onclick="location.href='${pageContext.request.contextPath}/admin/admin-order-view?cancel=canceled&orderId=${order.id}'">
-                                        Hủy đơn
-                                    </button>
+                                        <c:if test="${not empty order.ghnOrderCode}">
+                                            <p>Mã vận đơn GHN: ${order.ghnOrderCode}</p>
+                                        </c:if>
+                                    </div>
                                 </c:when>
 
                                 <c:when test="${order.status == 'completed'}">
@@ -243,20 +232,29 @@
                         </p>
 
                         <c:if test="${not empty payment and not payment.status}">
-                            <form action="${pageContext.request.contextPath}/admin/admin-order-view" method="get"
-                                  style="margin-top: 12px;">
-                                <input type="hidden" name="orderId" value="${order.id}">
-                                <input type="hidden" name="verifyPayment" value="1">
+                        <%-- với COD admin không xác nhận thủ công mà phải thông qua ghn--%>
+                            <c:choose>
+                                <c:when test="${payment.paymentMethod == 'COD'}">
+                                    <div style="margin-top:12px;color:#0d6efd;font-weight:bold;line-height:1.6;">
+                                        <p>Thanh toán COD sẽ được tự động cập nhật khi GHN giao hàng thành công.</p>
+                                        <p>Admin không cần xác nhận thanh toán thủ công.</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <form action="${pageContext.request.contextPath}/admin/admin-order-view" method="get"
+                                          style="margin-top: 12px;">
+                                        <input type="hidden" name="orderId" value="${order.id}">
+                                        <input type="hidden" name="verifyPayment" value="1">
 
-                                <c:if test="${payment.paymentMethod != 'COD'}">
-                                    <input class="input" type="text" name="transactionCode"
-                                           placeholder="Nhập mã giao dịch (nếu có)">
-                                </c:if>
+                                        <input class="input" type="text" name="transactionCode"
+                                               placeholder="Nhập mã giao dịch (nếu có)">
 
-                                <button type="submit" class="btn">
-                                    Xác nhận đã thanh toán
-                                </button>
-                            </form>
+                                        <button type="submit" class="btn">
+                                            Xác nhận đã thanh toán
+                                        </button>
+                                    </form>
+                                </c:otherwise>
+                            </c:choose>
                         </c:if>
 
                         <c:if test="${isVerifyPayment}">

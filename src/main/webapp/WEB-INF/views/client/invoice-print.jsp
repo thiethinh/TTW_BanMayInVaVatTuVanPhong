@@ -66,10 +66,10 @@
             <td>${oi.product.productName}</td>
             <td class="text-center">${oi.quantity}</td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.price}" pattern="#,###"/> đ
+                <fmt:formatNumber value="${oi.price}" pattern="#.###"/> đ
             </td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.total}" pattern="#,###"/> đ
+                <fmt:formatNumber value="${oi.total}" pattern="#.###"/> đ
             </td>
         </tr>
     </c:forEach>
@@ -81,13 +81,13 @@
         <tr>
             <td>Tạm tính:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#,###"/> đ
+                <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#.###"/> đ
             </td>
         </tr>
         <tr>
             <td>Phí vận chuyển:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.shippingFee}" pattern="#,###"/> đ
+                <fmt:formatNumber value="${order.shippingFee}" pattern="#.###"/> đ
             </td>
         </tr>
         <tr>
@@ -97,7 +97,7 @@
         <tr class="total">
             <td>TỔNG CỘNG:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice}" pattern="#,###"/> đ
+                <fmt:formatNumber value="${order.totalPrice}" pattern="#.###"/> đ
             </td>
         </tr>
     </table>
