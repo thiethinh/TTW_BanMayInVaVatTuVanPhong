@@ -229,13 +229,6 @@ public class CheckoutServlet extends HttpServlet {
         }
         logger.info("User ID '{}' submitted order confirmation request for products: '{}'", user.getId(), selectedIdsRaw);
 
-//        Cart selectedCart = new Cart();
-//        for (Product p : cart.list()) {
-//            if (selectedIds.contains(p.getId())) {
-//                selectedCart.put(p);
-//            }
-//        }
-
         ProductDAO productDAO = new ProductDAO();
         Cart selectedCart = new Cart();
 
@@ -281,6 +274,9 @@ public class CheckoutServlet extends HttpServlet {
         String paymentMethod = request.getParameter("paymentMethod");
         String shippingProvider = request.getParameter("shippingProvider");
         String shippingFeeRaw = request.getParameter("shippingFee");
+        String provinceIdRaw = request.getParameter("provinceId");
+        String districtIdRaw = request.getParameter("districtId");
+        String wardCode = request.getParameter("wardCode");
 
         String voucherIdRaw = request.getParameter("voucherId");
         if (voucherIdRaw != null && !voucherIdRaw.isBlank()) {
@@ -314,7 +310,6 @@ public class CheckoutServlet extends HttpServlet {
             fullAddressBuilder.append(", ").append(nation.trim());
         }
 
-//        String fullAddress = fullAddressBuilder.toString();
         String fullAddress = address + ", " + wardName + ", " + districtName + ", " + city + ", " + nation;
 
         //parse phí ship
@@ -348,13 +343,21 @@ public class CheckoutServlet extends HttpServlet {
             shippingProvider = "GHN";
         }
 
-
+        Integer provinceId = parseIntegerOrNull(provinceIdRaw);
+        Integer districtId = parseIntegerOrNull(districtIdRaw);
         Order order = new Order();
         order.setShippingName(fullname);
         order.setShippingPhone(phone);
         order.setShippingAddress(fullAddress);
         order.setShippingProvider(shippingProvider);
         order.setShippingFee(shippingFee);
+
+        order.setShippingProvinceId(provinceId);
+        order.setShippingProvinceName(city);
+        order.setShippingDistrictId(districtId);
+        order.setShippingDistrictName(districtName);
+        order.setShippingWardCode(wardCode);
+        order.setShippingWardName(wardName);
 
 //        //test
 //        order.setShippingProvider("GHN");
@@ -367,6 +370,7 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         logger.info("Calling OrderService to save new invoice information for User ID '{}' via method: '{}'", user.getId(), paymentMethod);
+
         OrderService orderService = new OrderService();
         int orderId = orderService.placeOrderAndReturnId(user, selectedCart, order, paymentMethod);
 
@@ -572,5 +576,16 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
         return result;
+    }
+
+    private Integer parseIntegerOrNull(String value) {
+        try {
+            if (value == null || value.isBlank()) {
+                return null;
+            }
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

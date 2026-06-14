@@ -144,29 +144,43 @@ public class OrderDAO {
 
     public Order getOrderByID(int orderId) {
         String sql = """
-        SELECT id, user_id, status, total_price, note,
-               shipping_fee, shipping_provider,
-               shipping_name, shipping_phone, shipping_address, created_at
-        FROM orders
-        WHERE id = ?
-        """;
+                SELECT id,user_id,status,total_price,note,shipping_fee,shipping_provider,ghn_order_code,ghn_status,
+                       shipping_name,shipping_phone,shipping_address,shipping_province_id,shipping_province_name,
+                       shipping_district_id,shipping_district_name,shipping_ward_code,shipping_ward_name,created_at
+                FROM orders
+                WHERE id = ?
+                """;
+
         try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Integer id = rs.getInt("id");
-                    Integer userId = rs.getInt("user_id");
-                    String status = rs.getString("status");
-                    BigDecimal totalPrice = rs.getBigDecimal("total_price");
-                    String note = rs.getString("note");
-                    BigDecimal shippingFee = rs.getBigDecimal("shipping_fee");
-                    String shippingProvider = rs.getString("shipping_provider");
-                    String shippingPhone = rs.getString("shipping_phone");
-                    String shippingName = rs.getString("shipping_name");
-                    String shippingAddress = rs.getString("shipping_address");
-                    Timestamp createdAt = rs.getTimestamp("created_at");
-                    return new Order(id, userId, status, totalPrice, note, shippingFee,shippingProvider, shippingName, shippingPhone, shippingAddress, createdAt);
+                    Order order = new Order();
+
+                    order.setId(rs.getInt("id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setNote(rs.getString("note"));
+
+                    order.setShippingFee(rs.getBigDecimal("shipping_fee"));
+                    order.setShippingProvider(rs.getString("shipping_provider"));
+
+                    order.setGhnOrderCode(rs.getString("ghn_order_code"));
+                    order.setGhnStatus(rs.getString("ghn_status"));
+                    order.setShippingName(rs.getString("shipping_name"));
+                    order.setShippingPhone(rs.getString("shipping_phone"));
+                    order.setShippingAddress(rs.getString("shipping_address"));
+                    order.setShippingProvinceId((Integer) rs.getObject("shipping_province_id"));
+                    order.setShippingProvinceName(rs.getString("shipping_province_name"));
+                    order.setShippingDistrictId((Integer) rs.getObject("shipping_district_id"));
+                    order.setShippingDistrictName(rs.getString("shipping_district_name"));
+                    order.setShippingWardCode(rs.getString("shipping_ward_code"));
+                    order.setShippingWardName(rs.getString("shipping_ward_name"));
+
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    return order;
                 }
             }
         }catch (SQLException e) {
@@ -250,9 +264,10 @@ public class OrderDAO {
 
     public int insertOrder(Connection conn, Order order) throws SQLException {
         String sql = """
-                        INSERT INTO orders (user_id, status, total_price, note, shipping_fee, shipping_provider, shipping_name, shipping_phone, shipping_address)
-                        VALUES (?, ?, ?, ? ,?, ?, ?, ?,?)
-                """;
+                    INSERT INTO orders (user_id, status, total_price, note,shipping_fee, shipping_provider,shipping_name, shipping_phone, shipping_address,shipping_province_id, shipping_province_name,
+                            shipping_district_id, shipping_district_name,shipping_ward_code, shipping_ward_name)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             ps.setInt(1, order.getUserId());
@@ -264,6 +279,24 @@ public class OrderDAO {
             ps.setString(7, order.getShippingName());
             ps.setString(8, order.getShippingPhone());
             ps.setString(9, order.getShippingAddress());
+
+            if (order.getShippingProvinceId() == null) {
+                ps.setNull(10, Types.INTEGER);
+            } else {
+                ps.setInt(10, order.getShippingProvinceId());
+            }
+
+            ps.setString(11, order.getShippingProvinceName());
+
+            if (order.getShippingDistrictId() == null) {
+                ps.setNull(12, Types.INTEGER);
+            } else {
+                ps.setInt(12, order.getShippingDistrictId());
+            }
+
+            ps.setString(13, order.getShippingDistrictName());
+            ps.setString(14, order.getShippingWardCode());
+            ps.setString(15, order.getShippingWardName());
 
             int affectedRows = ps.executeUpdate();
 
@@ -400,10 +433,9 @@ public class OrderDAO {
         }catch (Exception e) {
             logger.error("Failed to search orders by month, year={}, month={}", year, month, e);
         }
-
         return orders;
     }
-// logic khi cancel đơn hàng => +stock quantity
+    // logic khi cancel đơn hàng => +stock quantity
     public boolean updateOrderStatusFromPendingToCanceled(Connection conn, int orderId) throws SQLException {
         String sql = """
             UPDATE orders
@@ -417,5 +449,103 @@ public class OrderDAO {
 
             return ps.executeUpdate() > 0;
         }
+    }
+    //lưu trữ mã đơn hàng
+    public boolean updateGHNInfo(int orderId, String ghnOrderCode, String ghnStatus) {
+        String sql = """
+            UPDATE orders
+            SET ghn_order_code = ?,
+                ghn_status = ?
+            WHERE id = ?
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, ghnOrderCode);
+            ps.setString(2, ghnStatus);
+            ps.setInt(3, orderId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    //tìm đơn hàng theo mã đơn Hàng GHN
+    public Order getOrderByGHNOrderCode(String ghnOrderCode) {
+        String sql = """
+                    SELECT id, user_id, status, total_price, note,
+                        shipping_fee, shipping_provider,
+                        ghn_order_code, ghn_status,
+                        shipping_name, shipping_phone, shipping_address,
+                        shipping_province_id, shipping_province_name,
+                        shipping_district_id, shipping_district_name,
+                        shipping_ward_code, shipping_ward_name,
+                        created_at
+                    FROM orders
+                    WHERE ghn_order_code = ?
+                    """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, ghnOrderCode);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Order order = new Order();
+
+                    order.setId(rs.getInt("id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setNote(rs.getString("note"));
+                    order.setShippingFee(rs.getBigDecimal("shipping_fee"));
+                    order.setShippingProvider(rs.getString("shipping_provider"));
+                    order.setGhnOrderCode(rs.getString("ghn_order_code"));
+                    order.setGhnStatus(rs.getString("ghn_status"));
+                    order.setShippingName(rs.getString("shipping_name"));
+                    order.setShippingPhone(rs.getString("shipping_phone"));
+                    order.setShippingAddress(rs.getString("shipping_address"));
+                    order.setShippingProvinceId((Integer) rs.getObject("shipping_province_id"));
+                    order.setShippingProvinceName(rs.getString("shipping_province_name"));
+                    order.setShippingDistrictId((Integer) rs.getObject("shipping_district_id"));
+                    order.setShippingDistrictName(rs.getString("shipping_district_name"));
+                    order.setShippingWardCode(rs.getString("shipping_ward_code"));
+                    order.setShippingWardName(rs.getString("shipping_ward_name"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+
+                    return order;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //UPDATE trạng thái
+    public boolean updateStatusByGHNOrderCode(String ghnOrderCode, String internalStatus, String ghnStatus) {
+        String sql = """
+            UPDATE orders
+            SET status = ?,ghn_status = ?
+            WHERE ghn_order_code = ? AND status NOT IN ('completed', 'canceled')
+            """;
+
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, internalStatus);
+            ps.setString(2, ghnStatus);
+            ps.setString(3, ghnOrderCode);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

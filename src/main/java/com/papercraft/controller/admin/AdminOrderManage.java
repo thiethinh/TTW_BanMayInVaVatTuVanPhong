@@ -2,8 +2,10 @@ package com.papercraft.controller.admin;
 
 import com.papercraft.dao.NotificationDAO;
 import com.papercraft.dao.OrderDAO;
+import com.papercraft.dao.ProductDAO;
 import com.papercraft.model.Notification;
 import com.papercraft.model.Order;
+import com.papercraft.model.Product;
 import com.papercraft.model.User;
 import com.papercraft.model.enums.NotificationType;
 import jakarta.servlet.ServletException;
@@ -14,6 +16,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.papercraft.service.OrderShippingService;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,23 +63,32 @@ public class AdminOrderManage extends HttpServlet {
                         String currentStatus = order.getStatus();
 
                         if (isValidStatusChange(currentStatus, newStatus)) {
-                            orderDAO.updateOrderStatus(orderId, newStatus);
-                            logger.info("Admin ID '{}' successfully updated Order {} from [{}] -> [{}]",
-                                    (user != null ? user.getId() : "Unknown"), orderId, currentStatus, newStatus);
+                            boolean updated;
+                            if ("shipped".equalsIgnoreCase(newStatus)) {
+                                OrderShippingService shippingService = new OrderShippingService();
+                                updated = shippingService.shipOrderWithGHN(orderId);
+                            } else {
+                                updated = orderDAO.updateOrderStatus(orderId, newStatus);
+                            }
 
-                            //tao thong bao order
-                            NotificationType typeNoti = switch (newStatus) {
-                                case "pending" -> NotificationType.ORDER_PENDING;
-                                case "shipped" -> NotificationType.ORDER_SHIPPED;
-                                case "completed" -> NotificationType.ORDER_COMPLETED;
-                                case "canceled" -> NotificationType.ORDER_CANCELLED;
-                                default -> null;
-                            };
+                            if (updated) {
+                                logger.info("Admin ID '{}' successfully updated Order {} from [{}] -> [{}]",
+                                        (user != null ? user.getId() : "Unknown"), orderId, currentStatus, newStatus);
 
-                            if (typeNoti != null && user != null) {
-                                Notification noti = new Notification(user.getId(), typeNoti, orderId);
-                                notificationDAO.insertNotification(noti);
-                                logger.debug("Sent notification of type '{}' for Order ID: {}", typeNoti, orderId);
+                                //tao thong bao order
+                                NotificationType typeNoti = switch (newStatus) {
+                                    case "pending" -> NotificationType.ORDER_PENDING;
+                                    case "shipped" -> NotificationType.ORDER_SHIPPED;
+                                    case "completed" -> NotificationType.ORDER_COMPLETED;
+                                    case "canceled" -> NotificationType.ORDER_CANCELLED;
+                                    default -> null;
+                                };
+
+                                if (typeNoti != null && !"shipped".equalsIgnoreCase(newStatus)) {
+                                    Notification noti = new Notification(order.getUserId(), typeNoti, orderId);
+                                    notificationDAO.insertNotification(noti);
+                                    logger.debug("Sent notification of type '{}' for Order ID: {}", typeNoti, orderId);
+                                }
                             }
                         } else {
                             logger.warn("INVALID status transition for Order ID {}: Cannot change from [{}] to [{}]",

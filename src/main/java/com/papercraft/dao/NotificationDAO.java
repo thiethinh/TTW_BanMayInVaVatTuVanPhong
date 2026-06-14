@@ -15,11 +15,11 @@ public class NotificationDAO {
     public List<Notification> getAllNotificationByUserId(int userId) {
         List<Notification> list = new ArrayList<>();
         String sql = """
-                SELECT id, user_id, content, type, reference_id, is_seen, is_read, created_at
-                FROM notifications
-                WHERE user_id = ?
-                ORDER BY created_at DESC
-            """;
+                    SELECT id, user_id, content, type, reference_id, is_seen, is_read, created_at
+                    FROM notifications
+                    WHERE user_id = ?
+                    ORDER BY created_at DESC
+                """;
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -53,11 +53,11 @@ public class NotificationDAO {
     public int countUnseenNotification(int userId) {
         int count = 0;
         String sql = """
-            SELECT COUNT(*)
-            FROM notifications
-            WHERE user_id = ?
-              AND is_seen = 0
-            """;
+                SELECT COUNT(*)
+                FROM notifications
+                WHERE user_id = ?
+                  AND is_seen = 0
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,11 +77,11 @@ public class NotificationDAO {
 
     public void markRead(int notificationId) {
         String sql = """
-            UPDATE notifications
-            SET is_read = 1,
-                is_seen = 1
-            WHERE id = ?
-            """;
+                UPDATE notifications
+                SET is_read = 1,
+                    is_seen = 1
+                WHERE id = ?
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -92,13 +92,14 @@ public class NotificationDAO {
             logger.error("Failed to count unseen notifications, notificationId={}", notificationId, e);
         }
     }
+
     public void markAllSeen(int userId) {
         String sql = """
-            UPDATE notifications
-            SET is_seen = 1
-            WHERE user_id = ?
-            AND is_seen = 0
-            """;
+                UPDATE notifications
+                SET is_seen = 1
+                WHERE user_id = ?
+                AND is_seen = 0
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,31 +111,29 @@ public class NotificationDAO {
     }
 
     public boolean insertNotification(Notification notification) {
+        if (notification == null) {
+            return false;
+        }
+        if (notification.getType() == null) {
+            return false;
+        }
+
         String sql = """
-        INSERT INTO notifications (
-            user_id,
-            content,
-            type,
-            reference_id,
-            is_seen,
-            is_read,
-            created_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        AS new_row
-        ON DUPLICATE KEY UPDATE
-            content = new_row.content,
-            is_seen = new_row.is_seen,
-            is_read = new_row.is_read,
-            created_at = new_row.created_at
-        """;
+                INSERT INTO notifications (user_id,content,type,reference_id,is_seen,is_read,created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, notification.getUserId());
-            ps.setString(2, notification.getContent());
-            ps.setString(3, notification.getType() != null ? notification.getType().name() : null);
+
+            String content = notification.getContent();
+            if (content == null || content.isBlank()) {
+                content = buildNotificationContent(notification);
+            }
+            ps.setString(2, content);
+            ps.setString(3, notification.getType().name());
 
             if (notification.getReferenceId() != null) {
                 ps.setInt(4, notification.getReferenceId());
@@ -142,17 +141,33 @@ public class NotificationDAO {
                 ps.setNull(4, Types.INTEGER);
             }
 
-            ps.setBoolean(5, notification.isSeen());
-            ps.setBoolean(6, notification.isRead());
-            ps.setTimestamp(7, notification.getCreatedAt() != null ? notification.getCreatedAt() : new Timestamp(System.currentTimeMillis()));
+            ps.setBoolean(5, false);
+            ps.setBoolean(6, false);
+            ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
+            System.out.println("Lỗi insertNotification:");
+            e.printStackTrace();
             logger.error("Failed to insert notification, userId={}, type={}, referenceId={}",
                     notification.getUserId(), notification.getType(), notification.getReferenceId(), e);
             return false;
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            System.out.println("Lỗi hệ thống khi insertNotification:");
         }
+        return false;
+    }
+
+    private String buildNotificationContent(Notification notification) {
+        NotificationType type = notification.getType();
+        if (type == null) {
+            return "Bạn có thông báo mới từ PaperCraft.";
+        }
+        Integer referenceId = notification.getReferenceId();
+        if (type.requiresReferenceId() && referenceId != null) {
+            return String.format(type.getContentTemplate(), referenceId);
+        }
+        return type.getContentTemplate();
     }
 }
