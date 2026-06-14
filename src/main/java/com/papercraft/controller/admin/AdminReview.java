@@ -31,22 +31,22 @@ public class AdminReview extends HttpServlet {
 
         String action = request.getParameter("action");
         String id = request.getParameter("id");
-        logger.debug("Nhận yêu cầu vào AdminReview. Action: '{}', ID: '{}', Keyword mặc định: '{}'", action, id, keyword);
+        logger.debug("Received request to AdminReview. Action: '{}', ID: '{}', Default Keyword: '{}'", action, id, keyword);
 
         if ("delete".equals(action) && id != null) {
             try {
                 int idReview = Integer.parseInt(id);
                 boolean isDeleted = reviewDAO.deleteReviewByID(idReview);
-                logger.info("Kết quả xóa đánh giá ID {}: {}", idReview, isDeleted);
+                logger.info("Result of deleting review ID {}: {}", idReview, isDeleted);
 
                 response.sendRedirect("admin-review?deleted=" + isDeleted + "&id=" + idReview);
                 return;
             } catch (NumberFormatException e) {
-                logger.error("Lỗi định dạng ID khi xóa đánh giá (Không phải là số): '{}'", id);
+                logger.error("Format error for ID when deleting review (Not a number): '{}'", id);
                 response.sendRedirect("admin-review?deleted=false");
                 return;
             } catch (Exception e) {
-                logger.error("Lỗi hệ thống bất ngờ xảy ra khi xóa đánh giá ID '{}': ", id, e);
+                logger.error("Unexpected system error occurred while deleting review ID '{}': ", id, e);
                 response.sendRedirect("admin-review?deleted=false");
                 return;
             }
@@ -55,7 +55,7 @@ public class AdminReview extends HttpServlet {
         String date = request.getParameter("date");
         if ("search-time".equals(action) && date != null && !date.isEmpty()) {
             LocalDate dateSearch = LocalDate.parse(date);
-            logger.info("Thực hiện lọc đánh giá theo ngày: '{}'", date);
+            logger.info("Filtering reviews by date: '{}'", date);
 
             LocalDateTime start = dateSearch.atStartOfDay();
             LocalDateTime end = dateSearch.plusDays(1).atStartOfDay();
@@ -70,7 +70,7 @@ public class AdminReview extends HttpServlet {
 
         String content = request.getParameter("content");
         if ("search-content".equals(action) && content != null) {
-            logger.info("Thực hiện tìm kiếm đánh giá theo nội dung: '{}'", content);
+            logger.info("Searching reviews by content: '{}'", content);
             List<Review> reviews = reviewDAO.findReviewByContent(content);
 
             request.setAttribute("reviews", reviews);
@@ -82,7 +82,7 @@ public class AdminReview extends HttpServlet {
 
         String userName = request.getParameter("user-name");
         if ("search-user-name".equals(action) && userName != null) {
-            logger.info("Thực hiện tìm kiếm đánh giá theo tên Username: '{}'", userName);
+            logger.info("Searching reviews by username: '{}'", userName);
             List<Review> reviews = reviewDAO.findReviewByUserName(userName);
             request.setAttribute("reviews", reviews);
             request.setAttribute("userKeyword", userName);
@@ -94,7 +94,7 @@ public class AdminReview extends HttpServlet {
 
         String rating = request.getParameter("rating");
         if ("search-rating".equals(action) && rating != null) {
-            logger.info("Thực hiện lọc đánh giá theo số sao (Rating): '{}'", rating);
+            logger.info("Filtering reviews by rating: '{}'", rating);
             List<Review> reviews = new ArrayList<>();
             try {
                 int ratingNumb = Integer.parseInt(rating);
@@ -108,14 +108,14 @@ public class AdminReview extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
                 return;
             } catch (NumberFormatException e) {
-                logger.error("Lỗi định dạng tham số số sao (Rating không phải là số): '{}'", rating);
+                logger.error("Format error for rating parameter (Not a number): '{}'", rating);
                 response.sendRedirect("admin-review?search=false");
                 return;
             }
         }
 
         List<Review> reviews = reviewDAO.getReviews(keyword);
-        logger.debug("Hoàn tất xử lý dữ liệu. Forward sang admin-review.jsp với {} bản ghi.", reviews);
+        logger.debug("Finished processing data. Forwarding to admin-review.jsp with {} records.", reviews);
         request.setAttribute("reviews", reviews);
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-review.jsp").forward(request, response);
     }

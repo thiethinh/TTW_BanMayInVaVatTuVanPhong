@@ -32,7 +32,7 @@ public class AdminContact extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         ContactDAO contactDAO = new ContactDAO();
         String action = request.getParameter("action");
-        logger.debug("Nhận yêu cầu GET vào AdminContact với action: '{}'", action);
+        logger.debug("Received GET request to AdminContact with action: '{}'", action);
 
         if ("get-by-month".equals(action)) {
 
@@ -43,15 +43,15 @@ public class AdminContact extends HttpServlet {
                 int month = Integer.parseInt(request.getParameter("month"));
                 int year = Integer.parseInt(request.getParameter("year"));
 
-                logger.info("Yêu cầu AJAX: Tải danh sách liên hệ theo tháng {}/{}", month, year);
+                logger.info("AJAX request: Loading contact list by month {}/{}", month, year);
                 List<ContactDTO> list = new ContactDAO().getContactsByMonth(month, year);
 
                 PrintWriter out = response.getWriter();
                 out.print(new Gson().toJson(list));
                 out.flush();
-                logger.debug("Trả về dữ liệu JSON thành công cho hành động 'get-by-month'");
+                logger.debug("Successfully returned JSON data for action 'get-by-month'");
             } catch (Exception e) {
-                logger.error("Lỗi hệ thống nghiêm trọng khi thực hiện lấy dữ liệu liên hệ theo tháng: ", e);
+                logger.error("Critical system error while retrieving contact data by month: ", e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().print("{\"error\":\"server error\"}");
             }
@@ -69,7 +69,7 @@ public class AdminContact extends HttpServlet {
             try {
                 replied = Integer.parseInt(reply);
             } catch (NumberFormatException e) {
-                logger.warn("Lỗi định dạng bộ lọc 'reply' nhận được từ URL (reply='{}'). Tự động thiết lập hiển thị tất cả (-1).", reply);
+                logger.warn("Format error for 'reply' filter received from URL (reply='{}'). Automatically setting to display all (-1).", reply);
             }
         }
 
@@ -80,7 +80,7 @@ public class AdminContact extends HttpServlet {
                 boolean currentStatus = Boolean.parseBoolean(request.getParameter("status"));
                 boolean newStatus = !currentStatus;
 
-                logger.info("Thực hiện đổi trạng thái liên hệ ID '{}' từ {} sang {}", id, currentStatus, newStatus);
+                logger.info("Changing status of contact ID '{}' from {} to {}", id, currentStatus, newStatus);
                 contactDAO.updateStatus(id, !currentStatus);
 
                 String redirectUrl = "admin-contacts?keyword=" + URLEncoder.encode(keyword, "UTF-8");
@@ -96,17 +96,17 @@ public class AdminContact extends HttpServlet {
                         NotificationDAO notificationDAO = new NotificationDAO();
                         Notification noti = new Notification(user.getId(), NotificationType.CONTACT_REPLIED, id);
                         notificationDAO.insertNotification(noti);
-                        logger.info("Admin ID '{}' đã xử lý liên hệ ID '{}'. Đã bắn thông báo CONTACT_REPLIED.", user.getId(), id);
+                        logger.info("Admin ID '{}' has processed contact ID '{}'. Sent CONTACT_REPLIED notification.", user.getId(), id);
                     } else {
-                        logger.warn("Không tìm thấy thông tin Admin trong session. Bỏ qua bước tạo thông báo hệ thống.");
+                        logger.warn("Admin info not found in session. Skipping system notification creation.");
                     }
                 }
 
-                logger.debug("Redirect về danh sách liên hệ: {}", redirectUrl);
+                logger.debug("Redirecting to contact list: {}", redirectUrl);
                 response.sendRedirect(redirectUrl);
                 return;
             } catch (Exception e) {
-                logger.error("Lỗi nghiêm trọng xảy ra khi thực hiện đổi trạng thái liên hệ ID '{}': ", idRaw, e);
+                logger.error("Critical error occurred while changing status of contact ID '{}': ", idRaw, e);
             }
         }
 
@@ -114,29 +114,29 @@ public class AdminContact extends HttpServlet {
             String idRaw = request.getParameter("id");
             try {
                 int id = Integer.parseInt(idRaw);
-                logger.info("Yêu cầu xóa liên hệ ID: {}", id);
+                logger.info("Request to delete contact ID: {}", id);
                 boolean deleted = contactDAO.deleteContactById(id);
-                logger.info("Kết quả xóa liên hệ ID '{}' từ DB: {}", id, deleted);
+                logger.info("Result of deleting contact ID '{}' from DB: {}", id, deleted);
 
                 response.sendRedirect("admin-contacts?deleted=" + deleted);
                 return;
 
             } catch (Exception e) {
-                logger.error("Lỗi hệ thống khi thực hiện xóa liên hệ ID '{}': ", idRaw, e);
+                logger.error("System error while deleting contact ID '{}': ", idRaw, e);
                 response.sendRedirect("admin-contacts?deleted=false");
                 return;
             }
         }
 
-        logger.info("Đang tải danh sách liên hệ - Bộ lọc [Từ khóa: '{}', Trạng thái phản hồi (replied): {}]", keyword, replied);
+        logger.info("Loading contact list - Filters [Keyword: '{}', Reply status (replied): {}]", keyword, replied);
         List<Contact> contacts = contactDAO.getContact(keyword, replied);
-        logger.debug("Tìm thấy tổng cộng {} bản ghi liên hệ.", (contacts != null ? contacts.size() : 0));
+        logger.debug("Found total of {} contact records.", (contacts != null ? contacts.size() : 0));
 
         request.setAttribute("contacts", contacts);
         request.setAttribute("keyword", keyword);
         request.setAttribute("currentReplied", replied);
 
-        logger.debug("Forward dữ liệu sang giao diện admin-contacts.jsp");
+        logger.debug("Forwarding data to admin-contacts.jsp interface");
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-contacts.jsp").forward(request, response);
     }
 

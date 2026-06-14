@@ -25,7 +25,7 @@ public class RevenueServlet extends HttpServlet {
             throws ServletException, IOException {
         String from = request.getParameter("from");
         String to = request.getParameter("to");
-        logger.info("Nhận yêu cầu API thống kê doanh thu. Khoảng thời gian từ: '{}' đến: '{}'", from, to);
+        logger.info("Received revenue statistics API request. Time range from: '{}' to: '{}'", from, to);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -36,19 +36,19 @@ public class RevenueServlet extends HttpServlet {
             List<RevenueDTO> list = paymentDAO.getRevenue(from, to);
 
             if (list == null || list.isEmpty()) {
-                logger.warn("Không tìm thấy bất kỳ dữ liệu doanh thu nào trong khoảng thời gian đã chọn. Trả về mảng rỗng.");
+                logger.warn("No revenue data found within the selected time range. Returning empty array.");
                 out.print("[]");
                 out.flush();
                 return;
             }
 
-            logger.debug("Truy vấn database thành công. Tìm thấy {} bản ghi doanh thu.", list.size());
+            logger.debug("Successfully queried database. Found {} revenue records.", list.size());
 
             out.print(toJson(list));
             out.flush();
-            logger.info("Đã phản hồi dữ liệu cấu trúc JSON thành công về Client ứng dụng.");
+            logger.info("Successfully sent JSON structured data response back to the client application.");
         } catch (Exception e) {
-            logger.error("Xảy ra lỗi nghiêm trọng trong tiến trình xử lý API doanh thu từ '{}' đến '{}': ", from, to, e);
+            logger.error("Critical error occurred during revenue API processing from '{}' to '{}': ", from, to, e);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             try (PrintWriter errorOut = response.getWriter()) {

@@ -23,21 +23,21 @@ public class OrderHistoryServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Yêu cầu truy cập lịch sử đơn hàng bị từ chối: Người dùng chưa đăng nhập hệ thống.");
+            logger.warn("Request to access order history denied: User is not logged into the system.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        logger.info("Nhận yêu cầu tải lịch sử đơn hàng từ User ID: '{}', Email: '{}'", user.getId(), user.getEmail());
+        logger.info("Received request to load order history from User ID: '{}', Email: '{}'", user.getId(), user.getEmail());
 
         OrderDAO orderDAO = new OrderDAO();
-        logger.debug("Đang truy vấn danh sách đơn hàng từ CSDL cho User ID: '{}'...", user.getId());
+        logger.debug("Querying order list from DB for User ID: '{}'...", user.getId());
         List<Order> orderList = orderDAO.getOrdersByUserId(user.getId());
 
-        logger.info("Tải danh sách lịch sử thành công. Tìm thấy {} đơn hàng cho User ID: '{}'", orderList.size(), user.getId());
+        logger.info("Successfully loaded history list. Found {} orders for User ID: '{}'", orderList.size(), user.getId());
         request.setAttribute("orderList", orderList);
 
-        logger.debug("Chuyển tiếp luồng (Forward) sang giao diện hiển thị order-history.jsp");
+        logger.debug("Forwarding flow to order-history.jsp display interface");
         request.getRequestDispatcher("/WEB-INF/views/client/order-history.jsp").forward(request, response);
     }
 

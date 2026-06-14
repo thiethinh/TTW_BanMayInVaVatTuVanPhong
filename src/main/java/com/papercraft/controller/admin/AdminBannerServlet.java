@@ -28,7 +28,7 @@ public class AdminBannerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        logger.debug("Nhận yêu cầu GET với action: '{}'", action);
+        logger.debug("Received GET request with action: '{}'", action);
 
         if (action != null) {
             switch (action) {
@@ -49,7 +49,7 @@ public class AdminBannerServlet extends HttpServlet {
                     addBanner(request, response);
                     return;
                 default:
-                    logger.warn("Hành động GET '{}' không hợp lệ, chuyển về tải trang mặc định.", action);
+                    logger.warn("Invalid GET action '{}', reverting to default page load.", action);
             }
         }
 
@@ -60,7 +60,7 @@ public class AdminBannerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        logger.info("Nhận yêu cầu POST với hành động: '{}'", action);
+        logger.info("Received POST request with action: '{}'", action);
 
         if ("update".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
@@ -68,7 +68,7 @@ public class AdminBannerServlet extends HttpServlet {
             int sortOrder = Integer.parseInt(request.getParameter("sortOrder"));
             boolean active = request.getParameter("active") != null;
             String oldImage = request.getParameter("oldImage");
-            logger.info("Bắt đầu cập nhật Banner ID: {} [Tiêu đề: '{}', Thứ tự: {}, Active: {}]", id, title, sortOrder, active);
+            logger.info("Starting update for Banner ID: {} [Title: '{}', Order: {}, Active: {}]", id, title, sortOrder, active);
 
             Part imagePart = request.getPart("image");
             String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
@@ -76,24 +76,24 @@ public class AdminBannerServlet extends HttpServlet {
 
             // Có upload ảnh mới
             if (fileName != null && !fileName.isBlank()) {
-                logger.info("Phát hiện ảnh mới được upload: '{}'. Tiến hành đẩy lên Cloudinary...", fileName);
+                logger.info("New image upload detected: '{}'. Uploading to Cloudinary...", fileName);
                 File tempFile = File.createTempFile("banner_", ".tmp");
                 try {
                     imagePart.write(tempFile.getAbsolutePath());
                     CloudinaryService.upload(tempFile, fileName);
                     imageName = fileName;
-                    logger.debug("Tải ảnh mới lên Cloudinary thành công.");
+                    logger.debug("Successfully uploaded new image to Cloudinary.");
                 } catch (Exception e) {
-                    logger.error("Lỗi xảy ra khi tải ảnh lên Cloudinary cho Banner ID {}: ", id, e);
+                    logger.error("Error occurred while uploading image to Cloudinary for Banner ID {}: ", id, e);
                     throw e;
                 } finally {
                     if (tempFile.exists()) {
                         boolean deleted = tempFile.delete();
-                        logger.debug("Xóa file tạm thời '{}': {}", tempFile.getName(), deleted);
+                        logger.debug("Deleting temporary file '{}': {}", tempFile.getName(), deleted);
                     }
                 }
             } else {
-                logger.debug("Không có ảnh mới được chọn. Sử dụng lại ảnh cũ: '{}'", oldImage);
+                logger.debug("No new image selected. Reusing old image: '{}'", oldImage);
             }
 
             Banner b = new Banner();
@@ -105,7 +105,7 @@ public class AdminBannerServlet extends HttpServlet {
 
             BannerDAO dao = new BannerDAO();
             dao.updateBanner(b);
-            logger.info("Cập nhật thành công Banner ID: {} vào cơ sở dữ liệu.", id);
+            logger.info("Successfully updated Banner ID: {} in the database.", id);
 
             response.sendRedirect("admin-banner");
         } else if ("insert".equals(action)) {
@@ -114,29 +114,29 @@ public class AdminBannerServlet extends HttpServlet {
             String title = request.getParameter("title");
             int sortOrder = Integer.parseInt(request.getParameter("sortOrder"));
             boolean active = request.getParameter("active") != null;
-            logger.info("Bắt đầu thêm mới Banner [Tiêu đề: '{}', Thứ tự: {}, Active: {}]", title, sortOrder, active);
+            logger.info("Starting creation of new Banner [Title: '{}', Order: {}, Active: {}]", title, sortOrder, active);
 
             Part imagePart = request.getPart("image");
             String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
 
             if (fileName == null || fileName.isBlank()) {
-                logger.warn("Thêm banner thất bại: Admin không lựa chọn file ảnh.");
+                logger.warn("Banner addition failed: Administrator did not select an image file.");
                 throw new RuntimeException("Vui lòng chọn ảnh");
             }
 
-            logger.info("Tiến hành tải ảnh '{}' lên Cloudinary...", fileName);
+            logger.info("Uploading image '{}' to Cloudinary...", fileName);
             File tempFile = File.createTempFile("banner_", ".tmp");
             try {
                 imagePart.write(tempFile.getAbsolutePath());
                 CloudinaryService.upload(tempFile, fileName);
-                logger.debug("Tải ảnh lên Cloudinary thành công.");
+                logger.debug("Successfully uploaded image to Cloudinary.");
             } catch (Exception e) {
-                logger.error("Lỗi xảy ra khi tải ảnh lên Cloudinary trong quá trình thêm mới: ", e);
+                logger.error("Error occurred while uploading image to Cloudinary during banner addition: ", e);
                 throw e;
             } finally {
                 if (tempFile.exists()) {
                     boolean deleted = tempFile.delete();
-                    logger.debug("Xóa file tạm thời '{}': {}", tempFile.getName(), deleted);
+                    logger.debug("Deleting temporary file '{}': {}", tempFile.getName(), deleted);
                 }
             }
             Banner banner = new Banner();
@@ -146,10 +146,10 @@ public class AdminBannerServlet extends HttpServlet {
             banner.setSortOrder(sortOrder);
 
             dao.insertBanner(banner);
-            logger.info("Thêm mới Banner thành công vào cơ sở dữ liệu.");
+            logger.info("Successfully added new Banner to the database.");
             response.sendRedirect("admin-banner");
         } else {
-            logger.warn("Hành động POST '{}' không hợp lệ.", action);
+            logger.warn("Invalid POST action '{}'.", action);
             response.sendRedirect("admin-banner");
         }
     }
@@ -162,7 +162,7 @@ public class AdminBannerServlet extends HttpServlet {
             keyword = "";
         }
 
-        logger.info("Tải danh sách Banner với từ khóa tìm kiếm: '{}'", keyword);
+        logger.info("Loading Banner list with search keyword: '{}'", keyword);
         List<Banner> banners = bannerDAO.getAllBanner(keyword);
 
         request.setAttribute("banners", banners);
@@ -172,21 +172,21 @@ public class AdminBannerServlet extends HttpServlet {
 
     private void toggleBanner(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        logger.info("Thực hiện bật/tắt (toggle) trạng thái hoạt động của Banner ID: {}", id);
+        logger.info("Toggling active status of Banner ID: {}", id);
         bannerDAO.toggleBanner(id);
         response.sendRedirect("admin-banner");
     }
 
     private void deleteBanner(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        logger.info("Yêu cầu xóa Banner ID: {}", id);
+        logger.info("Request to delete Banner ID: {}", id);
         bannerDAO.deleteBanner(id);
-        logger.info("Đã xóa thành công Banner ID: {} khỏi cơ sở dữ liệu.", id);
+        logger.info("Successfully deleted Banner ID: {} from the database.", id);
         response.sendRedirect("admin-banner");
     }
 
     private void getActiveBanner(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        logger.info("Lọc danh sách các Banner đang hoạt động (Active).");
+        logger.info("Filtering active banners list.");
         List<Banner> banners = bannerDAO.getActiveBanner();
         request.setAttribute("banners", banners);
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-banner.jsp").forward(request, response);
@@ -194,7 +194,7 @@ public class AdminBannerServlet extends HttpServlet {
 
     private void editBanner(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
-        logger.info("Yêu cầu xem form chỉnh sửa cho Banner ID: {}", id);
+        logger.info("Request to view edit form for Banner ID: {}", id);
         BannerDAO dao = new BannerDAO();
         Banner banner = dao.getBannerById(id);
 
@@ -202,13 +202,13 @@ public class AdminBannerServlet extends HttpServlet {
             request.setAttribute("banner", banner);
             request.getRequestDispatcher("/WEB-INF/views/admin/admin-banner-edit.jsp").forward(request, response);
         } else {
-            logger.warn("Không tìm thấy Banner có ID: {} để chỉnh sửa. Điều hướng lại.", id);
+            logger.warn("Banner with ID: {} not found to edit. Redirecting.", id);
             response.sendRedirect("admin-banner");
         }
     }
 
     private void addBanner(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Chuyển hướng sang giao diện thêm mới banner (admin-banner-add.jsp).");
+        logger.debug("Redirecting to add banner interface (admin-banner-add.jsp).");
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-banner-add.jsp").forward(request, response);
     }
 }

@@ -27,11 +27,11 @@ public class AdminCreateInventoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Nhận yêu cầu GET: Hiển thị giao diện tạo phiếu kho.");
+        logger.debug("Received GET request: Displaying create inventory interface.");
 
         ProductDAO productDAO = new ProductDAO();
         List<Product> productList = productDAO.getAllProduct();
-        logger.debug("Tải thành công danh sách sản phẩm nền. Số lượng: {}", (productList != null ? productList.size() : 0));
+        logger.debug("Successfully loaded base product list. Count: {}", (productList != null ? productList.size() : 0));
 
         request.setAttribute("productList", productList);
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-create-inventory.jsp").forward(request, response);
@@ -44,7 +44,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("acc");
         if (user == null) {
-            logger.warn("Yêu cầu POST bị từ chối: Người dùng chưa đăng nhập hệ thống.");
+            logger.warn("POST request rejected: User is not logged into the system.");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -52,7 +52,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
         String transactionType = request.getParameter("transactionType");
         String note = request.getParameter("note");
         String totalValueStr = request.getParameter("totalValue");
-        logger.info("Admin ID '{}' gửi yêu cầu tạo phiếu kho [Loại: '{}', Tổng giá trị raw: '{}']",
+        logger.info("Admin ID '{}' submitted inventory transaction request [Type: '{}', Raw total value: '{}']",
                 user.getId(), transactionType, totalValueStr);
 
         double totalValue = (totalValueStr != null && !totalValueStr.isEmpty()) ? Double.parseDouble(totalValueStr) : 0;
@@ -60,7 +60,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
         String[] productIds = request.getParameterValues("productId[]");
         String[] quantities = request.getParameterValues("quantity[]");
         String[] prices = request.getParameterValues("price[]");
-        logger.debug("Mảng tham số nhận được: productIds={}, quantities={}, prices={}",
+        logger.debug("Parameter arrays received: productIds={}, quantities={}, prices={}",
                 Arrays.toString(productIds), Arrays.toString(quantities), Arrays.toString(prices));
 
         try {
@@ -72,7 +72,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
 
             List<InventoryTransactionDetail> details = new ArrayList<>();
             if (productIds != null && productIds.length > 0) {
-                logger.debug("Bắt đầu phân tích cú pháp chuỗi danh sách sản phẩm gồm {} dòng phần tử.", productIds.length);
+                logger.debug("Starting to parse product list string containing {} element rows.", productIds.length);
                 for (int i = 0; i < productIds.length; i++) {
                     if (productIds[i] != null && !productIds[i].trim().isEmpty()) {
                         InventoryTransactionDetail detail = new InventoryTransactionDetail();
@@ -85,18 +85,18 @@ public class AdminCreateInventoryServlet extends HttpServlet {
             }
 
             if (details.isEmpty()) {
-                logger.warn("Lập phiếu thất bại: Danh sách chi tiết phiếu kho trống rỗng.");
+                logger.warn("Transaction creation failed: Inventory transaction details list is empty.");
                 throw new Exception("Bạn chưa chọn sản phẩm nào hợp lệ!");
             }
 
             transaction.setDetails(details);
-            logger.debug("Phân tích danh sách sản phẩm hoàn tất. Đang tiến hành lưu phiếu kho vào CSDL qua DAO...");
+            logger.debug("Product list parsing completed. Saving inventory transaction to the database via DAO...");
 
             InventoryDAO inventoryDAO = new InventoryDAO();
             boolean isSuccess = inventoryDAO.insertTransaction(transaction);
 
             if (isSuccess) {
-                logger.info("Tạo phiếu kho thành công! Loại: {}, ID Người tạo: {}, Tổng số mặt hàng: {}",
+                logger.info("Inventory transaction created successfully! Type: {}, Creator ID: {}, Total items: {}",
                         transactionType, user.getId(), details.size());
 
                 clearDraftSession(session);
@@ -106,7 +106,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
                 throw new Exception("Có lỗi xảy ra khi lưu vào cơ sở dữ liệu!");
             }
         } catch (Exception e) {
-            logger.error("Thất bại khi xử lý lập phiếu kho. Tiến hành sao lưu dữ liệu tạm (Draft Session) cho Admin ID '{}'. Lý do: ", user.getId(), e);
+            logger.error("Failed to process inventory transaction. Backing up temporary data (Draft Session) for Admin ID '{}'. Reason: ", user.getId(), e);
             session.setAttribute("error", "Lỗi: " + e.getMessage());
 
             session.setAttribute("draftType", transactionType);
@@ -121,7 +121,7 @@ public class AdminCreateInventoryServlet extends HttpServlet {
     }
 
     private void clearDraftSession(HttpSession session) {
-        logger.debug("Dọn dẹp sạch sẽ các bản ghi nháp (Draft Session) phiếu kho.");
+        logger.debug("Cleaning up inventory transaction draft records (Draft Session).");
         session.removeAttribute("draftType");
         session.removeAttribute("draftNote");
         session.removeAttribute("draftTotalValue");

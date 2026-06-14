@@ -29,7 +29,7 @@ public class AdminProductAddServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Nhận yêu cầu GET: Hiển thị giao diện thêm mới sản phẩm.");
+        logger.debug("Received GET request: Displaying product addition interface.");
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-product-add.jsp").forward(request, response);
     }
 
@@ -38,7 +38,7 @@ public class AdminProductAddServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         List<String> uploadedFiles = new ArrayList<>();
         String name = req.getParameter("name");
-        logger.info("Bắt đầu xử lý luồng POST thêm sản phẩm mới. Tên sản phẩm gửi lên: '{}'", name);
+        logger.info("Starting POST flow to add new product. Submitted product name: '{}'", name);
 
         try {
             int categoryId = Integer.parseInt(req.getParameter("categoryId"));
@@ -59,7 +59,7 @@ public class AdminProductAddServlet extends HttpServlet {
                     JSONObject obj = new JSONObject(specs);
                     brand = obj.optString("brand", "");
                 } catch (Exception e) {
-                    logger.warn("Không thể phân tích cú pháp chuỗi JSON 'specs' để tìm thương hiệu (brand). Chuỗi raw: '{}'. Lỗi: {}", specs, e.getMessage());
+                    logger.warn("Cannot parse JSON string 'specs' to find brand. Raw string: '{}'. Error: {}", specs, e.getMessage());
                 }
             }
 
@@ -70,18 +70,18 @@ public class AdminProductAddServlet extends HttpServlet {
 
             String thumbName = Paths.get(thumbPart.getSubmittedFileName()).getFileName().toString();
             File tempThumb = File.createTempFile("thumb_", ".tmp");
-            logger.debug("Tạo file tạm cho ảnh đại diện tại đường dẫn: {}", tempThumb.getAbsolutePath());
+            logger.debug("Created temporary file for thumbnail at path: {}", tempThumb.getAbsolutePath());
             try {
                 thumbPart.write(tempThumb.getAbsolutePath());
                 CloudinaryService.upload(tempThumb, thumbName);
                 uploadedFiles.add(thumbName);
-                logger.info("Upload thành công ảnh đại diện '{}' lên Cloudinary.", thumbName);
+                logger.info("Successfully uploaded thumbnail '{}' to Cloudinary.", thumbName);
             } finally {
                 boolean isDeleted = tempThumb.delete();
                 if (isDeleted) {
-                    logger.debug("Đã dọn dẹp sạch file tạm ảnh đại diện.");
+                    logger.debug("Cleaned up thumbnail temporary file.");
                 } else {
-                    logger.warn("Không thể xóa file tạm ảnh đại diện tại: {}", tempThumb.getAbsolutePath());
+                    logger.warn("Failed to delete thumbnail temporary file at: {}", tempThumb.getAbsolutePath());
                 }
             }
 
@@ -96,7 +96,7 @@ public class AdminProductAddServlet extends HttpServlet {
                     galleryParts.add(p);
                 }
             }
-            logger.debug("Tìm thấy {} tệp tin hợp lệ nằm trong mục Gallery ảnh.", galleryParts.size());
+            logger.debug("Found {} valid files under the image gallery category.", galleryParts.size());
 
             if (galleryParts.size() > 5) {
                 throw new RuntimeException("Tối đa 5 ảnh gallery");
@@ -110,11 +110,11 @@ public class AdminProductAddServlet extends HttpServlet {
                     CloudinaryService.upload(temp, fileName);
                     galleryNames.add(fileName);
                     uploadedFiles.add(fileName);
-                    logger.debug("Upload thành công ảnh thuộc bộ sưu tập: '{}'", fileName);
+                    logger.debug("Successfully uploaded gallery image: '{}'", fileName);
                 } finally {
                     boolean isDeleted = temp.delete();
                     if (!isDeleted) {
-                        logger.warn("Không thể xóa file tạm bộ sưu tập tại: {}", temp.getAbsolutePath());
+                        logger.warn("Failed to delete gallery temporary file at: {}", temp.getAbsolutePath());
                     }
                 }
             }
@@ -130,29 +130,29 @@ public class AdminProductAddServlet extends HttpServlet {
             product.setDiscount(discount);
             product.setStockQuantity(stock);
 
-            logger.info("Tiến hành ghi nhận thông tin sản phẩm vào Cơ sở dữ liệu...");
+            logger.info("Saving product information to the database...");
             ProductDAO productDAO = new ProductDAO();
             boolean inserted = productDAO.insertProduct(product);
             if (!inserted) {
                 throw new RuntimeException("Không thể thêm sản phẩm");
             }
             int productId = product.getId();
-            logger.info("Thêm sản phẩm thành công! ID vừa sinh ra: {}", productId);
+            logger.info("Product added successfully! Generated ID: {}", productId);
 
             ImageDAO imageDAO = new ImageDAO();
             imageDAO.insertImage(productId, "Product", thumbName, true);
-            logger.debug("Đã map ảnh đại diện '{}' với sản phẩm ID {}", thumbName, productId);
+            logger.debug("Mapped thumbnail '{}' to product ID {}", thumbName, productId);
 
             for (String img : galleryNames) {
                 imageDAO.insertImage(productId, "Product", img, false);
-                logger.debug("Đã map ảnh gallery '{}' với sản phẩm ID {}", img, productId);
+                logger.debug("Mapped gallery image '{}' to product ID {}", img, productId);
             }
 
-            logger.info("Hoàn tất nghiệp vụ thêm sản phẩm. Thực hiện chuyển hướng (redirect)...");
+            logger.info("Product addition workflow completed. Performing redirect...");
             resp.sendRedirect(req.getContextPath() + "/admin/admin-product?msg=add_success");
 
         } catch (Exception e) {
-            logger.error("Xảy ra lỗi hệ thống nghiêm trọng trong quá trình thêm sản phẩm mới '{}': ", name, e);
+            logger.error("Critical system error occurred during addition of new product '{}': ", name, e);
 
             for (String file : uploadedFiles) {
                 try {

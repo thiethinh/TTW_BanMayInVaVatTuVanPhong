@@ -25,22 +25,22 @@ public class ProductDetailServlet extends HttpServlet {
         try {
             String productId = request.getParameter("productId");
             if (productId == null) {
-                logger.warn("Yêu cầu xem chi tiết sản phẩm bị từ chối: Thiếu tham số 'productId'.");
+                logger.warn("Request to view product details denied: Missing 'productId' parameter.");
                 response.sendRedirect("home");
                 return;
             }
             int id = Integer.parseInt(productId);
-            logger.info("Nhận yêu cầu tải trang chi tiết sản phẩm ID: '{}'", id);
+            logger.info("Received request to load product details page for ID: '{}'", id);
 
             // Lấy thông tin sản phẩm
             ProductDAO dao = new ProductDAO();
-            logger.debug("Đang truy vấn thông tin cơ bản và bộ sưu tập ảnh của sản phẩm ID: '{}'...", id);
+            logger.debug("Querying basic information and image collection for product ID: '{}'...", id);
             Product product = dao.getProductById(id);
             List<String> listImages = dao.getAllImageOfProduct(id);
 
             // Lấy đánh giá
             ReviewDAO reviewDao = new ReviewDAO();
-            logger.debug("Đang tải danh sách đánh giá (Reviews) của sản phẩm ID: '{}'...", id);
+            logger.debug("Loading list of reviews (Reviews) for product ID: '{}'...", id);
             List<Review> reviewList = reviewDao.getReviewsByProductId(id);
 
             double avgRating = 0.0;
@@ -51,7 +51,7 @@ public class ProductDetailServlet extends HttpServlet {
                 }
                 avgRating = total / reviewList.size();
                 avgRating = Math.round(avgRating * 10.0) / 10.0;
-                logger.debug("Tính toán điểm đánh giá trung bình cho sản phẩm ID '{}': {} sao (Tổng số: {} đánh giá)",
+                logger.debug("Calculating average rating for product ID '{}': {} stars (Total: {} reviews)",
                         id, avgRating, reviewList.size());
             }
             product.setAvgRating(BigDecimal.valueOf(avgRating));
@@ -61,10 +61,10 @@ public class ProductDetailServlet extends HttpServlet {
             request.setAttribute("reviewList", reviewList);
             request.setAttribute("countReview", reviewList.size());
 
-            logger.info("Tải dữ liệu chi tiết sản phẩm '{}' thành công. Chuyển tiếp luồng sang product-details.jsp", product.getProductName());
+            logger.info("Successfully loaded product details for '{}'. Forwarding flow to product-details.jsp", product.getProductName());
             request.getRequestDispatcher("/WEB-INF/views/client/product-details.jsp").forward(request, response);
         } catch (Exception e) {
-            logger.error("Lỗi hệ thống nghiêm trọng khi tải dữ liệu chi tiết sản phẩm: ", e);
+            logger.error("Serious system error when loading product details data: ", e);
             response.sendRedirect("home");
         }
     }

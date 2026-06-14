@@ -27,17 +27,17 @@ public class VerifyCodeServlet extends HttpServlet {
         User tempUser = (User) session.getAttribute("tempUser");
 
         if (serverOTP == null || tempUser == null) {
-            logger.warn("Yêu cầu xác thực OTP bị từ chối: Phiên giao dịch (Session) của người dùng đã bị hủy hoặc hết hạn trước đó.");
+            logger.warn("OTP verification request rejected: User session has expired or been destroyed.");
             request.setAttribute("error", "Phiên giao dịch hết hạn vui lòng đăng ký lại");
             request.getRequestDispatcher("/WEB-INF/views/client/login.jsp").forward(request, response);
             return;
         }
 
-        logger.info("Nhận yêu cầu xác thực OTP từ Email: '{}'", tempUser.getEmail());
+        logger.info("Received OTP verification request for Email: '{}'", tempUser.getEmail());
 
         Long createTime = (Long) session.getAttribute("REG_OTP_createTime");
         if (createTime != null && (System.currentTimeMillis() - createTime) > 300000) {
-            logger.warn("Xác thực thất bại: Mã OTP gửi đến Email '{}' đã quá hạn 5 phút quy định.", tempUser.getEmail());
+            logger.warn("Verification failed: OTP sent to Email '{}' has exceeded the 5-minute expiration limit.", tempUser.getEmail());
             request.setAttribute("error", "OTP đã hết hạn! Vui lòng bấm gửi lại mã");
             request.setAttribute("showVerifyModal", true);
             request.setAttribute("activeTab", "register");
@@ -47,12 +47,12 @@ public class VerifyCodeServlet extends HttpServlet {
 
         // So khớp mã OTP người dùng nhập vào với mã lưu trên Server Session
         if (inputOTP != null && inputOTP.equals(serverOTP)) {
-            logger.info("Mã OTP hoàn toàn chính xác. Tiến hành ghi nhận thông tin và tạo tài khoản chính thức cho Email: '{}' vào CSDL...", tempUser.getEmail());
+            logger.info("OTP is correct. Proceeding to save information and create official account for Email: '{}' in the database...", tempUser.getEmail());
 
             UserDAO dao = new UserDAO();
             dao.signup(tempUser);
 
-            logger.debug("Tạo tài khoản thành công. Bắt đầu giải phóng và dọn dẹp toàn bộ dữ liệu tạm thời (OTP, TempUser, RateLimiter) ra khỏi Session...");
+            logger.debug("Account created successfully. Cleaning up temporary session data (OTP, TempUser, RateLimiter)...");
             session.removeAttribute("authCode");
             session.removeAttribute("tempUser");
             session.removeAttribute("REG_OTP_createTime");
@@ -62,10 +62,10 @@ public class VerifyCodeServlet extends HttpServlet {
 
             session.setAttribute("msg", "Đăng ký thành công! Bạn có thể đăng nhập");
 
-            logger.info("Quy trình đăng ký của Email '{}' đã hoàn tất tốt đẹp. Điều hướng sang trang đăng nhập.", tempUser.getEmail());
+            logger.info("Registration process for Email '{}' completed successfully. Redirecting to login page.", tempUser.getEmail());
             response.sendRedirect(request.getContextPath() + "/login");
         } else {
-            logger.warn("Xác thực thất bại: Người dùng nhập sai mã OTP đối với Email '{}'. (Mã nhập vào: '{}')", tempUser.getEmail(), inputOTP);
+            logger.warn("Verification failed: User entered incorrect OTP for Email '{}'. (Entered code: '{}')", tempUser.getEmail(), inputOTP);
             request.setAttribute("error", "Mã OTP không đúng");
             request.setAttribute("showVerifyModal", true);
             request.setAttribute("activeTab", "register");

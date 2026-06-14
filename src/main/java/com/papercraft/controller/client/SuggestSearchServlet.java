@@ -29,29 +29,29 @@ public class SuggestSearchServlet extends HttpServlet {
         String type = request.getParameter("type");
         List<String> suggests = new ArrayList<>();
 
-        logger.debug("Nhận yêu cầu gọi ý tìm kiếm (Auto-complete). Từ khóa: '{}', Phân loại nhóm: '{}'", keyword, type);
+        logger.debug("Received search suggestion request (Auto-complete). Keyword: '{}', Category type: '{}'", keyword, type);
 
         ProductDAO productDAO = new ProductDAO();
 
         if (keyword != null && !keyword.isEmpty()) {
-            logger.debug("Đang truy vấn top 5 sản phẩm khớp với từ khóa '{}' từ CSDL...", keyword);
+            logger.debug("Querying top 5 products matching keyword '{}' from the database...", keyword);
             suggests = productDAO.findTop5NameProductMatchest(keyword, type);
         }
 
         if (suggests != null) {
             if (logger.isTraceEnabled()) {
                 for (String suggest : suggests) {
-                    logger.trace("Gợi ý tìm kiếm tìm thấy: '{}'", suggest);
+                    logger.trace("Search suggestion found: '{}'", suggest);
                 }
             }
         } else {
-            logger.warn("Kết quả trả về từ CSDL bị null đối với từ khóa: '{}'", keyword);
+            logger.warn("Result returned from the database is null for keyword: '{}'", keyword);
             response.setContentType("application/json");
             response.getWriter().print("[]");
             return;
         }
 
-        logger.info("Hoàn tất xử lý gợi ý cho từ khóa '{}'. Số lượng kết quả tìm thấy: {}", keyword, suggests.size());
+        logger.info("Completed suggestion processing for keyword '{}'. Number of results found: {}", keyword, suggests.size());
 
         response.setContentType("application/json");
         PrintWriter writer = response.getWriter();
@@ -64,7 +64,7 @@ public class SuggestSearchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
-        logger.debug("Nhận yêu cầu POST tại /suggest (Không xử lý logic nghiệp vụ).");
+        logger.debug("Received POST request at /suggest (No business logic processed).");
         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 }

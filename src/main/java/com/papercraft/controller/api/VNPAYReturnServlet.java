@@ -39,7 +39,7 @@ public class VNPAYReturnServlet extends HttpServlet {
         String orderIdStr = request.getParameter("vnp_TxnRef");
         String transactionNo = request.getParameter("vnp_TransactionNo");
 
-        logger.info("Nhận phản hồi giao dịch từ VNPAY (Return URL). TxnRef (OrderId): '{}', Status: '{}', TransNo: '{}'",
+        logger.info("Received transaction response from VNPAY (Return URL). TxnRef (OrderId): '{}', Status: '{}', TransNo: '{}'",
                 orderIdStr, vnp_TransactionStatus, transactionNo);
 
         fields.remove("vnp_SecureHashType");
@@ -47,7 +47,7 @@ public class VNPAYReturnServlet extends HttpServlet {
 
         String signValue = hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {
-            logger.debug("Xác thực chữ ký số VNPAY thành công. Dữ liệu toàn vẹn.");
+            logger.debug("VNPAY signature verification successful. Data integrity verified.");
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 int orderId = 0;
                 try {
@@ -55,33 +55,33 @@ public class VNPAYReturnServlet extends HttpServlet {
 
                     PaymentDAO paymentDAO = new PaymentDAO();
                     paymentDAO.verifyPaymentSuccess(orderId, transactionNo);
-                    logger.info("Giao dịch VNPAY thành công hoàn toàn. Đơn hàng ID {} đã được cập nhật.", orderId);
+                    logger.info("VNPAY transaction completely successful. Order ID {} has been updated.", orderId);
                     response.sendRedirect(request.getContextPath() + "/order-success");
                 } catch (Exception e) {
-                    logger.error("Lỗi hệ thống: Khách đã bị trừ tiền tại VNPAY nhưng CSDL không thể cập nhật Đơn hàng ID '{}': ", orderId, e);
+                    logger.error("System error: Customer was charged on VNPAY but database failed to update Order ID '{}': ", orderId, e);
                     request.getSession().setAttribute("error", "Thanh toán thành công tại VNPAY nhưng hệ thống gặp sự cố cập nhật. Vui lòng liên hệ Admin kèm mã VNPAY: " + request.getParameter("vnp_TransactionNo"));
                     response.sendRedirect(request.getContextPath() + "/cart");
                 }
             } else {
-                logger.warn("Giao dịch VNPAY thất bại hoặc bị hủy bỏ. Trạng thái lỗi (vnp_TransactionStatus): {}", vnp_TransactionStatus);
+                logger.warn("VNPAY transaction failed or was cancelled. Error status (vnp_TransactionStatus): {}", vnp_TransactionStatus);
                 if (orderIdStr != null && !orderIdStr.isEmpty()) {
                     try {
                         int orderId = Integer.parseInt(orderIdStr);
                         OrderService orderService = new OrderService();
                         orderService.cancelOrderAndReleaseStock(orderId);
-                        logger.info("Đã tự động hủy đơn và hoàn trả số lượng tồn kho cho Đơn hàng ID: {}", orderId);
+                        logger.info("Successfully cancelled order automatically and released stock for Order ID: {}", orderId);
                     } catch (NumberFormatException e) {
-                        logger.error("Không thể xử lý hoàn kho do mã đơn hàng 'vnp_TxnRef' sai định dạng số: '{}'", orderIdStr);
+                        logger.error("Could not process stock release because 'vnp_TxnRef' order ID format is invalid: '{}'", orderIdStr);
                     } catch (Exception e) {
-                        logger.error("Lỗi phát sinh khi thực hiện hủy đơn hàng tự động ID '{}': ", orderIdStr, e);
+                        logger.error("Error occurred while attempting to automatically cancel Order ID '{}': ", orderIdStr, e);
                     }
                 }
                 request.getSession().setAttribute("error", "Giao dịch VNPAY đã bị hủy hoặc không thành công");
                 response.sendRedirect(request.getContextPath() + "/cart");
             }
         } else {
-            logger.error("CẢNH BÁO AN NINH NGUY HIỂM: Sai lệch chữ ký số VNPAY (Signature Mismatch)! " +
-                    "Nhận được: '{}', Tự tính toán: '{}'. Yêu cầu có thể đã bị can thiệp giả mạo dữ liệu.", vnp_SecureHash, signValue);
+            logger.error("DANGEROUS SECURITY WARNING: VNPAY Signature Mismatch! " +
+                    "Received: '{}', Calculated: '{}'. The request might have been tampered with.", vnp_SecureHash, signValue);
             request.getSession().setAttribute("error", "Lỗi bảo mật: Sai chữ ký xác thực từ VNPAY");
             response.sendRedirect(request.getContextPath() + "/cart");
         }

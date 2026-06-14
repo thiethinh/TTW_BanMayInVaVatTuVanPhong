@@ -40,12 +40,12 @@ public class AddBlogServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Một yêu cầu đăng bài viết bị từ chối do chưa đăng nhập hệ thống.");
+            logger.warn("A request to post a blog was denied due to not being logged into the system.");
             session.setAttribute("failedMsg", "Vui lòng đăng nhập để viết bài");
             response.sendRedirect("login");
             return;
         }
-        logger.info("User ID '{}' bắt đầu tạo bài viết mới với tiêu đề: '{}'", user.getId(), title);
+        logger.info("User ID '{}' started creating a new blog post with title: '{}'", user.getId(), title);
 
         // Xử lý ảnh
         Part part = request.getPart("image");
@@ -69,11 +69,11 @@ public class AddBlogServlet extends HttpServlet {
         boolean result = blogDao.addBlog(blog, fileName);
 
         if (result) {
-            logger.info("Đăng bài viết mới thành công (Chờ duyệt) cho User ID: {}", user.getId());
+            logger.info("Successfully posted a new blog post (Pending approval) for User ID: {}", user.getId());
             session.setAttribute("success", "Đăng bài thành công, bạn hãy đợi admin duyệt nhé!");
             response.sendRedirect("blog");
         } else {
-            logger.error("Lỗi tầng DB: Không thể chèn bản ghi bài viết mới của User ID: {}", user.getId());
+            logger.error("DB layer error: Cannot insert new blog record for User ID: {}", user.getId());
             session.setAttribute("failedMsg", "Có lỗi xảy ra, vui lòng thử lại");
             response.sendRedirect("create-blog");
         }

@@ -24,18 +24,18 @@ public class BlogPostServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String idParam = request.getParameter("id");
         if (idParam == null) {
-            logger.warn("Yêu cầu xem chi tiết bài viết bị từ chối: Tham số 'id' trống.");
+            logger.warn("Request to view blog post details denied: Empty 'id' parameter.");
             response.sendRedirect("blog");
             return;
         }
         int id = Integer.parseInt(idParam);
-        logger.info("Khách truy cập đang tải nội dung chi tiết bài viết ID: {}", id);
+        logger.info("Visitor is loading detailed content for blog post ID: {}", id);
 
         BlogDao blogDao = new BlogDao();
         Blog blog = blogDao.getBlogById(id);
 
         if (blog == null) {
-            logger.warn("Bài viết ID '{}' không tồn tại trong hệ thống cơ sở dữ liệu.", id);
+            logger.warn("Blog post ID '{}' does not exist in the database system.", id);
             response.sendRedirect("blog");
             return;
         }
@@ -45,11 +45,11 @@ public class BlogPostServlet extends HttpServlet {
             User user = (User) session.getAttribute("acc");
 
             if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
-                logger.warn("Cảnh báo bảo mật: Người dùng thông thường (hoặc khách vãng lai) cố tình truy cập bài viết chưa phê duyệt ID: {}", id);
+                logger.warn("Security warning: Regular user (or guest) attempted to access unapproved blog post ID: {}", id);
                 response.sendRedirect("home");
                 return;
             }
-            logger.info("Admin ID '{}' đang xem trước (Preview) bài viết chưa phê duyệt ID: {}", user.getId(), id);
+            logger.info("Admin ID '{}' is previewing unapproved blog post ID: {}", user.getId(), id);
         }
 
         List<Blog> relatedBlogs = blogDao.getRelatedBlogs(blog.getTypeBlog(), id);

@@ -19,7 +19,7 @@ public class AdminSettingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Nhận yêu cầu GET: Tải cấu hình hệ thống lên trang quản trị.");
+        logger.debug("Received GET request: Loading system settings onto the admin page.");
         SettingDAO settingDAO = new SettingDAO();
         request.setAttribute("settings", settingDAO.getAllSettings());
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-setting.jsp").forward(request, response);
@@ -30,7 +30,7 @@ public class AdminSettingServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         SettingDAO settingDAO = new SettingDAO();
-        logger.info("Nhận yêu cầu POST: Bắt đầu quy trình cập nhật cấu hình hệ thống (Global Settings).");
+        logger.info("Received POST request: Starting update process for global system settings.");
 
         String[] keys = {"email", "phone", "address", "working_hours", "facebook", "instagram", "twitter", "policy_privacy", "policy_terms", "policy_return", "policy_guarantee"};
         boolean hasError = false;
@@ -41,7 +41,7 @@ public class AdminSettingServlet extends HttpServlet {
                 settingDAO.updateSetting(key, value);
             } else {
                 hasError = true;
-                logger.warn("Tham số cấu hình '{}' không tìm thấy trong dữ liệu Form gửi lên.", key);
+                logger.warn("Configuration parameter '{}' not found in the submitted form data.", key);
             }
         }
 

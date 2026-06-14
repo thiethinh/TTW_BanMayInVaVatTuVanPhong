@@ -27,13 +27,13 @@ public class AdminProduct extends HttpServlet {
 
         String idDeleted = request.getParameter("delete");
         if (idDeleted != null) {
-            logger.info("Nhận yêu cầu xóa sản phẩm. ID raw từ client: '{}'", idDeleted);
+            logger.info("Received request to delete product. Raw ID from client: '{}'", idDeleted);
             boolean isDeleted = productDAO.deleteProductById(Integer.parseInt(idDeleted));
 
             if (isDeleted) {
-                logger.info("Xóa thành công sản phẩm ID: {}", idDeleted);
+                logger.info("Successfully deleted product ID: {}", idDeleted);
             } else {
-                logger.error("Thất bại khi thực thi xóa sản phẩm ID: {} tại cơ sở dữ liệu", idDeleted);
+                logger.error("Failed to execute product deletion for ID: {} in the database", idDeleted);
             }
 
             response.sendRedirect(request.getContextPath() + "/admin/admin-product?msg=" + (isDeleted ? "delete_success" : "delete_fail"));
@@ -68,16 +68,16 @@ public class AdminProduct extends HttpServlet {
             }
         }
 
-        logger.debug("Thông số bộ lọc sản phẩm nhận được - Keyword: '{}', Type: '{}', CategoryId: '{}'", keyword, type, categoryId);
+        logger.debug("Product filter parameters received - Keyword: '{}', Type: '{}', CategoryId: '{}'", keyword, type, categoryId);
 
         if (type != null && categoryId == null) {
-            logger.info("Thực hiện tìm kiếm sản phẩm theo từ khóa: '{}'", keyword);
+            logger.info("Searching for products by keyword: '{}'", keyword);
             type = type.trim();
             CategoryDAO categoryDAO = new CategoryDAO();
             List<Category> categories = categoryDAO.getAllCategories(type);
             products = productDAO.getAllProduct(type);
 
-            logger.debug("Hoàn tất truy vấn dữ liệu. Gửi sang JSP {} sản phẩm và {} danh mục", products, categories);
+            logger.debug("Data query completed. Sending to JSP: {} products and {} categories", products, categories);
             request.setAttribute("categories", categories);
             request.setAttribute("products", products);
             request.setAttribute("type", type);

@@ -30,9 +30,9 @@ public class AdminBlogServlet extends HttpServlet {
         User user = (User) session.getAttribute("acc");
 
         if (user == null) {
-            logger.warn("Cảnh báo: Có yêu cầu truy cập ẩn danh vào hệ thống quản lý blog.");
+            logger.warn("Warning: Anonymous access request to the blog management system.");
         } else {
-            logger.debug("Tài khoản '{}' (ID: {}) truy cập vào AdminBlogServlet", user.getEmail(), user.getId());
+            logger.debug("Account '{}' (ID: {}) accessed AdminBlogServlet", user.getEmail(), user.getId());
         }
 
         BlogDao blogDao = new BlogDao();
@@ -45,7 +45,7 @@ public class AdminBlogServlet extends HttpServlet {
         if (viewType == null) viewType = "pending";
 
         int status = "approved".equals(viewType) ? 1 : 0;
-        logger.debug("Bộ lọc hiển thị: viewType='{}' (status={}), keyword='{}', type='{}'", viewType, status, keyword, typeFilter);
+        logger.debug("Display filters: viewType='{}' (status={}), keyword='{}', type='{}'", viewType, status, keyword, typeFilter);
 
         if (action != null) {
             String idRaw = request.getParameter("id");
@@ -55,40 +55,40 @@ public class AdminBlogServlet extends HttpServlet {
                 NotificationDAO notificationDAO = new NotificationDAO();
                 NotificationType type = null;
 
-                logger.info("Admin ID '{}' yêu cầu thực hiện hành động '{}' trên Blog ID '{}'", (user != null ? user.getId() : "Unknown"), action, id);
+                logger.info("Admin ID '{}' requested action '{}' on Blog ID '{}'", (user != null ? user.getId() : "Unknown"), action, id);
 
                 if ("approve".equals(action)) {
                     success = blogDao.actionBlog(id, 1);
                     session.setAttribute("msg", success ? "Duyệt thành công!" : "Lỗi duyệt bài.");
                     type = NotificationType.BLOG_APPROVED;
 
-                    if (success) logger.info("Duyệt thành công Blog ID: {}", id);
-                    else logger.error("Thất bại khi duyệt Blog ID: {}", id);
+                    if (success) logger.info("Successfully approved Blog ID: {}", id);
+                    else logger.error("Failed to approve Blog ID: {}", id);
                 } else if ("hidden".equals(action)) {
                     success = blogDao.actionBlog(id, 0);
                     session.setAttribute("msg", success ? "Ẩn thành công!" : "Lỗi ẩn bài.");
                     type = NotificationType.BLOG_HIDDEN;
 
-                    if (success) logger.info("Đã ẩn thành công Blog ID: {}", id);
-                    else logger.error("Thất bại khi ẩn Blog ID: {}", id);
+                    if (success) logger.info("Successfully hid Blog ID: {}", id);
+                    else logger.error("Failed to hide Blog ID: {}", id);
                 } else if ("delete".equals(action)) {
                     success = blogDao.deleteBlog(id);
                     session.setAttribute("msg", success ? "Xóa thành công!" : "Lỗi xóa bài.");
                     type = NotificationType.BLOG_DELETED;
 
-                    if (success) logger.info("Đã xóa vĩnh viễn thành công Blog ID: {}", id);
-                    else logger.error("Thất bại khi xóa Blog ID: {}", id);
+                    if (success) logger.info("Successfully permanently deleted Blog ID: {}", id);
+                    else logger.error("Failed to delete Blog ID: {}", id);
                 } else {
-                    logger.warn("Hành động '{}' không hợp lệ / không được hỗ trợ xử lý.", action);
+                    logger.warn("Action '{}' is invalid or not supported.", action);
                 }
 
                 if (type != null && success) {
                     if (user != null) {
                         Notification noti = new Notification(user.getId(), type, id);
                         notificationDAO.insertNotification(noti);
-                        logger.debug("Đã thêm thông báo hệ thống loại '{}' cho Blog ID: {}", type, id);
+                        logger.debug("Added system notification of type '{}' for Blog ID: {}", type, id);
                     } else {
-                        logger.warn("Không thể tạo thông báo vì không tìm thấy thông tin Admin trong session.");
+                        logger.warn("Cannot create notification because Admin info was not found in session.");
                     }
                 }
 
@@ -96,24 +96,24 @@ public class AdminBlogServlet extends HttpServlet {
                 if (keyword != null && !keyword.isEmpty()) redirectUrl += "&keyword=" + keyword;
                 if (typeFilter != null && !typeFilter.isEmpty()) redirectUrl += "&type=" + typeFilter;
 
-                logger.debug("Redirecting về trang danh sách: {}", redirectUrl);
+                logger.debug("Redirecting to list page: {}", redirectUrl);
                 response.sendRedirect(redirectUrl);
                 return;
             } catch (Exception e) {
-                logger.error("Lỗi hệ thống nghiêm trọng xảy ra khi thực hiện hành động '{}' trên Blog ID '{}': ", action, idRaw, e);
+                logger.error("Critical system error occurred while performing action '{}' on Blog ID '{}': ", action, idRaw, e);
             }
         }
 
-        logger.info("Đang tải danh sách Blog phục vụ kiểm duyệt từ cơ sở dữ liệu...");
+        logger.info("Loading Blog list for moderation from the database...");
         List<Blog> listBlog = blogDao.searchAdminBlogs(keyword, typeFilter, status);
-        logger.debug("Tìm thấy tổng cộng {} bài viết thỏa mãn điều kiện lọc.", (listBlog != null ? listBlog.size() : 0));
+        logger.debug("Found total of {} articles matching the filter conditions.", (listBlog != null ? listBlog.size() : 0));
 
         request.setAttribute("listBlog", listBlog);
         request.setAttribute("currentView", viewType);
         request.setAttribute("searchKeyword", keyword);
         request.setAttribute("searchType", typeFilter);
 
-        logger.debug("Chuyển tiếp (forward) dữ liệu sang /WEB-INF/views/admin/admin-blog.jsp");
+        logger.debug("Forwarding data to /WEB-INF/views/admin/admin-blog.jsp");
         request.getRequestDispatcher("/WEB-INF/views/admin/admin-blog.jsp").forward(request, response);
     }
 }

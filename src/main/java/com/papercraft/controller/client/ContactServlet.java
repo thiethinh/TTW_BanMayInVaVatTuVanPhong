@@ -25,7 +25,7 @@ public class ContactServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Tải giao diện trang Liên hệ (contact.jsp).");
+        logger.debug("Loading Contact page interface (contact.jsp).");
         request.getRequestDispatcher("/WEB-INF/views/client/contact.jsp").forward(request, response);
     }
 
@@ -40,7 +40,7 @@ public class ContactServlet extends HttpServlet {
         String subject = request.getParameter("subject") != null ? request.getParameter("subject") : "";
         String message = request.getParameter("message") != null ? request.getParameter("message") : "";
 
-        logger.info("Nhận yêu cầu gửi liên hệ mới. Người gửi: '{}', Email: '{}', Chủ đề: '{}'", fullname, email, subject);
+        logger.info("Received a request to send a new contact. Sender: '{}', Email: '{}', Subject: '{}'", fullname, email, subject);
 
         String errorFullname = "";
         String errorEmail = "";
@@ -68,7 +68,7 @@ public class ContactServlet extends HttpServlet {
                 || !errorMessage.isEmpty();
         JsonObject json = new JsonObject();
         if (hasError) {
-            logger.warn("Dữ liệu biểu mẫu liên hệ không hợp lệ. Chi tiết lỗi -> Họ tên: '{}', Email: '{}', Chủ đề: '{}', Nội dung: '{}'",
+            logger.warn("Invalid contact form data. Error details -> Fullname: '{}', Email: '{}', Subject: '{}', Message: '{}'",
                     errorFullname, errorEmail, errorSubject, errorMessage);
 
             json.addProperty("success", false);
@@ -91,17 +91,17 @@ public class ContactServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("acc");
         contact.setUserId(user != null ? user.getId() : null);
-        logger.debug("Tiến hành ghi nhận thông tin liên hệ vào CSDL. Liên kết User ID: {}", contact.getUserId());
+        logger.debug("Proceeding to record contact information in DB. Associated User ID: {}", contact.getUserId());
 
         ContactDAO dao = new ContactDAO();
         boolean isuccess = dao.insertContact(contact);
         if (isuccess && user != null) {
-            logger.info("Tạo thông báo hệ thống CONTACT_SUBMITTED cho User ID: '{}'", user.getId());
+            logger.info("Creating system notification CONTACT_SUBMITTED for User ID: '{}'", user.getId());
             NotificationDAO notificationDAO = new NotificationDAO();
             Notification noti = new Notification(user.getId(), NotificationType.CONTACT_SUBMITTED, null);
             notificationDAO.insertNotification(noti);
         } else {
-            logger.error("Lỗi hệ thống: Không thể lưu thông tin liên hệ của '{}' vào cơ sở dữ liệu.", email);
+            logger.error("System error: Unable to save contact information of '{}' into the database.", email);
         }
 
         json.addProperty("success", isuccess);

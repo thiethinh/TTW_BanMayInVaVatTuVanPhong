@@ -24,7 +24,7 @@ public class GHNAddressServlet extends HttpServlet {
         response.setContentType("application/json; charset=UTF-8");
 
         String type = request.getParameter("type");
-        logger.info("Nhận yêu cầu API địa chỉ GHN. Phân loại truy vấn (type): '{}'", type);
+        logger.info("Received GHN address API request. Query type: '{}'", type);
 
         try {
             String resultJson;
@@ -36,7 +36,7 @@ public class GHNAddressServlet extends HttpServlet {
                 String provinceId = request.getParameter("provinceId");
 
                 if (provinceId == null || provinceId.isBlank()) {
-                    logger.warn("Yêu cầu lấy danh mục Quận/Huyện thất bại: Thiếu tham số 'provinceId'.");
+                    logger.warn("Request to get Districts failed: Missing 'provinceId' parameter.");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"code\":400,\"message\":\"provinceId is required\"}");
                     return;
@@ -48,7 +48,7 @@ public class GHNAddressServlet extends HttpServlet {
                 String districtId = request.getParameter("districtId");
 
                 if (districtId == null || districtId.isBlank()) {
-                    logger.warn("Yêu cầu lấy danh mục Phường/Xã thất bại: Thiếu tham số 'districtId'.");
+                    logger.warn("Request to get Wards failed: Missing 'districtId' parameter.");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"code\":400,\"message\":\"districtId is required\"}");
                     return;
@@ -57,16 +57,16 @@ public class GHNAddressServlet extends HttpServlet {
                 resultJson = ghnAddressService.getWards(districtId);
 
             } else {
-                logger.warn("Tham số 'type' truyền vào không nằm trong danh mục hỗ trợ: '{}'", type);
+                logger.warn("The passed 'type' parameter is not supported: '{}'", type);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"code\":400,\"message\":\"Invalid type\"}");
                 return;
             }
 
             response.getWriter().write(resultJson);
-            logger.debug("Phản hồi dữ liệu địa chỉ thành công cho loại hình: '{}'", type);
+            logger.debug("Successfully responded with address data for type: '{}'", type);
         } catch (Exception e) {
-            logger.error("Xảy ra lỗi nghiêm trọng khi thiết lập kết nối hoặc xử lý dữ liệu từ đối tác API GHN (Type: '{}'): ", type, e);
+            logger.error("Critical error occurred while establishing connection or processing data from partner GHN API (Type: '{}'): ", type, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             String safeMessage = e.getMessage() == null ? "Unknown error" : e.getMessage().replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
 

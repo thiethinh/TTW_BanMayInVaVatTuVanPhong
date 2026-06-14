@@ -23,28 +23,28 @@ public class HomeServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.info("Bắt đầu tải dữ liệu trang chủ hệ thống (Home Page).");
+        logger.info("Starting to load system homepage data (Home Page).");
 
         ProductDAO dao = new ProductDAO();
         BannerDAO bannerDAO = new BannerDAO();
 
-        logger.debug("Đang truy vấn danh sách URL Banner đang hoạt động...");
+        logger.debug("Querying list of active Banner URLs...");
         List<String> banners = bannerDAO.getActiveUrlBannerImage();
 
-        logger.debug("Đang truy vấn danh sách sản phẩm nổi bật thuộc nhóm 'Printer'...");
+        logger.debug("Querying list of featured products in 'Printer' group...");
         List<Product> featuredPrinter = dao.getFeaturedProductsByType("Printer");
 
-        logger.debug("Đang truy vấn danh sách sản phẩm nổi bật thuộc nhóm 'Stationery'...");
+        logger.debug("Querying list of featured products in 'Stationery' group...");
         List<Product> featuredStationery = dao.getFeaturedProductsByType("Stationery");
 
-        logger.info("Tải dữ liệu trang chủ thành công. Số lượng Banner: {}, Số lượng Máy in: {}, Số lượng Văn phòng phẩm: {}",
+        logger.info("Successfully loaded homepage data. Banner count: {}, Printer count: {}, Stationery count: {}",
                 banners.size(), featuredPrinter.size(), featuredStationery.size());
 
         request.setAttribute("printers", featuredPrinter);
         request.setAttribute("stationery", featuredStationery);
         request.setAttribute("banners", banners);
 
-        logger.debug("Chuyển tiếp luồng (Forward) dữ liệu sang giao diện home.jsp");
+        logger.debug("Forwarding data flow to home.jsp interface");
         request.getRequestDispatcher("/WEB-INF/views/client/home.jsp").forward(request, response);
     }
 }
