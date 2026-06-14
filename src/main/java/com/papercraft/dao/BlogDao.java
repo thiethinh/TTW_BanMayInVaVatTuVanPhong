@@ -2,12 +2,15 @@ package com.papercraft.dao;
 
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Blog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlogDao {
+    private static final Logger logger = LoggerFactory.getLogger(BlogDao.class);
 
     public boolean addBlog(Blog blog, String thumbnailName) {
         String sqlBlog = "INSERT INTO blog (user_id, blog_title, blog_description, type_blog, blog_content, status) VALUES (?, ?, ?, ?, ?, ?)";
@@ -47,13 +50,15 @@ public class BlogDao {
             }
 
             conn.commit();
+            logger.info("Blog created, blogId={}, userId={}", blog.getId(), blog.getUserId());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             try {
                 if (conn != null) conn.rollback();
+                logger.error("Failed to create blog, userId={}", blog.getUserId(), e);
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                logger.error("Failed to rollback blog creation transaction", ex);
             }
         } finally {
             try {
@@ -99,7 +104,7 @@ public class BlogDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load blog, blogId={}", id, e);
         }
         return null;
     }
@@ -154,7 +159,7 @@ public class BlogDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search blogs", e);
         }
         return blogs;
     }
@@ -192,7 +197,7 @@ public class BlogDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load related blogs, currentBlogId={}", currentBlogId, e);
         }
         return blogs;
     }
@@ -229,7 +234,7 @@ public class BlogDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load latest blogs, currentBlogId={}", currentBlogId, e);
         }
         return blogs;
     }
@@ -240,9 +245,15 @@ public class BlogDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, action);
             ps.setInt(2, id);
-            return ps.executeUpdate() == 1;
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 1) {
+                logger.info("Blog status changed, blogId={}, status={}", id, action);
+                return true;
+            }
+            logger.warn("Blog status update failed, blogId={}", id);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to change blog status, blogId={}", id, e);
         }
         return false;
     }
@@ -252,9 +263,15 @@ public class BlogDao {
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
-            return ps.executeUpdate() == 1;
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 1) {
+                logger.info("Blog deleted, blogId={}", id);
+                return true;
+            }
+            logger.warn("Blog delete failed, blogId={}", id);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to delete blog, blogId={}", id, e);
         }
         return false;
     }
@@ -311,7 +328,7 @@ public class BlogDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to search admin blogs", e);
         }
         return list;
     }

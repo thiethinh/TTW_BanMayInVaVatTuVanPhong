@@ -3,6 +3,8 @@ package com.papercraft.dao;
 import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Order;
 import com.papercraft.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
+    private static final Logger logger = LoggerFactory.getLogger(OrderDAO.class);
+
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> orders = new ArrayList<>();
 
@@ -44,13 +48,11 @@ public class OrderDAO {
                     orders.add(order);
                 }
             }
-        } catch (SQLException e) {
-
-            System.err.println("SQL Error in getOrdersByUserId: " + e.getMessage());
-            e.printStackTrace();
-            // Ném lại RuntimeException để tầng trên xử lý
-            throw new RuntimeException("Database error occurred while fetching orders for user ID " + userId, e);
-        } catch (Exception e) {
+        }catch (SQLException e) {
+            logger.error("Failed to get orders, userId={}", userId, e);
+            throw new RuntimeException("Database error occurred while fetching orders", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting orders, userId={}", userId, e);
             throw new RuntimeException(e);
         }
         return orders;
@@ -70,13 +72,12 @@ public class OrderDAO {
             int rowsAffected = ps.executeUpdate();
 
             return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println("SQL Error in updateOrderStatus: Could not update order ID " + orderId);
-            e.printStackTrace();
-
-            // Ném lại RuntimeException để tầng Service xử lý lỗi hệ thống
-            throw new RuntimeException("Database error occurred while updating order status.", e);
-        } catch (Exception e) {
+        }catch (SQLException e) {
+            logger.error("Failed to update order status, orderId={}, status={}", orderId, status, e);
+            throw new RuntimeException("Database error occurred while updating order status", e);
+        }
+        catch (Exception e) {
+            logger.error("Unexpected error while updating order status, orderId={}, status={}", orderId, status, e);
             throw new RuntimeException(e);
         }
     }
@@ -92,12 +93,11 @@ public class OrderDAO {
                     return rs.getInt("pending_order");
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to count pending orders", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while counting pending orders", e);
         }
-
         return 0;
     }
 
@@ -134,10 +134,10 @@ public class OrderDAO {
                     orders.add(order);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to get pending orders", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting pending orders", e);
         }
         return orders;
     }
@@ -183,9 +183,10 @@ public class OrderDAO {
                     return order;
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Lỗi getOrderByID với orderId = " + orderId);
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to get order, orderId={}", orderId, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting order, orderId={}", orderId, e);
         }
         return null;
     }
@@ -230,10 +231,10 @@ public class OrderDAO {
                     orders.add(order);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to get orders, status={}, pageSize={}, offset={}", statusOrder, pageSize, offset, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting orders, status={}, pageSize={}, offset={}", statusOrder, pageSize, offset, e);
         }
         return orders;
     }
@@ -253,10 +254,10 @@ public class OrderDAO {
                 }
 
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to count orders, status={}", status, e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while counting orders, status={}", status, e);
         }
         return 0;
     }
@@ -332,10 +333,10 @@ public class OrderDAO {
                     orders.add(order);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            logger.error("Failed to get all orders", e);
+        }catch (Exception e) {
+            logger.error("Unexpected error while getting all orders", e);
         }
         return orders;
     }
@@ -383,8 +384,8 @@ public class OrderDAO {
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to search orders by date, year={}, month={}, day={}", year, month, day, e);
         }
 
         return orders;
@@ -429,8 +430,8 @@ public class OrderDAO {
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            logger.error("Failed to search orders by month, year={}, month={}", year, month, e);
         }
         return orders;
     }

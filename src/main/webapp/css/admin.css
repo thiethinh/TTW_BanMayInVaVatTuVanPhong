@@ -236,6 +236,11 @@
 
 
 /*order-pending*/
+.table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 
 .content-table {
     width: 100%;
@@ -364,11 +369,13 @@
 }
 
 .block-table {
-    background: #f1f2f4;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 16px;
-    padding: 10px;
+    /*background: #f1f2f4;*/
+    /*overflow-x: auto;*/
+    /*-webkit-overflow-scrolling: touch;*/
+    /*border-radius: 16px;*/
+    /*padding: 10px;*/
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .table-customer {

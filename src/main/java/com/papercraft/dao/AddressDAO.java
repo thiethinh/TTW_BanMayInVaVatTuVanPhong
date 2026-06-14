@@ -1,13 +1,15 @@
 package com.papercraft.dao;
 
-import com.papercraft.utils.DBConnect;
 import com.papercraft.model.Address;
+import com.papercraft.utils.DBConnect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.Objects;
 
 public class AddressDAO {
-
+    private static final Logger logger = LoggerFactory.getLogger(AddressDAO.class);
     // insertAddress
     public boolean insertAddress(Address address) {
         // ID auto increament
@@ -57,18 +59,20 @@ public class AddressDAO {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         int generatedId = rs.getInt(1);
-                        address.setId(generatedId); // gán id mới cho đối tượng Address
+                        address.setId(generatedId);
+                        logger.info("Address inserted successfully, addressId={}, userId={}", generatedId, address.getUserId());
                     }
                 }
                 return true;
             }
+            logger.warn("Insert address failed, no rows affected, userId={}", address.getUserId());
             return false;
 
         } catch (SQLException e) {
-            System.err.println("SQL Error when inserting address: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("SQL error while inserting address for userId={}", address.getUserId(), e);
             throw new RuntimeException("Database error occurred while adding a new address.", e);
         } catch (Exception e) {
+            logger.error("Unexpected error while inserting address for userId={}", address.getUserId(), e);
             throw new RuntimeException(e);
         }
     }
@@ -105,12 +109,16 @@ public class AddressDAO {
                     addr.setWardCode(rs.getString("ward_code"));
                     addr.setWardName(rs.getString("ward_name"));
 
+                    logger.debug("Default address found, addressId={}, userId={}", addr.getId(), userId);
                     return addr;
                 }
             }
+            logger.warn("No default address found for userId={}", userId);
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQL error while finding default address for userId={}", userId, e);
         } catch (Exception e) {
+            logger.error("Unexpected error while finding default address for userId={}", userId, e);
             throw new RuntimeException(e);
         }
         return null;
@@ -153,11 +161,19 @@ public class AddressDAO {
             ps.setString(13, address.getPhone());
             ps.setInt(14, userId);
 
+            int rowsAffected = ps.executeUpdate();
 
-            return ps.executeUpdate() > 0;
+            if (rowsAffected > 0) {
+                logger.info("Address updated successfully for userId={}", userId);
+                return true;
+            }else{
+                logger.warn("Address update failed, no rows affected for userId={}", userId);
+                return false;
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQL error while updating address for userId={}", userId, e);
         } catch (Exception e) {
+            logger.error("Unexpected error while updating address for userId={}", userId, e);
             throw new RuntimeException(e);
         }
         return false;
@@ -196,13 +212,15 @@ public class AddressDAO {
                     addr.setWardCode(Objects.requireNonNullElse(rs.getString("ward_code"), ""));
                     addr.setWardName(Objects.requireNonNullElse(rs.getString("ward_name"), ""));
 
+                    logger.debug("Address loaded successfully, addressId={}, userId={}", addr.getId(), userId);
                     return addr;
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQL error while getting address for userId={}", userId, e);
         } catch (Exception e) {
+            logger.error("Unexpected error while getting address for userId={}", userId, e);
             throw new RuntimeException(e);
         }
 
