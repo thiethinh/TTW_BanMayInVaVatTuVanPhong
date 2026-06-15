@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <fmt:setLocale value="vi_VN"/>
-<fmt:setTimeZone value="Asia/Ho_Chi_Minh" />
+<fmt:setTimeZone value="Asia/Ho_Chi_Minh"/>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -52,9 +52,20 @@
                                 <tr>
                                     <td>${o.id}</td>
                                     <td>${o.shippingName}</td>
-                                    <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm" timeZone="Asia/Ho_Chi_Minh"/></td>
+                                    <td><fmt:formatDate value="${o.createdAt}" pattern="dd/MM/yyyy HH:mm"
+                                                        timeZone="Asia/Ho_Chi_Minh"/></td>
                                     <td><fmt:formatNumber value="${o.totalPrice}" pattern="#.###"/> đ</td>
-                                    <td><span class="status ${o.status}">${o.status}</span></td>
+                                    <td>
+                                        <span class="status ${o.status}">
+                                            <c:choose>
+                                                <c:when test="${o.status == 'pending'}">Chờ Xử Lý</c:when>
+                                                <c:when test="${o.status == 'shipped'}">Đã Gửi</c:when>
+                                                <c:when test="${o.status == 'completed'}">Hoàn Thành</c:when>
+                                                <c:when test="${o.status == 'canceled'}">Đã Hủy</c:when>
+                                                <c:otherwise>${o.status}</c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </td>
                                     <td>
                                         <a href="${pageContext.request.contextPath}/order-view?orderId=${o.id}"
                                            class="btn-action view">Xem</a>

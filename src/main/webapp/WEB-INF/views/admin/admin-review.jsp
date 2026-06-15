@@ -31,7 +31,7 @@
                 <input type="hidden" name="action" value="search-time">
                 <input type="date" name="date" value="${dateSearch}" class="date-input">
                 <button type="submit" id="bt-search">
-                    🔍 Tìm kiếm
+                    Tìm kiếm
                 </button>
             </form>
 

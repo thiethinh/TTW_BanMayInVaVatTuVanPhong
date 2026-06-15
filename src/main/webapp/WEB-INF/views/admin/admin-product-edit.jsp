@@ -102,12 +102,12 @@
 
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group">
-                        <label for="product-stock">Số lượng kho</label>
-                        <input type="number" id="product-stock" name="stock" class="form-input"
+                        <label for="product-stock">Số lượng kho (Chỉ xem)</label>
+                        <input type="number" id="product-stock" name="stock" class="form-input" readonly
                                value="${product.stockQuantity}" required>
                     </div>
                     <div class="form-group">
-                        <label>Giá bán ra (Read Only)</label>
+                        <label>Giá bán ra (Chỉ xem)</label>
                         <input type="text" class="form-input" value="${product.price}" disabled
                                style="background: #f0f0f0;">
                     </div>
