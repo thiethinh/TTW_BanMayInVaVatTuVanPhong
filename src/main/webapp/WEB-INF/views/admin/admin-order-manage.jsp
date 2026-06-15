@@ -57,13 +57,12 @@
         <section class="content-table-view">
             <div class="filter">
                 <label for="statusFilter"><i class="fa fa-filter"></i> Lọc theo trạng thái:</label>
-                <select id="statusFilter" onchange="location.href='?action=filter-status&status=' + this.value;">
-                    <option value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
-                    <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Chờ Xử Lý</option>
-                    <option value="shipped" ${param.status == 'shipped' ? 'selected' : ''}>Đã Gửi</option>
-                    <option value="completed" ${param.status == 'completed' ? 'selected' : ''}>Hoàn Thành</option>
-                    <option value="canceled" ${param.status == 'canceled' ? 'selected' : ''}>Đã Hủy</option>
-                    <%-- <option value="hidden" ${param.status == 'hidden' ? 'selected' : ''}>Đã Ẩn</option>--%>
+                <select id="statusFilter" onchange="location.href='?action=filter-status&status=' + this.value;" disabled>
+                    <option disabled value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
+                    <option disabled value="pending" ${param.status == 'pending' ? 'selected' : ''}>Chờ Xử Lý</option>
+                    <option disabled value="shipped" ${param.status == 'shipped' ? 'selected' : ''}>Đã Gửi</option>
+                    <option disabled value="completed" ${param.status == 'completed' ? 'selected' : ''}>Hoàn Thành</option>
+                    <option disabled value="canceled" ${param.status == 'canceled' ? 'selected' : ''}>Đã Hủy</option>
                 </select>
             </div>
 

@@ -73,8 +73,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="product-amount">Số lượng kho</label>
-                        <input type="text" id="product-amount" name="stock" class="form-input"
+                        <label for="product-amount">Số lượng kho (Mặc định)</label>
+                        <input type="text" id="product-amount" name="stock" class="form-input" value="0" readonly
                                placeholder="Số lượng: 10" required>
                     </div>
                 </div>
