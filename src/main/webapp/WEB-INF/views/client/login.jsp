@@ -189,13 +189,15 @@
                 </div>
 
                 <div class="social-login">
-                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=http://localhost:8080/papercraft/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
+                    <c:set var="baseUrl" value="${pageContext.request.scheme}://${pageContext.request.serverName}${pageContext.request.serverPort != 80 && pageContext.request.serverPort != 443 ? ':' += pageContext.request.serverPort : ''}${pageContext.request.contextPath}" />
+
+                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=${baseUrl}/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
                        class="btn btn-google">
                         <img src="${pageContext.request.contextPath}/images/google-logo.svg"
                              alt="Đăng nhập bằng Google">
                     </a>
 
-                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &redirect_uri=http://localhost:8080/papercraft/facebook-login&scope=email,public_profile"
+                    <a href="https://www.facebook.com/v19.0/dialog/oauth?client_id= &redirect_uri=${baseUrl}/facebook-login&scope=email,public_profile"
                        class="btn btn-facebook">
                         <img src="${pageContext.request.contextPath}/images/facebook-logo.svg"
                              alt="Đăng nhập bằng Facebook">
