@@ -32,8 +32,21 @@ public class GoogleLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String code = request.getParameter("code");
-        String requestUrl = request.getRequestURL().toString();
-        String redirectUri = requestUrl.split("\\?")[0];
+        String scheme = request.getHeader("X-Forwarded-Proto");
+        String serverName = request.getHeader("X-Forwarded-Host");
+
+        if (scheme == null) {
+            scheme = request.getScheme();
+        }
+        if (serverName == null) {
+            serverName = request.getServerName();
+            int port = request.getServerPort();
+            if (port != 80 && port != 443) {
+                serverName += ":" + port;
+            }
+        }
+
+        String redirectUri = scheme + "://" + serverName + request.getContextPath() + "/google-login";
 
         if (code == null || code.isEmpty()) {
             logger.warn("Google login failed: 'code' parameter not received from Google OAuth.");

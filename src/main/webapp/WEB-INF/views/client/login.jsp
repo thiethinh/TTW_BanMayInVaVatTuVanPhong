@@ -189,7 +189,11 @@
                 </div>
 
                 <div class="social-login">
-                    <c:set var="baseUrl" value="${pageContext.request.scheme}://${pageContext.request.serverName}${pageContext.request.serverPort != 80 && pageContext.request.serverPort != 443 ? ':' += pageContext.request.serverPort : ''}${pageContext.request.contextPath}" />
+                    <c:set var="proxyScheme" value="${not empty header['X-Forwarded-Proto'] ? header['X-Forwarded-Proto'] : pageContext.request.scheme}" />
+                    <c:set var="proxyHost" value="${not empty header['X-Forwarded-Host'] ? header['X-Forwarded-Host'] : pageContext.request.serverName}" />
+                    <c:set var="proxyPort" value="${pageContext.request.serverPort}" />
+
+                    <c:set var="baseUrl" value="${proxyScheme}://${proxyHost}${empty header['X-Forwarded-Host'] && proxyPort != 80 && proxyPort != 443 ? ':'.concat(proxyPort) : ''}${pageContext.request.contextPath}" />
 
                     <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile&response_type=code&redirect_uri=${baseUrl}/google-login&client_id=1017456100003-la7556j2pllifg2o4bm3oiin8atofdg8.apps.googleusercontent.com"
                        class="btn btn-google">
