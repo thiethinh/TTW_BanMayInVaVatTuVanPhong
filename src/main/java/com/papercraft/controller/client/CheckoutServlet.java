@@ -420,8 +420,10 @@ public class CheckoutServlet extends HttpServlet {
                 vnp_Params.put("vnp_ReturnUrl", VNPAYConfig.getReturnUrl(request));
                 vnp_Params.put("vnp_IpAddr", VNPAYConfig.getIpAddress(request));
 
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+                formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
                 String vnp_CreateDate = formatter.format(calendar.getTime());
                 vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
