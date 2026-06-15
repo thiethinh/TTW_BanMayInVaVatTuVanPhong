@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
     <Resource
@@ -8,7 +9,8 @@
             factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
             driverClassName="com.mysql.cj.jdbc.Driver"
 
-            url="jdbc:mysql://localhost:3307/papercraft_db?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"
+            url="jdbc:mysql://db:3306/papercraft_db?useSSL=false&amp;allowPublicKeyRetrieval=true"
+
             username="root"
             password="1"
 
