@@ -11,17 +11,25 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
 
   webapp:
     build: .
     container_name: papercraft-web
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
+      DB_HOST: db
+      DB_PORT: 3306
 
 volumes:
   mysql-data:
