@@ -187,7 +187,8 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     outline: none;
     cursor: pointer;
     transition: all 0.25s ease;
-    min-width: 140px;
+    max-width: 80px;
+    text-align: center;
     color: white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }

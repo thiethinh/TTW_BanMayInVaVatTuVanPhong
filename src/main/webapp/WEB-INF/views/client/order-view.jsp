@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <fmt:setTimeZone value="Asia/Ho_Chi_Minh" />
 <!DOCTYPE html>
@@ -108,8 +109,9 @@
                                         </td>
                                         <td>${oi.product.productName}</td>
                                         <td style="text-align: center;">${oi.quantity}</td>
-                                        <td><fmt:formatNumber value="${oi.price}" pattern="#.###"/> đ</td>
-                                        <td><fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#.###"/> đ</td>
+                                        <fmt:formatNumber value="${oi.price}" pattern="#,##0" var="priceFormatted"/><td>${fn:replace(priceFormatted, ',', '.')} đ</td>
+                                        <fmt:formatNumber value="${oi.price * oi.quantity}" pattern="#,##0" var="itemTotalFormatted"/><td>${fn:replace(itemTotalFormatted, ',', '.')} đ</td>
+
                                     </tr>
                                 </c:forEach>
                                 </tbody>
@@ -125,14 +127,11 @@
                         <div class="bill-details">
                             <div class="summary-bill">
                                 <h4>Tóm tắt thanh toán: </h4>
-                                <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice - order.shippingFee}"
-                                                                      pattern="#.###"/> đ</span></p>
-                                <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}"
-                                                                            pattern="#.###"/> đ</span>
+                                <p> Tạm tính: <span><fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#,##0" var="subtotalFormatted"/>${fn:replace(subtotalFormatted, ',', '.')} đ</span></p>
+                                <p> Phí vận chuyển: <span><fmt:formatNumber value="${order.shippingFee}" pattern="#,##0" var="shippingFormatted"/>${fn:replace(shippingFormatted, ',', '.')} đ</span>
                                 </p>
                                 <p> Thuế(VAT): <span>Đã bao gồm</span></p>
-                                <h3>Tổng Cộng: <span style="color: red"><fmt:formatNumber value="${order.totalPrice}"
-                                                                                          pattern="#.###"/> đ</span>
+                                <h3>Tổng Cộng: <span style="color: red"><fmt:formatNumber value="${order.totalPrice}" pattern="#,##0" var="totalFormatted"/>${fn:replace(totalFormatted, ',', '.')} đ</span>
                                 </h3>
                             </div>
 

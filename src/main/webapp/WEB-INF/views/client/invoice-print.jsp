@@ -1,7 +1,10 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<fmt:setLocale value="vi_VN"/>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -66,10 +69,11 @@
             <td>${oi.product.productName}</td>
             <td class="text-center">${oi.quantity}</td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.price}" pattern="#.###"/> đ
+                <fmt:formatNumber value="${oi.price}" pattern="#,##0" var="priceFormatted" />${fn:replace(priceFormatted, ',', '.')} đ
             </td>
             <td class="text-right">
-                <fmt:formatNumber value="${oi.total}" pattern="#.###"/> đ
+                <fmt:formatNumber value="${oi.total}" pattern="#,##0" var="totalFormatted" />${fn:replace(totalFormatted, ',', '.')} đ
+
             </td>
         </tr>
     </c:forEach>
@@ -81,13 +85,16 @@
         <tr>
             <td>Tạm tính:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" pattern="#.###"/> đ
+                <c:set var="subtotal" value="${order.totalPrice - order.shippingFee}" />
+                <fmt:formatNumber value="${subtotal}" pattern="#,##0" var="subtotalFormatted" />
+                ${fn:replace(subtotalFormatted, ',', '.')} đ
             </td>
         </tr>
         <tr>
             <td>Phí vận chuyển:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.shippingFee}" pattern="#.###"/> đ
+                <fmt:formatNumber value="${order.shippingFee}" pattern="#,##0" var="shippingFormatted" />${fn:replace(shippingFormatted, ',', '.')} đ
+
             </td>
         </tr>
         <tr>
@@ -97,7 +104,7 @@
         <tr class="total">
             <td>TỔNG CỘNG:</td>
             <td class="text-right">
-                <fmt:formatNumber value="${order.totalPrice}" pattern="#.###"/> đ
+                <fmt:formatNumber value="${order.totalPrice}" pattern="#,##0" var="orderTotalFormatted" />${fn:replace(orderTotalFormatted, ',', '.')} đ
             </td>
         </tr>
     </table>

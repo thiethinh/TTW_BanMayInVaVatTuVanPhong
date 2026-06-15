@@ -57,12 +57,12 @@
         <section class="content-table-view">
             <div class="filter">
                 <label for="statusFilter"><i class="fa fa-filter"></i> Lọc theo trạng thái:</label>
-                <select id="statusFilter" onchange="location.href='?action=filter-status&status=' + this.value;" disabled>
-                    <option disabled value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
-                    <option disabled value="pending" ${param.status == 'pending' ? 'selected' : ''}>Chờ Xử Lý</option>
-                    <option disabled value="shipped" ${param.status == 'shipped' ? 'selected' : ''}>Đã Gửi</option>
-                    <option disabled value="completed" ${param.status == 'completed' ? 'selected' : ''}>Hoàn Thành</option>
-                    <option disabled value="canceled" ${param.status == 'canceled' ? 'selected' : ''}>Đã Hủy</option>
+                <select id="statusFilter" onchange="location.href='?action=filter-status&status=' + this.value;" >
+                    <option  value="" ${param.status == '' ? 'selected' : ''}>Tất cả</option>
+                    <option  value="pending" ${param.status == 'pending' ? 'selected' : ''}>Chờ Xử Lý</option>
+                    <option  value="shipped" ${param.status == 'shipped' ? 'selected' : ''}>Đã Gửi</option>
+                    <option  value="completed" ${param.status == 'completed' ? 'selected' : ''}>Hoàn Thành</option>
+                    <option  value="canceled" ${param.status == 'canceled' ? 'selected' : ''}>Đã Hủy</option>
                 </select>
             </div>
 
@@ -93,18 +93,15 @@
                                 <td><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
 
                                 <td>
-                                    <select class="state-order-select ${o.status}"
-                                            onchange="location.href='?action=change-status&id=${o.id}&status-order=' + this.value;">
-                                        <option value="pending" ${o.status == 'pending' ? 'selected' : ''}>Chờ Xử Lý
-                                        </option>
-                                        <option value="shipped" ${o.status == 'shipped' ? 'selected' : ''}>Đã Gửi
-                                        </option>
-                                        <option value="completed" ${o.status == 'completed' ? 'selected' : ''}>Hoàn
-                                            Thành
-                                        </option>
-                                        <option value="canceled" ${o.status == 'canceled' ? 'selected' : ''}>Đã Hủy
-                                        </option>
-                                    </select>
+                                    <div class="state-order-select ${o.status}">
+                                            <span><c:choose>
+                                                <c:when test="${o.status == 'pending'}">Chờ xử lý</c:when>
+                                                <c:when test="${o.status == 'shipped'}">Đang giao hàng</c:when>
+                                                <c:when test="${o.status == 'completed'}">Hoàn thành</c:when>
+                                                <c:when test="${o.status == 'canceled'}">Đã hủy</c:when>
+                                                <c:otherwise>Không xác định</c:otherwise>
+                                            </c:choose></span>
+                                    </div>
                                 </td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/admin/admin-order-view?orderId=${o.id}"
